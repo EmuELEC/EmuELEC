@@ -35,18 +35,27 @@ esac
 
 cd /tmp
 
-case ${1} in
-	*.ytb)
+VIDEO_MODE=general
+IS_YOUTUBE=$(cat "${1}" | grep -E "^https://www.youtube.com/.*")
+[[ ! -z "${IS_YOUTUBE}" ]] && VIDEO_MODE=youtube
+IS_TWITCH=$(cat "${1}" | grep -E "^https://www.twitch.tv/.*")
+[[ ! -z "${IS_TWITCH}" ]] && VIDEO_MODE=twitch
+
+[[ "${1}" == *".ytb" ]] && VIDEO_MODE=youtube
+[[ "${1}" == *".twi" ]] && VIDEO_MODE=twitch
+
+case ${VIDEO_MODE} in
+	youtube)
 		#Youtube Video
 		${player} "/storage/.config/splash/youtube-1080.png"
 		youtube-dl --quiet --no-warnings -o - -a "${1}" | ${player} - > /dev/tty1 2>&1
 	;;
-	*.twi)
+	twitch)
 		# Twitch Video
 		${player}  "/storage/.config/splash/twitch-1080.png" 
 		youtube-dl --quiet --no-warnings -o - -a "${1}" | ${player} - > /dev/tty1 2>&1
 	;;
-	*)
+	general)
 	# Regular video
 	${player} "${1}" #> /dev/tty1 2>&1
 	;;
