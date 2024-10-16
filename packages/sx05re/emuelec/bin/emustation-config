@@ -295,4 +295,10 @@ if [[ ! -f "$REMAP_VERSION" ]]; then
 	echo "2" > "${REMAP_VERSION}"
 fi
 
+RA_CORE_OPTION="/storage/.config/retroarch/retroarch-core-options.cfg"
+HAS_RA_CORE_OPTION_X68K_FDD_FIX=$(cat "${RA_CORE_OPTION}" | grep px68k_save_fdd_path)
+[[ -z "${HAS_RA_CORE_OPTION_X68K_FDD_FIX}" ]] && echo "px68k_save_fdd_path = \"disabled\"" >> "${RA_CORE_OPTION}"
+HAS_RA_CORE_OPTION_X68K_HDD_FIX=$(cat "${RA_CORE_OPTION}" | grep px68k_save_hdd_path)
+[[ -z "${HAS_RA_CORE_OPTION_X68K_HDD_FIX}" ]] && echo "px68k_save_hdd_path = \"disabled\"" >> "${RA_CORE_OPTION}"
+
 exit 0
