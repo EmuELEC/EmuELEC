@@ -547,6 +547,9 @@ if [ "${EE_DEVICE}" == "OdroidGoAdvance" ]; then
         esac
 fi
 
+# Dolphin does not like to be killed?
+[[ "${EMU}" = "dolphin" ]] && ret_error="0"
+
 # Chocolate Doom does not like to be killed?
 [[ "${EMU}" = "Chocolate-Doom" ]] && ret_error="0"
 

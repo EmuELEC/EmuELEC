@@ -171,19 +171,19 @@ set_pad() {
 
   local JOYSTICK="Main Stick"
   local GC_RECORD
-  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}\/Modifier *= *(.*)$")
+  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}/Modifier *= *(.*)$")
   [[ -z "${GC_RECORD}" ]] && echo "${JOYSTICK}/Modifier = Shift_L" >> ${CONFIG_TMP}
-  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}\/Modifier\/Range *= *(.*)$")
+  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}/Modifier/Range *= *(.*)$")
   [[ -z "${GC_RECORD}" ]] && echo "${JOYSTICK}/Modifier/Range = 50.000000000000000" >> ${CONFIG_TMP}
-  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}\/Dead Zone *= *(.*)$")
+  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}/Dead Zone *= *(.*)$")
   [[ -z "${GC_RECORD}" ]] && echo "${JOYSTICK}/Dead Zone = 25.000000000000000" >> ${CONFIG_TMP}
 
   JOYSTICK="C-Stick"
-  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}\/Modifier *= *(.*)$")
+  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}/Modifier *= *(.*)$")
   [[ -z "${GC_RECORD}" ]] && echo "${JOYSTICK}/Modifier = Control_L" >> ${CONFIG_TMP}
-  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}\/Modifier\/Range *= *(.*)$")
+  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}/Modifier/Range *= *(.*)$")
   [[ -z "${GC_RECORD}" ]] && echo "${JOYSTICK}/Modifier/Range = 50.000000000000000" >> ${CONFIG_TMP}
-  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}\/Dead Zone *= *(.*)$")
+  GC_RECORD=$(cat ${CONFIG_TMP} | grep -E "^${JOYSTICK}/Dead Zone *= *(.*)$")
   [[ -z "${GC_RECORD}" ]] && echo "${JOYSTICK}/Dead Zone = 25.000000000000000" >> ${CONFIG_TMP}
 
   cat "${CONFIG_TMP}" | sort >> ${CONFIG}
