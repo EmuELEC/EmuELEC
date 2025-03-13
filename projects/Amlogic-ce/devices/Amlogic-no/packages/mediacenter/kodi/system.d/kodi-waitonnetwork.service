@@ -1,0 +1,20 @@
+[Unit]
+Description=Wait on network
+After=connman.service
+Before=network-online.target
+DefaultDependencies=no
+Conflicts=shutdown.target
+ConditionFileNotEmpty=/storage/.cache/coreelec/network_wait
+ConditionPathExists=!/dev/.kernel_ipconfig
+ConditionPathExists=/storage/.kodi/userdata/addon_data/service.coreelec.settings/oe_settings.xml
+
+[Service]
+Type=oneshot
+EnvironmentFile=/storage/.cache/coreelec/network_wait
+ExecStart=/usr/bin/wait-time-sync --timeout ${WAIT_NETWORK_TIME}
+StandardOutput=tty
+RemainAfterExit=yes
+SuccessExitStatus=1
+
+[Install]
+WantedBy=network-online.target

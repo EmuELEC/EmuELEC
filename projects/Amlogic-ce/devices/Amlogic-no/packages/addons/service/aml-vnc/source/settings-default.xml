@@ -1,0 +1,8 @@
+<settings>
+    <setting id="AML_VNC_PORT" value="5900" />
+    <setting id="AML_VNC_AUTH" value="true" />
+    <setting id="AML_VNC_PWD" value="coreelec" />
+    <setting id="AML_VNC_STAT" value="false" />
+    <setting id="AML_VNC_NAME" value="CoreELEC" />
+</settings>
+

@@ -94,7 +94,7 @@ KILLSIGNAL="15"
 
 if [[ "${CORE}" == *"_32b"* ]]; then
     BIT32="yes"
-    #LD_LIBRARY_PATH="/emuelec/lib32:${LD_LIBRARY_PATH}"
+    LD_LIBRARY_PATH="/emuelec/lib32:/usr/lib32:${LD_LIBRARY_PATH}"
     RABIN="retroarch32"
 else
     BIT32="No"
@@ -448,6 +448,7 @@ else # Retrorun was selected
 # Retrotun does not support settings
     RUNTHIS="retrorun"
     if [ "${BIT32}" == "yes" ]; then
+    LD_LIBRARY_PATH="/emuelec/lib32:/usr/lib32:${LD_LIBRARY_PATH}"
         RUNTHIS+="32"
     fi
 

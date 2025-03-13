@@ -1,0 +1,16 @@
+[Unit]
+Description=Tmate terminal sharing
+After=machine-id.service network-online.target
+ConditionKernelCommandLine=|tmate
+ConditionPathExists=|/storage/.cache/services/tmate.conf
+
+[Service]
+Type=simple
+Environment="TMATE_CONF=/var/run/tmate.conf"
+EnvironmentFile=-/storage/.cache/services/tmate.conf
+ExecStartPre=/usr/lib/libreelec/tmate-pre.sh
+ExecStart=/bin/sh -c ". /etc/profile; /usr/bin/tmate -f ${TMATE_CONF} -F"
+ExecStop=/bin/kill -TERM ${MAINPID}
+
+[Install]
+WantedBy=multi-user.target

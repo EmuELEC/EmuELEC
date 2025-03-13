@@ -13,7 +13,7 @@ PKG_LONGDESC=" GL4ES is a OpenGL 2.1/1.5 to GL ES 2.0/1.1 translation library, w
 PKG_CONFIGURE_OPTS_TARGET="--disable-static --enable-shared"
 
 pre_configure_target() {
-cp -rf $(get_build_dir gl4es)/.install_pkg/usr/lib/gl4es/libGL.so.1 ${SYSROOT_PREFIX}/usr/lib/libGL.so
+cp -rf $(get_build_dir gl4es)/lib/libGL.so.1 ${SYSROOT_PREFIX}/usr/lib/libGL.so
 cp -rf $(get_build_dir gl4es)/include/GL/gl.h ${SYSROOT_PREFIX}/usr/include/GL/gl.h
 cp -rf ${PKG_DIR}/gl.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
 }

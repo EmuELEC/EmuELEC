@@ -1,0 +1,10 @@
+[Unit]
+Description=Copy user edid to dtb
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStop=-/usr/lib/coreelec/dtb-xml -e
+
+[Install]
+WantedBy=multi-user.target

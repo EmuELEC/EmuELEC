@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+message="$message\n There is no working 'installtointernal'."
+message="$message\n "
+message="$message\n On CoreELEC -ng releases 'installtointernal' has been replaced"
+message="$message\n by 'ceemmc'"
+message="$message\n "
+message="$message\n Please refer to the following link for more information:"
+message="$message\n https://discourse.coreelec.org/t/how-to-use-the-team-coreelec-ceemmc-tool/7630"
+message="$message\n "
+
+echo -e $message
+
+exit 1

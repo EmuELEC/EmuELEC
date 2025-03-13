@@ -1,0 +1,49 @@
+diff --git a/include/drv_conf.h b/include/drv_conf.h
+index 5ad652e..f1ae864 100755
+--- a/include/drv_conf.h
++++ b/include/drv_conf.h
+@@ -711,8 +711,4 @@ power down etc.) in last time, we can unmark this flag to avoid some unpredictab
+ */
+ #define RTW_WKARD_TRIGGER_FRAME_PARSER
+ 
+-#if !defined(strlcpy)
+-#define strlcpy(a, b, c) strscpy(a, b, c)
+-#endif
+-
+ #endif /* __DRV_CONF_H__ */
+diff --git a/include/osdep_service_linux.h b/include/osdep_service_linux.h
+index b15cbc9..4d43be4 100755
+--- a/include/osdep_service_linux.h
++++ b/include/osdep_service_linux.h
+@@ -1082,11 +1082,6 @@ static inline void rtw_dump_stack(void)
+ #endif
+ #endif
+ 
+-#ifndef static_assert
+-#define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+-#define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+-#endif
+-
+ #ifdef CONFIG_PCI_HCI
+ /* Extended Capabilities (PCI-X 2.0 and Express) */
+ #ifndef PCI_EXT_CAP_ID_L1SS
+diff --git a/os_dep/linux/os_ch_utils.c b/os_dep/linux/os_ch_utils.c
+index 5ec049f..a725e75 100644
+--- a/os_dep/linux/os_ch_utils.c
++++ b/os_dep/linux/os_ch_utils.c
+@@ -115,7 +115,6 @@ const enum nl80211_band _rtw_band_to_nl80211_band[] = {
+ 	[BAND_ON_6G]	= NUM_NL80211_BANDS,
+ 	#endif
+ };
+-static_assert(ARRAY_SIZE(_rtw_band_to_nl80211_band) >= BAND_MAX);
+ 
+ const enum band_type _nl80211_band_to_rtw_band[] = {
+ 	[NL80211_BAND_2GHZ]	= BAND_ON_24G,
+@@ -137,7 +136,6 @@ const enum band_type _nl80211_band_to_rtw_band[] = {
+ 	[NL80211_BAND_LC]	= BAND_MAX,	/* light communication band (placeholder) */
+ #endif
+ };
+-static_assert(ARRAY_SIZE(_nl80211_band_to_rtw_band) >= NUM_NL80211_BANDS);
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+ const char *nl80211_chan_width_str(enum nl80211_chan_width cwidth)

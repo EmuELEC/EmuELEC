@@ -1,0 +1,15 @@
+[Unit]
+Description=Entware service
+After=systemd-tmpfiles-setup.service network-online.target
+Before=kodi.service
+Requires=network-online.target
+ConditionPathExists=/opt/etc/init.d/rc.unslung
+
+[Service]
+Type=oneshot
+ExecStart=/opt/etc/init.d/rc.unslung start
+ExecStop=/opt/etc/init.d/rc.unslung stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

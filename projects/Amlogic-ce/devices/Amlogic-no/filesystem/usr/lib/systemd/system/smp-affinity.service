@@ -1,0 +1,13 @@
+[Unit]
+Description=Set smp_affinity from script
+Before=kodi.service
+After=graphical.target
+ConditionPathExists=/usr/lib/coreelec/smp-affinity.sh
+
+[Service]
+Type=oneshot
+ExecStart=-/bin/sh /usr/lib/coreelec/smp-affinity.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=kodi.service

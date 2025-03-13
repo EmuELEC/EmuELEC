@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib
+includedir=${prefix}/include
+
+Name: egl
+Description: libhybris EGL library
+# Set to 7.10 because some package like weston are usually built
+# against mesa and because of that expect certain version from egl.
+Version: 7.10
+Libs: -L${libdir} -lEGL
+Cflags: -I${includedir}

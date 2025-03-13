@@ -1,0 +1,6 @@
+################################################################################
+# udev rules file for loading qca-firmware-aml
+################################################################################
+
+ACTION=="add", SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x0271", ATTRS{device}=="0x0[578]0?", \
+  TAG+="systemd", ENV{SYSTEMD_WANTS}+="qca-firmware-aml.service"

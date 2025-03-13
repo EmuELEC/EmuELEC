@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="@PKG_ADDON_ID@"
+       name="@ADDON_NAME@"
+       version="@ADDON_VERSION@"
+       provider-name="@PROVIDER_NAME@">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py">
+    <provides/>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="de_DE">Homatics LED Kit Modus</summary>
+    <summary lang="en_GB">Homatics LED Kit mode</summary>
+    <summary lang="hu_HU">Homatics LED Kit üzemmód</summary>
+    <description lang="de_DE">
+Mit diesem Addon können die LEDs in den Knight-Rider-Modus gesetzt werden, oder ihre Farbe kann einfach angepasst werden...
+Danke an vpeter und FoLeY für die Unterstützung...
+hex grün 122e04, blau 101010, lila 800080, gelb ff4600, tiefblau 0d00bf,
+magenta d8007a, orange f50e00, ff0000 rot, 00000 keine Farbe
+    </description>
+    <description lang="en_GB">
+With this addon, the LEDs can be set to knight rider mode, or their color can be simply customized...
+Thanks to vpeter and FoLeY for the support...
+hex green 122e04, blue 101010, purple 800080, yellow ff4600, deepblue 0d00bf,
+magenta d8007a, orange f50e00, ff0000 red, 00000 no color
+    </description>
+    <description lang="hu_HU">
+A kiegészítővel beállíthatóak a ledek knight Rider módba, vagy simán testreszabható a színük ...
+Köszönet vpeter-nek, és FoLeY-nak a támogatásért...
+hex green 122e04, blue 101010, purple 800080, yellow ff4600,
+deepblue 0d00bf, magenta d8007a, orange f50e00, ff0000 red,
+00000 no color
+    </description>
+    <disclaimer>
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+21.0.2
+- added german translation
+21.0.1
+- added language strings
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>

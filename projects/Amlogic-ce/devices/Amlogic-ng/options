@@ -110,7 +110,8 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS+=" RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8821CU
+    ADDITIONAL_DRIVERS+=" uwe5631-aml RTL8812AU RTL8822BU-aml RTL8822CS-aml RTL8822CU-aml
+                        RTL8852BS-aml RTL8152-aml w1-aml RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8821CU
                         ssv6xxx-aml mt7668-wifi-bt RTL8188FTV-aml RTL8189ES-aml RTL8189FS-aml
                         RTL8723BS-aml RTL8822BS-aml RTL8821CS-aml qca9377-aml
                         qca6174-aml smartchip"

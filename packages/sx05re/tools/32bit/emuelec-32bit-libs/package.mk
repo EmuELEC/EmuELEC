@@ -27,6 +27,10 @@ elif [[ "${DEVICE}" == "Amlogic-ng" ]]; then
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/gondul/r12p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.gondul.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r12p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.dvalin.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so
+elif [[ "${DEVICE}" == "Amlogic-ne" ]]; then
+    cp -rf ${PKG_BUILD}/Amlogic-ne/* ${INSTALL}/
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/gondul/r25p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.gondul.so
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r25p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.dvalin.so
 elif [[ "${DEVICE}" == "Amlogic-old" ]]; then
 	cp -rf ${PKG_BUILD}/Amlogic-old/* ${INSTALL}/
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so

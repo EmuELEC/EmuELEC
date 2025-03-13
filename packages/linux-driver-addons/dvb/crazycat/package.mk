@@ -24,6 +24,18 @@ if [ "${DEVICE}" = "Amlogic-ng" ]; then
   PKG_NEED_UNPACK="${PKG_NEED_UNPACK} $(get_pkg_directory media_tree_aml)"
 fi
 
+if [ "${DEVICE}" = "Amlogic-ne" ]; then
+  PKG_PATCH_DIRS="amlogic-5.4"
+  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} media_tree_aml"
+  PKG_NEED_UNPACK="${PKG_NEED_UNPACK} $(get_pkg_directory media_tree_aml)"
+fi
+
+if [ "${DEVICE}" = "Amlogic-no" ]; then
+  PKG_PATCH_DIRS="amlogic-5.15"
+  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} media_tree_aml"
+  PKG_NEED_UNPACK="${PKG_NEED_UNPACK} $(get_pkg_directory media_tree_aml)"
+fi
+
 pre_make_target() {
   export KERNEL_VER=$(get_module_dir)
   export LDFLAGS=""

@@ -1,0 +1,25 @@
+From 5469b35b9764b5fb9a40d504624ff091f37e9105 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Mon, 4 Nov 2024 10:05:12 +0100
+Subject: [PATCH 2/2] 8812au: fix typo
+
+---
+ rtw8812au.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rtw8812au.c b/rtw8812au.c
+index 947e3e9..f2548f2 100644
+--- a/rtw8812au.c
++++ b/rtw8812au.c
+@@ -19,7 +19,7 @@ static const struct usb_device_id rtw_8812au_id_table[] = {
+ 	  .driver_info = (kernel_ulong_t)&(rtw8812a_hw_spec) },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(0x0409, 0x0408, 0xff, 0xff, 0xff),
+ 	  .driver_info = (kernel_ulong_t)&(rtw8812a_hw_spec) }, /* NEC */
+-	{ USB_DEVICE_AND_INTERFACE_INFO(0x0411, 0x0408, 0xff, 0xff, 0xff),
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x0411, 0x025D, 0xff, 0xff, 0xff),
+ 	  .driver_info = (kernel_ulong_t)&(rtw8812a_hw_spec) }, /* Buffalo */
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(0x04bb, 0x0952, 0xff, 0xff, 0xff),
+ 	  .driver_info = (kernel_ulong_t)&(rtw8812a_hw_spec) }, /* I-O DATA */
+-- 
+2.43.0
+

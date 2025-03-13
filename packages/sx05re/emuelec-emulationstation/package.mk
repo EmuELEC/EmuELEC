@@ -28,6 +28,10 @@ fi
 PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} Crystal"
 
 pre_configure_target() {
+
+# adding audio port for s905w2 and derivatives
+sed -i '/Audiodevices\.push_back("0,1");/a\\t\tAudiodevices.push_back("0,2");\n\t\tAudiodevices.push_back("1,2");' ${PKG_BUILD}/es-app/src/guis/GuiMenu.cpp
+
 PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1 -DGLES2=1 -DENABLE_TTS=1"
 
 # Read api_keys.txt if it exist to add the required keys for cheevos, thegamesdb and screenscrapper. You need to get your own API keys. 
@@ -105,7 +109,9 @@ makeinstall_target() {
 # Remove unused cores
 CORESFILE="${INSTALL}/usr/config/emulationstation/es_systems.cfg"
 
-if [ "${DEVICE}" != "Amlogic-ng" ]; then
+#identifier Amlogic-ng Amlogic-ne Amlogic-no
+if [[ "${DEVICE}" != "Amlogic-ng" || "${DEVICE}" != "Amlogic-ne" || "${DEVICE}" != "Amlogic-no" ]]; then
+
     if [[ ${DEVICE} == "OdroidGoAdvance" || "${DEVICE}" == "GameForce" ]]; then
         remove_cores="mesen-s quicknes mame2016 mesen"
     elif [ "${DEVICE}" == "Amlogic-old" ]; then

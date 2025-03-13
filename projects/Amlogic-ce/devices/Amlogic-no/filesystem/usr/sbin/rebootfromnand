@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2016-2018 kszaq (kszaquitto@gmail.com)
+# Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
+
+if /usr/sbin/fw_printenv whereToBootFrom > /dev/null 2>&1; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
+/usr/sbin/fw_setenv bootfromnand 1

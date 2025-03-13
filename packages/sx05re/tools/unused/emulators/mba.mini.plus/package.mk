@@ -25,7 +25,7 @@ pre_configure_target() {
   
 if [[ "${ARCH}" == "arm" ]]; then
   
-   if [ "${DEVICE}" = "Amlogic-ng" ]; then
+   if [[ "${DEVICE}" == "Amlogic-ng" || "${DEVICE}" == "Amlogic-ne" || "${DEVICE}" == "Amlogic-no" ]]; then
 	PKG_MAKE_OPTS_TARGET="platform=AMLG12B"
   elif [ "${DEVICE}" = "Amlogic-old" ]; then
 	PKG_MAKE_OPTS_TARGET="platform=AMLGX"
@@ -41,7 +41,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   
 else
 
-  if [ "${DEVICE}" = "Amlogic-ng" ]; then
+  if [[ "${DEVICE}" == "Amlogic-ng" || "${DEVICE}" == "Amlogic-ne" || "${DEVICE}" == "Amlogic-no" ]]; then
 	PKG_MAKE_OPTS_TARGET="platform=emuelec-n2"
   elif [ "${DEVICE}" = "Amlogic-old" ]; then
 	PKG_MAKE_OPTS_TARGET="platform=emuelec"

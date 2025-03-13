@@ -59,7 +59,7 @@ PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
 SDL2_DIRECTORY="$(get_pkg_directory SDL2)"
 PKG_PATCH_DIRS+=" ${SDL2_DIRECTORY}/patches" 
 case "${DEVICE}" in
-  'Amlogic-ng'|'Amlogic-old')  # We should've used PROJECT=Amlogic-ce logically, but using these two device names here saves a comparasion (only device needs to be compared)
+  'Amlogic-ng'|'Amlogic-old'|'Amlogic-ne'|'Amlogic-no')  # We should've used PROJECT=Amlogic-ce logically, but using these two device names here saves a comparasion (only device needs to be compared)
     PKG_PATCH_DIRS+=" ${SDL2_DIRECTORY}/patches/Amlogic"
     PKG_CMAKE_OPTS_TARGET+=" -DSDL_MALI=ON -DSDL_KMSDRM=OFF"
   ;;

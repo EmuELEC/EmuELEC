@@ -1,0 +1,11 @@
+[Unit]
+Description=Attach /dev/ttyS1 to BlueZ stack using rtk_h5 type
+Wants=bluetooth.service
+Before=bluetooth.service
+After=dev-ttyS1.device
+
+[Service]
+Type=simple
+ExecStartPre=/usr/sbin/rfkill unblock bluetooth
+ExecStart=/usr/bin/rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5
+ExecStopPost=/usr/sbin/rfkill block bluetooth

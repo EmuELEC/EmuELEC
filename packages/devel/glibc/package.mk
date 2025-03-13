@@ -23,6 +23,9 @@ case "${LINUX}" in
   amlogic-5.4)
     OPT_ENABLE_KERNEL=5.4.0
     ;;
+  amlogic-5.15)
+    OPT_ENABLE_KERNEL=5.15.0
+    ;;
   amlogic-3.14)
     OPT_ENABLE_KERNEL=3.0.0
     ;;

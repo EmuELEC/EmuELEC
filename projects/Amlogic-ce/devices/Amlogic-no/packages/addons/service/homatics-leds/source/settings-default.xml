@@ -1,0 +1,5 @@
+<settings>
+  <setting id="strip_color"   value="red" />
+  <setting id="static_effect" value="effect" />
+  <setting id="number_leds"   value="all" />
+</settings>

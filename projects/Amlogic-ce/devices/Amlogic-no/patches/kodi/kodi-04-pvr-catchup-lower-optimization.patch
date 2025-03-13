@@ -1,0 +1,38 @@
+From 33a6a06b40281cc8668202cd2ded027624af914b Mon Sep 17 00:00:00 2001
+From: Peter <peter.vicman@gmail.com>
+Date: Sun, 21 Apr 2024 15:01:33 +0200
+Subject: [PATCH] make pvr.iptvsimple/inputstream.ffmpegdirect catchup working
+
+checked the difference with Ghidra but don't understand
+why optimization level 3 fails with this method on aarch64
+
+---
+ xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamAddon.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamAddon.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamAddon.cpp
+index 6a4c121..07fdc88 100644
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamAddon.cpp
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamAddon.cpp
+@@ -588,6 +588,9 @@ void CInputStreamAddon::SetSpeed(int speed)
+   m_ifc.inputstream->toAddon->demux_set_speed(m_ifc.inputstream, speed);
+ }
+ 
++#pragma GCC push_options
++#pragma GCC optimize ("O1")
++
+ bool CInputStreamAddon::SeekTime(double time, bool backward, double* startpts)
+ {
+   if (!m_ifc.inputstream->toAddon->demux_seek_time)
+@@ -608,6 +611,8 @@ bool CInputStreamAddon::SeekTime(double time, bool backward, double* startpts)
+   return m_ifc.inputstream->toAddon->demux_seek_time(m_ifc.inputstream, time, backward, startpts);
+ }
+ 
++#pragma GCC pop_options
++
+ void CInputStreamAddon::AbortDemux()
+ {
+   if (m_ifc.inputstream->toAddon->demux_abort)
+-- 
+2.41.0.dirty
+

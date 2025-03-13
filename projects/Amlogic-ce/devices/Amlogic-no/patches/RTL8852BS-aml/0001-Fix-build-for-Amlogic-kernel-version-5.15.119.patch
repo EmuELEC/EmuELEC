@@ -1,0 +1,215 @@
+--- a/core/rtw_br_ext.c	2022-08-14 21:13:04.000000000 +0200
++++ b/core/rtw_br_ext.c	2024-04-12 19:34:27.382104473 +0200
+@@ -14,10 +14,14 @@
+  *****************************************************************************/
+ #define _RTW_BR_EXT_C_
+ 
++#include <generated/uapi/linux/version.h>
++
+ #ifdef __KERNEL__
+ 	#include <linux/if_arp.h>
+ 	#include <net/ip.h>
+-	#include <net/ipx.h>
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
++	#include <net/ipx.h>
++#endif	
+ 	#include <linux/atalk.h>
+ 	#include <linux/udp.h>
+ 	#include <linux/if_pppox.h>
+@@ -886,6 +886,7 @@ int nat25_db_handle(_adapter *priv, stru
+ 		}
+ 	}
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
+ 	/*---------------------------------------------------*/
+ 	/*         Handle IPX and Apple Talk frame          */
+ 	/*---------------------------------------------------*/
+@@ -1106,6 +1107,7 @@ int nat25_db_handle(_adapter *priv, stru
+ 
+ 		return -1;
+ 	}
++#endif
+ 
+ 	/*---------------------------------------------------*/
+ 	/*                Handle PPPoE frame                */
+--- a/os_dep/linux/ioctl_cfg80211.c	2022-08-14 21:13:04.000000000 +0200
++++ b/os_dep/linux/ioctl_cfg80211.c	2024-04-12 19:36:47.294313677 +0200
+@@ -465,7 +465,17 @@ u8 rtw_cfg80211_ch_switch_notify(_adapte
+ 		 *  called by others with block-tx.
+ 		 */
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++/* for aml 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))
++		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false, 0);
++#else
++		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false);
++#endif
++#else
+ 		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, false);
++#endif
+ #else
+ 		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0);
+ #endif
+@@ -476,7 +486,17 @@ u8 rtw_cfg80211_ch_switch_notify(_adapte
+ 	if (!rtw_cfg80211_allow_ch_switch_notify(adapter))
+ 		goto exit;
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++/* for aml 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))
++	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0, 0);
++#else
++	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
++#endif
++#else
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
++#endif
+ 
+ #else
+ 	int freq = rtw_ch2freq(ch);
+@@ -1164,7 +1173,12 @@ check_bss:
+ 		#endif
+ 
+ 		#if defined(CPTCFG_VERSION) || LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++		roam_info.links[0].bssid = cur_network->network.MacAddress;
++#else
+ 		roam_info.bssid = cur_network->network.MacAddress;
++#endif
++
+ 		roam_info.req_ie = pmlmepriv->assoc_req + sizeof(struct rtw_ieee80211_hdr_3addr) + 2;
+ 		roam_info.req_ie_len = pmlmepriv->assoc_req_len - sizeof(struct rtw_ieee80211_hdr_3addr) - 2;
+ 		roam_info.resp_ie = pmlmepriv->assoc_rsp + sizeof(struct rtw_ieee80211_hdr_3addr) + 6;
+@@ -1908,6 +1922,9 @@ exit:
+ }
+ 
+ static int cfg80211_rtw_add_key(struct wiphy *wiphy, struct net_device *ndev
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	, int link_id
++#endif
+ 	, u8 key_index
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+ 	, bool pairwise
+@@ -2070,6 +2087,9 @@ addkey_end:
+ }
+ 
+ static int cfg80211_rtw_get_key(struct wiphy *wiphy, struct net_device *ndev
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	, int link_id
++#endif
+ 	, u8 keyid
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+ 	, bool pairwise
+@@ -2258,6 +2278,9 @@ exit:
+ }
+ 
+ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev,
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	int link_id,
++#endif
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+ 				u8 key_index, bool pairwise, const u8 *mac_addr)
+ #else	/* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) */
+@@ -2278,11 +2301,16 @@ static int cfg80211_rtw_del_key(struct w
+ }
+ 
+ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy,
+-	struct net_device *ndev, u8 key_index
++	struct net_device *ndev,
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	int link_id,
++#endif
++	u8 key_index
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 38)) || defined(COMPAT_KERNEL_RELEASE)
+ 	, bool unicast, bool multicast
+ 	#endif
+ )
++
+ {
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct security_priv *psecuritypriv = &padapter->securitypriv;
+@@ -2326,7 +2354,12 @@ static int cfg80211_rtw_set_default_key(
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
+ int cfg80211_rtw_set_default_mgmt_key(struct wiphy *wiphy,
+-	struct net_device *ndev, u8 key_index)
++	struct net_device *ndev,
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	int link_id,
++#endif
++	u8 key_index)
++
+ {
+ #define SET_DEF_KEY_PARAM_FMT " key_index=%d"
+ #define SET_DEF_KEY_PARAM_ARG , key_index
+@@ -5380,7 +5413,12 @@ static int cfg80211_rtw_change_beacon(st
+ 	return ret;
+ }
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev,
++		unsigned int link_id)
++#else
+ static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev)
++#endif
+ {
+ 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
+ 
+@@ -6328,7 +6366,12 @@ static int cfg80211_rtw_set_monitor_chan
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+ static int cfg80211_rtw_get_channel(struct wiphy *wiphy,
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	struct wireless_dev *wdev, unsigned int link_id,
++#else
+ 	struct wireless_dev *wdev,
++#endif
++
+ 	struct cfg80211_chan_def *chandef)
+ {
+ 	_adapter *padapter = wiphy_to_adapter(wiphy);
+@@ -10482,7 +10525,11 @@ void rtw_wdev_unregister(struct wireless
+ 	rtw_cfg80211_indicate_scan_done(adapter, _TRUE);
+ 
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(COMPAT_KERNEL_RELEASE)
++	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++	if (wdev->links[0].client.current_bss) {
++	#else
+ 	if (wdev->current_bss) {
++	#endif
+ 		RTW_INFO(FUNC_ADPT_FMT" clear current_bss by cfg80211_disconnected\n", FUNC_ADPT_ARG(adapter));
+ 		rtw_cfg80211_indicate_disconnect(adapter, 0, 1);
+ 	}
+--- a/os_dep/linux/recv_linux.c	2022-08-14 21:13:04.000000000 +0200
++++ b/os_dep/linux/recv_linux.c	2024-04-12 19:09:51.233708199 +0200
+@@ -338,8 +338,15 @@ static int napi_recv(_adapter *padapter,
+ 
+ #ifdef CONFIG_RTW_GRO
+ 		if (pregistrypriv->en_gro) {
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
++			rtw_napi_gro_receive(&padapter->napi, pskb);
++			rx_ok = _TRUE;
++#else
+ 			if (rtw_napi_gro_receive(&padapter->napi, pskb) != GRO_DROP)
+ 				rx_ok = _TRUE;
++#endif
++
+ 			goto next;
+ 		}
+ #endif /* CONFIG_RTW_GRO */
+--- a/os_dep/osdep_service_linux.c	2022-08-14 21:13:04.000000000 +0200
++++ b/os_dep/osdep_service_linux.c	2024-04-12 19:40:50.780332187 +0200
+@@ -442,6 +442,9 @@ static int readFile(struct file *fp, cha
+ }
+ 
+ #ifndef CONFIG_RTW_ANDROID
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))
++MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
++#endif
+ static int writeFile(struct file *fp, char *buf, int len)
+ {
+ 	int wlen = 0, sum = 0;

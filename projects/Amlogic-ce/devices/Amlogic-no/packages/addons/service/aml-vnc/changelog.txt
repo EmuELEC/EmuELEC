@@ -1,0 +1,43 @@
+22.0.0
+- add missing service alias
+- hide password on settings page
+
+21.0.6
+- bump package to 1.2.0
+
+21.0.5
+- replace package source git repository
+- creating a source directory with the necessary files and their modifications
+- modify the service start script to be compatible with the new binary
+- add Hungarian translation of the add-on
+- restart service on settings change
+
+21.0.4
+- performance fixes
+
+21.0.3
+- fix resolution issue when used other than native
+
+21.0.2
+- add option to set desktop name (hostname by default)
+
+21.0.1
+- make IPv6 listen port consistent with IPv4 port
+
+20.1.0
+- fix password authentication when building with openssl >=3.0.0
+
+20.0.104
+- update language strings file
+
+103
+- improvements
+
+102
+- libvncserver bump
+
+101
+- CoreELEC rebrand
+
+100
+- Initial release
