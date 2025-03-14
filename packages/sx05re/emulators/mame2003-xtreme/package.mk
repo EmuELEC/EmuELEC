@@ -17,14 +17,14 @@ pre_configure_target() {
   cd ${PKG_BUILD}
   export SYSROOT_PREFIX=${SYSROOT_PREFIX}
 
-  case ${DEVICE} in
-    Amlogic-ng|Amlogic-ogu)
+  case "${DEVICE}" in
+    Amlogic-n* | Amlogic-ogu)
         PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
-      ;;
+        ;;
     Amlogic-old)
         PKG_MAKE_OPTS_TARGET+=" platform=AMLGX"
-      ;;
-  esac
+        ;;
+    esac
   PKG_MAKE_OPTS_TARGET+=" ARCH=\"\" CC=\"${CC}\" NATIVE_CC=\"${CC}\" LD=\"${CC}\""
   
   # PKG_MAKE_OPTS_TARGET=" platform=rpi2 ARCH=\"\" CC=\"${CC}\" NATIVE_CC=\"${CC}\" LD=\"${CC}\""
