@@ -1,0 +1,30 @@
+--- a/src/os/libretro/Makefile
++++ b/src/os/libretro/Makefile
+@@ -137,6 +137,27 @@
+       endif
+    endif
+ 
++# EmuELEC for Amlogic devices
++else ifeq ($(platform), emuelec)
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--version-script=link.T -Wl,--no-undefined
++   CXXFLAGS += -lpthread -marm -mtune=cortex-a53 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7ve -DARM
++   LDFLAGS += -lpthread -static-libgcc -lstdc++
++   HAVE_NEON = 1
++   ARCH = arm
++   BUILTIN_GPU = neon
++   USE_DYNAREC = 1
++else ifeq ($(platform), emuelec-arm64)
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--version-script=link.T -Wl,--no-undefined
++   CXXFLAGS += -lpthread -DARM64
++   LDFLAGS += -lpthread -static-libgcc -lstdc++
++   ARCH = arm64
++   USE_DYNAREC = 1
++
++
+ # iOS
+ else ifneq (,$(findstring ios,$(platform)))
+    CXXFLAGS += $(LTO) $(PTHREAD_FLAGS) -stdlib=libc++
