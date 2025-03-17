@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="c94e4cff856b4f5ce02e15e3321650e62548e819"
+PKG_VERSION="5365639a367790e60c317f3007c222651de1ed08"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="${PKG_SITE}.git"
 PKG_LICENSE="GPLv3"
@@ -173,17 +173,17 @@ makeinstall_target() {
 
   # Updater
   if [ "${ARCH}" == "arm" ]; then
-    sed -i -e "s/# core_updater_buildbot_url = \"http:\/\/buildbot.libretro.com\"/core_updater_buildbot_url = \"http:\/\/buildbot.libretro.com\/nightly\/linux\/armhf\/latest\/\"/" ${INSTALL}/etc/retroarch.cfg
+    sed -i -e "s/# core_updater_buildbot_url = \"http:\/\/buildbot.libretro.com\"/core_updater_buildbot_cores_url = \"http:\/\/buildbot.libretro.com\/nightly\/linux\/armhf\/latest\/\"/" ${INSTALL}/etc/retroarch.cfg
   fi
   
   # Playlists
   echo "playlist_names = \"${RA_PLAYLIST_NAMES}\"" >> ${INSTALL}/etc/retroarch.cfg
   echo "playlist_cores = \"${RA_PLAYLIST_CORES}\"" >> ${INSTALL}/etc/retroarch.cfg
   echo "playlist_entry_rename = \"false\"" >> ${INSTALL}/etc/retroarch.cfg
-  echo "playlist_entry_remove = \"false\"" >> ${INSTALL}/etc/retroarch.cfg
+  echo "playlist_entry_remove_enable = \"2\"" >> ${INSTALL}/etc/retroarch.cfg
 
   #emuelec
-  sed -i -e "s/.*core_updater_buildbot_url =.*/core_updater_buildbot_url = \"http:\/\/dontupdatecores\"/" ${INSTALL}/etc/retroarch.cfg
+  sed -i -e "s/.*core_updater_buildbot_url =.*/core_updater_buildbot_cores_url = \"http:\/\/dontupdatecores\"/" ${INSTALL}/etc/retroarch.cfg
   sed -i -e "s/# input_hotkey_block_delay = \"5\"/input_hotkey_block_delay = \"5\"/" ${INSTALL}/etc/retroarch.cfg
   sed -i -e "s/# menu_show_core_updater = true/\# DONT UPDATE CORES IT WILL BREAK EMUELEC! \n menu_show_core_updater = false/" ${INSTALL}/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" ${INSTALL}/etc/retroarch.cfg
