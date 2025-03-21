@@ -15,7 +15,6 @@ PKG_LONGDESC="PPSSPP Standalone"
 GET_HANDLER_SUPPORT="git"
 PKG_BUILD_FLAGS="-lto"
 
-
 PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_FBDEV=ON \
                         -DUSING_EGL=OFF \
@@ -29,7 +28,6 @@ else
 PKG_CMAKE_OPTS_TARGET+=" -DARMV7=ON"
 fi
 
-
 pre_configure_target() {
 if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
 	sed -i "s|include_directories(/usr/include/drm)|include_directories(${SYSROOT_PREFIX}/usr/include/drm)|" ${PKG_BUILD}/CMakeLists.txt
@@ -42,7 +40,6 @@ pre_make_target() {
   find ${PKG_BUILD} -name build.ninja -exec sed -i "s:isystem :I:g" \{} \;
 }
 
-
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin
     cp ${PKG_DIR}/scripts/*.sh ${INSTALL}/usr/bin
@@ -54,4 +51,4 @@ makeinstall_target() {
     rm ${INSTALL}/usr/config/ppsspp/assets/gamecontrollerdb.txt
     ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt ${INSTALL}/usr/config/ppsspp/assets/gamecontrollerdb.txt
     curl -Lo ${INSTALL}/usr/config/ppsspp/PSP/Cheats/cheat.db https://raw.githubusercontent.com/Saramagrean/CWCheat-Database-Plus-/${CHEAT_DB_VERSION}/cheat.db
-} 
+}
