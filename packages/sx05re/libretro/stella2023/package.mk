@@ -18,34 +18,28 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="retroarch-assets"
-PKG_VERSION="818aca56efd784624a241a12936b5c0864e3ddd8"
-PKG_SHA256="4ab725ff4e016b4c68ebd0de2c60e610cda67c9991b751eaac8fe54bcb9c1189"
-PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/libretro/retroarch-assets"
-PKG_URL="https://github.com/libretro/retroarch-assets/archive/${PKG_VERSION}.tar.gz"
+PKG_NAME="stella2023"
+PKG_VERSION="ca34413ccc6bd684013f2befff3d108ca1e51821"
+PKG_REV="1"
+PKG_LICENSE="GPL2"
+PKG_SITE="https://github.com/libretro/stella2023"
+PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_LONGDESC="RetroArch assets. Background and icon themes for the menu drivers."
-PKG_TOOLCHAIN="manual"
+PKG_PRIORITY="optional"
+PKG_SECTION="libretro"
+PKG_SHORTDESC="Port of Stella to libretro."
+PKG_LONGDESC="Stella is a multi-platform Atari 2600 VCS emulator released under the GNU General Public License (GPL)."
+PKG_TOOLCHAIN="make"
 
 pre_configure_target() {
-  cd ../
-  rm -rf .${TARGET_NAME}
+if [ "${ARCH}" == "arm" ]; then
+PKG_MAKE_OPTS_TARGET=" -C ${PKG_BUILD}/src/os/libretro -f Makefile platform=emuelec"
+else
+PKG_MAKE_OPTS_TARGET=" -C ${PKG_BUILD}/src/os/libretro -f Makefile platform=emuelec-arm64"
+fi
 }
 
 makeinstall_target() {
-  make install INSTALLDIR="${INSTALL}/usr/share/retroarch-assets"
-  
-  
-  # Remove unnecesary Retroarch Assets
-  for i in Automatic branding cfg devtools FlatUX glui nxrgui pkg/wiiu scripts Systematic switch wallpapers COPYING; do
-    rm -rf "${INSTALL}/usr/share/retroarch-assets/${i}"
-  done
-  
-  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic convert.sh NPMApng2PMApng.py; do
-  rm -rf "${INSTALL}/usr/share/retroarch-assets/xmb/${i}"
-  done
-  
-  
-  
+  mkdir -p ${INSTALL}/usr/lib/libretro
+  cp ${PKG_BUILD}/src/os/libretro/stella2023_libretro.so ${INSTALL}/usr/lib/libretro/
 }
