@@ -82,7 +82,7 @@ amiberry.use_retroarch_reset=false
 ; *** Common / Paths
 ; 
 use_gui=no
-kickstart_rom_file=$(FILE_PATH)/kick40068.A1200.rom
+kickstart_rom_file=$(FILE_PATH)/kick40068.A1200
 kickstart_ext_rom_file=
 ide_mb_rom_file=:ENABLED
 flash_file=
@@ -114,8 +114,8 @@ gfx_refreshrate_rtg=50
 gfx_lores=false
 gfx_resolution=hires
 gfx_linemode=none
-gfx_fullscreen_amiga=false
-gfx_fullscreen_picasso=false
+gfx_fullscreen_amiga=true
+gfx_fullscreen_picasso=true
 ntsc=false
 ; 
 ; *** CPU options

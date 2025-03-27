@@ -2,10 +2,10 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="fc0645c51ce095f3f46c4faa70f9afab71d49526"
+PKG_VERSION="ecef2fd19f61e9360869eb9d5ebe1ad4c5019c14"
 PKG_ARCH="aarch64 arm"
 PKG_LICENSE="GPLv3"
-PKG_SITE="https://github.com/midwan/9f6a0f868639e9332cfae22d30531fa2f7894f43amiberry"
+PKG_SITE="https://github.com/midwan/amiberry"
 PKG_URL="https://github.com/midwan/amiberry.git"
 PKG_DEPENDS_TARGET="toolchain linux glibc bzip2 zlib SDL2 SDL2_image SDL2_ttf capsimg freetype libxml2 flac libogg mpg123-compat libpng libmpeg2"
 PKG_LONGDESC="Amiberry is an optimized Amiga emulator for ARM-based boards."
@@ -21,7 +21,7 @@ pre_configure_target() {
     'Amlogic-old')
       DEVICE_PLATFORMS=('a64' 'AMLGX')
       ;;
-    'Amlogic-ng'|'Amlogic-ne'|'Amlogic-no'|'Amlogic-ogu')
+    'Amlogic-ng'|'Amlogic-ne'|'Amlogic-ogu')
       DEVICE_PLATFORMS=('n2' 'AMLG12B')
       ;;
     'OdroidGoAdvance'|'GameForce')
