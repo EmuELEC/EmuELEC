@@ -102,112 +102,123 @@ elif [ "${ACTION_TYPE}" == "blank" ]; then
     SPLASH=${BLANKSPLASH}
 
 elif [ "${ACTION_TYPE}" == "gameloading" ]; then
-    # Standard fallback
+    # Default fallback for game loading splash image
     GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
     if [[ "${MODE}" == *"x"* ]]; then
         GAMELOADINGSPLASH="/storage/.config/splash/loading-game-std.png"
     fi
 
-    ROMNAME=$(basename "${3%.*}")
-    SPLMAP="/emuelec/configs/bezels/arcademap.cfg"
-    SPLNAME=$(sed -n "/`echo ""${PLATFORM}"_"${ROMNAME}" = "`/p" "${SPLMAP}")
-    REALSPL="${SPLNAME#*\"}"
-    REALSPL="${REALSPL%\"*}"
+    # Custom splashscreen settings check
+    CUSTOM_GAME_VIDEO=$(get_ee_setting "ee_customsplashvideo")
+    CUSTOM_GAME_VIDEO_ENABLED=$(get_ee_setting "ee_customsplashvideo.enabled")
+    CUSTOM_GAME_IMAGE=$(get_ee_setting "ee_customsplashimage")
+    CUSTOM_GAME_IMAGE_ENABLED=$(get_ee_setting "ee_customsplashimage.enabled")
 
-    [ ! -z "${ROMNAME}" ] && SPLASH1=$(find ${SPLASHDIR}/${PLATFORM} -iname "${ROMNAME}*.png" -maxdepth 1 | sort -V | head -n 1)
-    [ ! -z "${ROMNAME}" ] && SPLASHVID1=$(find ${SPLASHDIR}/${PLATFORM} -iname "${ROMNAME}*.mp4" -maxdepth 1 | sort -V | head -n 1)
-    [ ! -z "${REALSPL}" ] && SPLASH2=$(find ${SPLASHDIR}/${PLATFORM} -iname "${REALSPL}*.png" -maxdepth 1 | sort -V | head -n 1)
-    [ ! -z "${REALSPL}" ] && SPLASHVID2=$(find ${SPLASHDIR}/${PLATFORM} -iname "${REALSPL}*.mp4" -maxdepth 1 | sort -V | head -n 1)
-
-    SPLASH3="${SPLASHDIR}/${PLATFORM}/launching.png"
-    SPLASHVID3="${SPLASHDIR}/${PLATFORM}/launching.mp4"
-    SPLASH4="${SPLASHDIR}/${PLATFORM}.png"
-    SPLASHVID4="${SPLASHDIR}/${PLATFORM}.mp4"
-    SPLASH5="${SPLASHDIR}/launching.png"
-    SPLASHVID5="${SPLASHDIR}/launching.mp4"
-
-    if [ -f "${SPLASHVID1}" ]; then
-        SPLASH="${SPLASHVID1}"
+    # Check if custom video or image is enabled and exists
+    if [[ "${CUSTOM_GAME_VIDEO_ENABLED}" == "1" ]] && [[ -f "${CUSTOM_GAME_VIDEO}" ]]; then
+        SPLASH="${CUSTOM_GAME_VIDEO}"
         VIDEO=1
-    elif [ -f "${SPLASH1}" ]; then
-        SPLASH="${SPLASH1}"
-        VIDEO=0
-    elif [ -f "${SPLASHVID2}" ]; then
-        SPLASH="${SPLASHVID2}"
-        VIDEO=1
-    elif [ -f "${SPLASH2}" ]; then
-        SPLASH="${SPLASH2}"
-        VIDEO=0
-    elif [ -f "${SPLASHVID3}" ]; then
-        SPLASH="${SPLASHVID3}"
-        VIDEO=1
-    elif [ -f "${SPLASH3}" ]; then
-        SPLASH="${SPLASH3}"
-        VIDEO=0
-    elif [ -f "${SPLASHVID4}" ]; then
-        SPLASH="${SPLASHVID4}"
-        VIDEO=1
-    elif [ -f "${SPLASH4}" ]; then
-        SPLASH="${SPLASH4}"
-        VIDEO=0
-    elif [ -f "${SPLASHVID5}" ]; then
-        SPLASH="${SPLASHVID5}"
-        VIDEO=1
-    elif [ -f "${SPLASH5}" ]; then
-        SPLASH="${SPLASH5}"
+    elif [[ "${CUSTOM_GAME_IMAGE_ENABLED}" == "1" ]] && [[ -f "${CUSTOM_GAME_IMAGE}" ]]; then
+        SPLASH="${CUSTOM_GAME_IMAGE}"
         VIDEO=0
     else
-        # Fallback auf konfigurierbare Optionen
-        GAMELOADINGVIDEO="/storage/roms/splash/${PLATFORM}/launching.mp4"
-        GLOBALGAMELOADINGVIDEO="/storage/roms/splash/launching.mp4"
-        GLOBALGAMELOADINGIMAGE="/storage/roms/splash/launching.png"
-        RANDOMSYSTEMVIDEO=$(get_random_video "/storage/roms/splash/${PLATFORM}")
-        RANDOMVIDEOFILE=$(get_random_video "/storage/roms/splash/video")
+        # ROM-based splashscreen check
+        ROMNAME=$(basename "${3%.*}")
+        SPLMAP="/emuelec/configs/bezels/arcademap.cfg"
+        SPLNAME=$(sed -n "/`echo ""${PLATFORM}"_"${ROMNAME}" = "`/p" "${SPLMAP}")
+        REALSPL="${SPLNAME#*\"}"
+        REALSPL="${REALSPL%\"*}"
 
-        CUSTOM_GAME_VIDEO=$(get_ee_setting "ee_customsplashvideo")
-        CUSTOM_GAME_VIDEO_ENABLED=$(get_ee_setting "ee_customsplashvideo.enabled")
-        CUSTOM_GAME_IMAGE=$(get_ee_setting "ee_customsplashimage")
-        CUSTOM_GAME_IMAGE_ENABLED=$(get_ee_setting "ee_customsplashimage.enabled")
+        # Search for ROM-specific splashscreens (image and video)
+        [ ! -z "${ROMNAME}" ] && SPLASH1=$(find ${SPLASHDIR}/${PLATFORM} -iname "${ROMNAME}*.png" -maxdepth 1 | sort -V | head -n 1)
+        [ ! -z "${ROMNAME}" ] && SPLASHVID1=$(find ${SPLASHDIR}/${PLATFORM} -iname "${ROMNAME}*.mp4" -maxdepth 1 | sort -V | head -n 1)
+        [ ! -z "${REALSPL}" ] && SPLASH2=$(find ${SPLASHDIR}/${PLATFORM} -iname "${REALSPL}*.png" -maxdepth 1 | sort -V | head -n 1)
+        [ ! -z "${REALSPL}" ] && SPLASHVID2=$(find ${SPLASHDIR}/${PLATFORM} -iname "${REALSPL}*.mp4" -maxdepth 1 | sort -V | head -n 1)
 
-        if [[ "${CUSTOM_GAME_VIDEO_ENABLED}" == "1" ]] && [[ -f "${CUSTOM_GAME_VIDEO}" ]]; then
-            SPLASH="${CUSTOM_GAME_VIDEO}"
+        # Default platform-wide splashscreens (image and video)
+        SPLASH3="${SPLASHDIR}/${PLATFORM}/launching.png"
+        SPLASHVID3="${SPLASHDIR}/${PLATFORM}/launching.mp4"
+        SPLASH4="${SPLASHDIR}/${PLATFORM}.png"
+        SPLASHVID4="${SPLASHDIR}/${PLATFORM}.mp4"
+        SPLASH5="${SPLASHDIR}/launching.png"
+        SPLASHVID5="${SPLASHDIR}/launching.mp4"
+
+        # Check for available splashscreens (video or image)
+        if [ -f "${SPLASHVID1}" ]; then
+            SPLASH="${SPLASHVID1}"
             VIDEO=1
-        elif [[ "${CUSTOM_GAME_IMAGE_ENABLED}" == "1" ]] && [[ -f "${CUSTOM_GAME_IMAGE}" ]]; then
-            SPLASH="${CUSTOM_GAME_IMAGE}"
+        elif [ -f "${SPLASH1}" ]; then
+            SPLASH="${SPLASH1}"
             VIDEO=0
-        elif [[ $(get_ee_setting "ee_systemloadingvideo.enabled") == "1" ]] && [[ -f "${GAMELOADINGVIDEO}" ]]; then
-            SPLASH="${GAMELOADINGVIDEO}"
+        elif [ -f "${SPLASHVID2}" ]; then
+            SPLASH="${SPLASHVID2}"
             VIDEO=1
-        elif [[ $(get_ee_setting "ee_randomsystemvideo.enabled") == "1" ]] && [[ -n "${RANDOMSYSTEMVIDEO}" ]]; then
-            SPLASH="${RANDOMSYSTEMVIDEO}"
-            VIDEO=1
-        elif [[ $(get_ee_setting "ee_randomloadingvideo.enabled") == "1" ]] && [[ -n "${RANDOMVIDEOFILE}" ]]; then
-            SPLASH="${RANDOMVIDEOFILE}"
-            VIDEO=1
-        elif [[ $(get_ee_setting "ee_standardloadingvideo.enabled") == "1" ]] && [[ -f "${GLOBALGAMELOADINGVIDEO}" ]]; then
-            SPLASH="${GLOBALGAMELOADINGVIDEO}"
-            VIDEO=1
-        elif [[ $(get_ee_setting "ee_randomimage.enabled") == "1" ]]; then
-            SPLASH=$(get_random_splash "${RANDOMSPLASHDIR}")
+        elif [ -f "${SPLASH2}" ]; then
+            SPLASH="${SPLASH2}"
             VIDEO=0
-        elif [[ $(get_ee_setting "ee_randomsystemimage.enabled") == "1" ]]; then
-            SPLASH=$(get_random_splash "${PLATFORMSPLASHDIR}")
-            VIDEO=0
-        elif [[ $(get_ee_setting "ee_systemsplashimage.enabled") == "1" ]]; then
-            SPLASH="${PLATFORMSPLASHDIR}/launching.png"
-            VIDEO=0
-        elif [[ $(get_ee_setting "ee_standardloadingimage.enabled") == "1" ]] && [[ -f "${GLOBALGAMELOADINGIMAGE}" ]]; then
-            SPLASH="${GLOBALGAMELOADINGIMAGE}"
-            VIDEO=0
-        elif [[ -f "${GLOBALGAMELOADINGVIDEO}" ]]; then
-            SPLASH="${GLOBALGAMELOADINGVIDEO}"
+        elif [ -f "${SPLASHVID3}" ]; then
+            SPLASH="${SPLASHVID3}"
             VIDEO=1
+        elif [ -f "${SPLASH3}" ]; then
+            SPLASH="${SPLASH3}"
+            VIDEO=0
+        elif [ -f "${SPLASHVID4}" ]; then
+            SPLASH="${SPLASHVID4}"
+            VIDEO=1
+        elif [ -f "${SPLASH4}" ]; then
+            SPLASH="${SPLASH4}"
+            VIDEO=0
+        elif [ -f "${SPLASHVID5}" ]; then
+            SPLASH="${SPLASHVID5}"
+            VIDEO=1
+        elif [ -f "${SPLASH5}" ]; then
+            SPLASH="${SPLASH5}"
+            VIDEO=0
         else
-            SPLASH="$GAMELOADINGSPLASH"
-            VIDEO=0
+            # Fallback to configurable splash options
+            GAMELOADINGVIDEO="/storage/roms/splash/${PLATFORM}/launching.mp4"
+            GLOBALGAMELOADINGVIDEO="/storage/roms/splash/launching.mp4"
+            GLOBALGAMELOADINGIMAGE="/storage/roms/splash/launching.png"
+            RANDOMSYSTEMVIDEO=$(get_random_video "/storage/roms/splash/${PLATFORM}")
+            RANDOMVIDEOFILE=$(get_random_video "/storage/roms/splash/video")
+
+            # System loading video fallback
+            if [[ $(get_ee_setting "ee_systemloadingvideo.enabled") == "1" ]] && [[ -f "${GAMELOADINGVIDEO}" ]]; then
+                SPLASH="${GAMELOADINGVIDEO}"
+                VIDEO=1
+            elif [[ $(get_ee_setting "ee_randomsystemvideo.enabled") == "1" ]] && [[ -n "${RANDOMSYSTEMVIDEO}" ]]; then
+                SPLASH="${RANDOMSYSTEMVIDEO}"
+                VIDEO=1
+            elif [[ $(get_ee_setting "ee_randomloadingvideo.enabled") == "1" ]] && [[ -n "${RANDOMVIDEOFILE}" ]]; then
+                SPLASH="${RANDOMVIDEOFILE}"
+                VIDEO=1
+            elif [[ $(get_ee_setting "ee_standardloadingvideo.enabled") == "1" ]] && [[ -f "${GLOBALGAMELOADINGVIDEO}" ]]; then
+                SPLASH="${GLOBALGAMELOADINGVIDEO}"
+                VIDEO=1
+            elif [[ $(get_ee_setting "ee_randomimage.enabled") == "1" ]]; then
+                SPLASH=$(get_random_splash "${RANDOMSPLASHDIR}")
+                VIDEO=0
+            elif [[ $(get_ee_setting "ee_randomsystemimage.enabled") == "1" ]]; then
+                SPLASH=$(get_random_splash "${PLATFORMSPLASHDIR}")
+                VIDEO=0
+            elif [[ $(get_ee_setting "ee_systemsplashimage.enabled") == "1" ]]; then
+                SPLASH="${PLATFORMSPLASHDIR}/launching.png"
+                VIDEO=0
+            elif [[ $(get_ee_setting "ee_standardloadingimage.enabled") == "1" ]] && [[ -f "${GLOBALGAMELOADINGIMAGE}" ]]; then
+                SPLASH="${GLOBALGAMELOADINGIMAGE}"
+                VIDEO=0
+            elif [[ -f "${GLOBALGAMELOADINGVIDEO}" ]]; then
+                SPLASH="${GLOBALGAMELOADINGVIDEO}"
+                VIDEO=1
+            else
+                SPLASH="$GAMELOADINGSPLASH"
+                VIDEO=0
+            fi
         fi
     fi
 fi
+
+
 
 
 # Odroid Go Advance still does not support splash screens
