@@ -4,5 +4,15 @@
 # Copyright (C) 2016-2018 kszaq (kszaquitto@gmail.com)
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
-if /usr/sbin/fw_printenv whereToBootFrom > /dev/null 2>&1; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
-/usr/sbin/fw_setenv bootfromnand 1
+DT_ID=$(cat /proc/device-tree/amlogic-dt-id 2>/dev/null | tr -d '\0')
+
+# Check if Fire TV Cube (g12brevb_raven_2g) 
+if [ "${DT_ID}" = "g12brevb_raven_2g" ]; then
+  /sbin/reboot quiescent
+else
+  if /usr/sbin/fw_printenv whereToBootFrom > /dev/null 2>&1; then
+    /usr/sbin/fw_setenv whereToBootFrom internal
+  fi
+  
+  /usr/sbin/fw_setenv bootfromnand 1
+fi
