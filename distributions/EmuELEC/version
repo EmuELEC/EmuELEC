@@ -2,13 +2,13 @@
   OS_MAJOR="4"
 
 # OS_MINOR: OS minor Version
-  OS_MINOR="7"
+  OS_MINOR="8"
 
 # OS_VERSION: OS Version
   OS_VERSION="${OS_MAJOR}.${OS_MINOR}"
 
 # OS_CODENAME: OS Codename
-  OS_CODENAME="Nexus"
+  OS_CODENAME="retroarch"
 
 # OS_STAGE: OS Release Stage (alpha, beta, rc, build)
   OS_STAGE="alpha"
