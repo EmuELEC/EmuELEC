@@ -3,7 +3,7 @@
 
 PKG_NAME="multiemu"
 PKG_VERSION="20db0f242e4e11a476b548dd57d2ef9cc3e84f03"
-PKG_SHA256="8c414d6dea547d6819cc91be5bfbe1a6ce8d7ec71083e42046c489ebff7c4c73"
+PKG_SHA256="34ff9d9ae69bcd9a3108804c964630b94b8819b242d9092e8f4a699d79cfcfed"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame"
