@@ -602,5 +602,6 @@ if [[ "${ret_error}" != "0" ]]; then
 else
     echo "exit 0" >> ${EMUELECLOG}
     blank_buffer
+	echo "return_from_game" > /tmp/es_return_from_game
     exit 0
 fi
