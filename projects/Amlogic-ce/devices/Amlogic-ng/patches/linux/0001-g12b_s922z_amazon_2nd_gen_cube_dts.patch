@@ -1,0 +1,543 @@
+From ad806b6b591fdf43b586a3323a963ec49a5ff05e Mon Sep 17 00:00:00 2001
+Date: Wed, 9 Jul 2025 17:19:53 -0400
+Subject: [PATCH] Add DTS for g12b_s922z_amazon_2nd_gen_cube and update
+ Makefile
+
+---
+ arch/arm64/boot/dts/amlogic/Makefile          |   1 +
+ .../g12b_s922z_amazon_2nd_gen_cube.dts        | 511 ++++++++++++++++++
+ 2 files changed, 512 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/amlogic/g12b_s922z_amazon_2nd_gen_cube.dts
+
+diff --git a/arch/arm64/boot/dts/amlogic/Makefile b/arch/arm64/boot/dts/amlogic/Makefile
+index 9a58fe36b8b4..f216dcf7ca79 100644
+--- a/arch/arm64/boot/dts/amlogic/Makefile
++++ b/arch/arm64/boot/dts/amlogic/Makefile
+@@ -33,6 +33,7 @@ dtb-$(CONFIG_ARM64) += g12b_s922x_ugoos_am6b_rev_a_2g.dtb
+ dtb-$(CONFIG_ARM64) += g12b_s922x_ugoos_am6b_rev_a_4g.dtb
+ dtb-$(CONFIG_ARM64) += g12b_s922x_x88_king_rev_a.dtb
+ dtb-$(CONFIG_ARM64) += g12b_s922x_bananapi_m2s.dtb
++dtb-$(CONFIG_ARM64) += g12b_s922z_amazon_2nd_gen_cube.dtb
+ dtb-$(CONFIG_ARM64) += sc2_s905x4_2g.dtb
+ dtb-$(CONFIG_ARM64) += sc2_s905x4_2g_1gbit.dtb
+ dtb-$(CONFIG_ARM64) += sc2_s905x4_4g.dtb
+diff --git a/arch/arm64/boot/dts/amlogic/g12b_s922z_amazon_2nd_gen_cube.dts b/arch/arm64/boot/dts/amlogic/g12b_s922z_amazon_2nd_gen_cube.dts
+new file mode 100644
+index 000000000000..b5a54f15ec9b
+--- /dev/null
++++ b/arch/arm64/boot/dts/amlogic/g12b_s922z_amazon_2nd_gen_cube.dts
+@@ -0,0 +1,511 @@
++#include "coreelec_g12b.dtsi"
++
++/{
++	model = "Amazon Fire TV 2nd gen Cube";
++	coreelec-dt-id = "g12b_s922z_amazon_2nd_gen_cube";
++	amlogic-dt-id = "g12brevb_raven_2g";
++
++	
++	memory@00000000 {
++		device_type = "memory";
++		linux,usable-memory = <0x00 0x00 0x00 0x80000000>;
++	};
++	
++	reserved-memory {
++
++		linux,secmon {
++			size = <0x00 0x2400000>;
++			alloc-ranges = <0x00 0x5000000 0x00 0x2400000>;
++			/delete-property/ clear-map;
++		};
++		
++		linux,meson-fb {
++			alloc-ranges = <0x00 0x7f800000 0x00 0x800000>;
++		};
++	};		
++
++	bifrost {
++
++		dvfs285_cfg {
++			threshold = <0x64 0xbe>;
++		};
++
++		dvfs500_cfg {
++			threshold = <0xb4 0xdc>;
++		};
++
++		dvfs666_cfg {
++			threshold = <0xd2 0xec>;
++		};
++
++		dvfs850_cfg {
++			threshold = <0xe6 0xff>;
++		};
++	};
++	
++	secmon {
++		reserve_mem_size = <0x2300000>;
++	};
++
++	/delete-node/ ethernet@ff3f0000;
++	
++	pinctrl@ff800014 {
++	
++		/delete-node/ jtag_apao_pin;
++		
++		/delete-node/ spdifout;
++		
++		/delete-node/ spdifout_a_mute;
++	};
++	
++	pinctrl@ff634480 {
++		
++		/delete-node/ jtag_apee_pin;		
++
++		tdmout_a: tdmout_a {
++			mux {
++				groups = "tdma_sclk\0tdma_fs\0tdma_dout0";
++				function = "tdma_out";
++			};
++		};
++
++		tdmin_a: tdmin_a {
++			mux {
++				groups = "tdma_din1";
++				function = "tdma_in";
++			};
++		};
++
++		tdmc_mclk: tdmc_mclk {
++			mux {
++				groups = "mclk1_a";
++				function = "mclk1";
++			};
++		};
++
++		tdmout_c: tdmout_c {
++			mux {
++				groups = "tdmc_sclk_a\0tdmc_fs_a";
++				function = "tdmc_out";
++				drive-strength = <0x03>;
++			};
++		};
++
++		tdmin_c: tdmin_c {
++			mux {
++				groups = "tdmc_din0_a";
++				function = "tdmc_in";
++				drive-strength = <0x03>;
++			};
++		};
++
++		spdifin: spdifin {
++			mux {
++				groups = "spdif_in_h";
++				function = "spdif_in";
++			};
++		};
++	};
++
++	usb3phy@ffe09080 {
++		gpio-vbus-power = "GPIOH_4";
++		gpios = <&gpio GPIOH_4 GPIO_ACTIVE_HIGH>;
++	};
++
++	/delete-node/ jtag;
++	
++	soc {
++		cbus@ffd00000 {
++			i2c@1c000 {  
++				/delete-node/ rt5651@1a;
++			
++				is31fl3236@3F {
++					compatible = "issi,is31fl3236,gva";
++					reg = <0x3f>;
++					#address-cells = <1>;
++					#size-cells = <0>;
++	
++					led@1 {
++						reg_offset = <1>;
++						label = "led1";
++					};
++
++					led@2 {
++						reg_offset = <2>;
++						label = "led2";
++					};
++
++					led@3 {
++						reg_offset = <3>;
++						label = "led3";
++					};
++
++					led@4 {
++						reg_offset = <4>;
++						label = "led4";
++					};
++					
++					led@5 {
++						reg_offset = <5>;
++						label = "led5";
++					};
++					
++					led@6 {
++						reg_offset = <6>;
++						label = "led6";
++					};
++
++					led@7 {
++						reg_offset = <7>;
++						label = "led7";
++					};
++
++					led@8 {
++						reg_offset = <8>;
++						label = "led8";
++					};
++
++					led@9 {
++						reg_offset = <9>;
++						label = "led9";
++					};
++
++					led@10 {
++						reg_offset = <10>;
++						label = "led10";
++					};
++					
++					led@11 {
++						reg_offset = <11>;
++						label = "led11";
++					};
++
++					led@12 {
++						reg_offset = <12>;
++						label = "led12";
++					};
++
++					led@13 {
++						reg_offset = <13>;
++						label = "led13";
++					};
++
++					led@14 {
++						reg_offset = <14>;
++						label = "led14";
++					};
++					
++					led@15 {
++						reg_offset = <15>;
++						label = "led15";
++					};										
++				};	
++			};						
++		};
++
++		aobus@ff800000 {
++			
++			/delete-node/ meson-irblaster@14c;
++		}; 
++
++		audiobus@0xff642000 {
++
++			aml_tdma: tdma {
++				compatible = "amlogic, g12a-snd-tdma";
++				#sound-dai-cells = <0x00>;
++				dai-tdm-lane-slot-mask-in = <0x00 0x01>;
++				dai-tdm-lane-slot-mask-out = <0x01 0x00>;
++				dai-tdm-clk-sel = <0x00>;
++				clocks = <&clkaudio CLKID_AUDIO_MCLK_A>, 
++					<&clkc CLKID_MPLL1>; 
++				clock-names = "mclk\0clk_srcpll";
++				pinctrl-names = "tdm_pins";
++				pinctrl-0 = <&tdmout_a>, 
++					<&tdmin_a>;
++			};
++
++			tdmb {
++				clocks = <&clkaudio CLKID_AUDIO_MCLK_B>, 
++					<&clkc CLKID_MPLL0>; 
++				clock-names = "mclk\0clk_srcpll\0samesource_sysclk";
++				pinctrl-0 = <&tdmb_mclk>, 
++					<&tdmout_b>; 
++			};
++			
++			spdif {
++				pinctrl-names = "spdif_pins";
++				pinctrl-0 = <&spdifin>;
++				/delete-property/ pinctrl-1;
++			};
++		};
++	};
++	
++	serial@ffd24000 {
++		status = "disabled";
++	};
++
++	emmc@ffe07000 {
++		emmc {
++			/delete-property/ save_para ;
++			/delete-property/ compute_cmd_delay;
++			/delete-property/ compute_coef;
++			gpio_dat3 = <&gpio BOOT_3 GPIO_ACTIVE_HIGH>;
++			hw_reset = <&gpio BOOT_9 GPIO_ACTIVE_HIGH>;
++			caps = "MMC_CAP_8_BIT_DATA\0MMC_CAP_MMC_HIGHSPEED\0MMC_CAP_SD_HIGHSPEED\0MMC_CAP_NONREMOVABLE\0MMC_CAP_1_8V_DDR\0MMC_CAP_HW_RESET\0MMC_CAP_ERASE\0MMC_CAP_CMD23\0MMC_CAP_DRIVER_TYPE_A";
++			caps2 = "MMC_CAP2_HS200\0MMC_CAP2_HS400";
++		};
++	};
++
++	sd@ffe05000 {
++		interrupts = <0x00 0xbe 0x04>;
++
++		sd {
++			caps = "MMC_CAP_4_BIT_DATA\0MMC_CAP_MMC_HIGHSPEED\0MMC_CAP_SD_HIGHSPEED\0MMC_CAP_UHS_SDR12\0MMC_CAP_UHS_SDR25\0MMC_CAP_UHS_SDR50\0MMC_CAP_UHS_SDR104";
++			vol_switch_def = <&gpio GPIOX_17 GPIO_ACTIVE_HIGH>;
++			vol_switch = <&gpio GPIOX_19 GPIO_ACTIVE_HIGH>;
++			vol_switch_delay = <0x96>;
++			f_max = <0xbebc200>;
++		};
++
++		sdio {
++			caps = "MMC_CAP_4_BIT_DATA\0MMC_CAP_MMC_HIGHSPEED\0MMC_CAP_SD_HIGHSPEED\0MMC_CAP_NONREMOVABLE\0MMC_CAP_UHS_SDR12\0MMC_CAP_UHS_SDR25\0MMC_CAP_UHS_SDR50\0MMC_CAP_UHS_SDR104\0MMC_PM_KEEP_POWER\0MMC_CAP_SDIO_IRQ";
++			f_min = <0x61a80>;
++			f_max = <0xbebc200>;
++		};
++	};
++
++	sdio@ffe03000 {
++		mt76x8_pmu_en_gpio = <&gpio GPIOX_15 GPIO_ACTIVE_HIGH>;
++	};
++
++	gpioleds {
++		led_power {
++			gpios = <&gpio GPIOA_4 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++			retain-state-shutdown;
++		};
++	};	
++	
++	bt-dev {
++		gpio_en = <&gpio GPIOX_14 GPIO_ACTIVE_HIGH>;
++		/delete-property/ gpio_reset;
++		/delete-property/ gpio_hostwake;
++	};
++    
++	wifi {
++		power_on_pin = <&gpio GPIOX_15 GPIO_ACTIVE_HIGH>;
++		power_pin_reset = <0x01>;
++		/delete-property/ dhd_static_buf;
++		/delete-property/ pinctrl-names;
++		/delete-property/ pinctrl-0;
++	};
++
++	wifi_pwm_conf {
++
++		pwm_channel1_conf {
++			pwms = <&pwm_ef 0x00 0x7558 0x00>;
++			duty-cycle = <0x3aac>;
++		};
++
++		pwm_channel2_conf {
++			pwms = <&pwm_ef 0x02 0x754e 0x00>;
++			duty-cycle = <0x3aa7>;
++		};
++	};	
++
++	gpio_keypad {
++		key_num = <0x04>;
++		key_name = "mute\0action\0volup\0voldown";
++		key_code = <0xF0 0x74 0x72 0x73>;
++		key-gpios =  <&gpio GPIOX_16 GPIO_ACTIVE_HIGH>,
++			<&gpio GPIOX_6 GPIO_ACTIVE_HIGH>,
++			<&gpio GPIOX_12 GPIO_ACTIVE_HIGH>,
++			<&gpio GPIOX_13 GPIO_ACTIVE_HIGH>;
++		interrupts = <0x00 0x46 0x01 0x00 0x47 0x02>;
++		interrupt-names = "irq_keyup\0irq_keydown";
++		detect_mode = <0x00>;
++		/delete-property/ reg;
++	};
++	
++	/delete-node/ adc_keypad;
++	
++	meson-remote {
++		demod_enable;
++	};
++
++	meson-ir-tx {
++		compatible = "amlogic,meson-g12a-ir-tx", "amlogic,meson-ir-tx";
++		reg = <0x00 0xff80014c 0x00 0x10>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&irblaster_pins>;
++		interrupts = <0x00 0xc6 0x01>;
++		clocks = <&clkc CLKID_CLK81>, <&xtal>;
++		clock-names = "sysclk", "xtal";
++		status = "okay";
++	};
++
++	cpu_opp_table0 {
++
++		opp00 {
++			opp-hz = <0x00 0x5f5e100>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp01 {
++			opp-hz = <0x00 0xee6b280>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp02 {
++			opp-hz = <0x00 0x1dcd6500>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp03 {
++			opp-hz = <0x00 0x27c19cc0>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp04 {
++			opp-hz = <0x00 0x3b9aca00>;
++			opp-microvolt = <0xb9ca8>;
++		};
++
++		opp05 {
++			opp-hz = <0x00 0x47868c00>;
++			opp-microvolt = <0xbeac8>;
++		};
++
++		opp06 {
++			opp-hz = <0x00 0x5353c980>;
++			opp-microvolt = <0xc5ff8>;
++		};
++
++		opp07 {
++			opp-hz = <0x00 0x5a1f4a00>;
++			opp-microvolt = <0xd2348>;
++		};
++
++		opp08 {
++			opp-hz = <0x00 0x5fd82200>;
++			opp-microvolt = <0xdbf88>;
++		};
++
++		opp09 {
++			opp-hz = <0x00 0x6590fa00>;
++			opp-microvolt = <0xe82d8>;
++		};
++
++		opp10 {
++			opp-hz = <0x00 0x71b9c500>;
++			opp-microvolt = <0xf9830>;
++		};
++		opp11 {
++			opp-hz = <0x00 0x7829b800>;
++			opp-microvolt = <0xf9830>;
++		};		
++	};
++
++	cpu_opp_table1 {
++
++		opp00 {
++			opp-hz = <0x00 0x5f5e100>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp01 {
++			opp-hz = <0x00 0xee6b280>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp02 {
++			opp-hz = <0x00 0x1dcd6500>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp03 {
++			opp-hz = <0x00 0x27c19cc0>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp04 {
++			opp-hz = <0x00 0x3b9aca00>;
++			opp-microvolt = <0xb2778>;
++		};
++
++		opp05 {
++			opp-hz = <0x00 0x47868c00>;
++			opp-microvolt = <0xb7598>;
++		};
++
++		opp06 {
++			opp-hz = <0x00 0x5353c980>;
++			opp-microvolt = <0xbc3b8>;
++		};
++
++		opp07 {
++			opp-hz = <0x00 0x5a1f4a00>;
++			opp-microvolt = <0xbc3b8>;
++		};
++
++		opp08 {
++			opp-hz = <0x00 0x5fd82200>;
++			opp-microvolt = <0xbeac8>;
++		};
++
++		opp09 {
++			opp-hz = <0x00 0x6590fa00>;
++			opp-microvolt = <0xc11d8>;
++		};
++
++		opp10 {
++			opp-hz = <0x00 0x6b49d200>;
++			opp-microvolt = <0xcae18>;
++		};
++
++		opp11 {
++			opp-hz = <0x00 0x71b9c500>;
++			opp-microvolt = <0xd2348>;
++		};
++
++		opp12 {
++			opp-hz = <0x00 0x7829b800>;
++			opp-microvolt = <0xde698>;
++		};
++
++		opp13 {
++			opp-hz = <0x00 0x7d2b7500>;
++			opp-microvolt = <0xe82d8>;
++		};
++
++		opp14 {
++			opp-hz = <0x00 0x839b6800>;
++			opp-microvolt = <0xf6d38>;
++		};
++		opp15 {
++			opp-hz = <0x00 0x89544000>;
++			opp-microvolt = <0xf6d38>;
++		};
++
++		opp16 {
++			opp-hz = <0x00 0x8f0d1800>;
++			opp-microvolt = <0xf9830>;
++		};		
++	};
++
++	pwmao_d-regulator {
++		pwms = <&pwm_AO_cd 0x01 0x4e2 0x00>;
++		regulator-min-microvolt = <0xb0068>;
++		regulator-max-microvolt = <0xf9830>;
++		max-duty-cycle = <0x4e2>;
++		voltage-table = <0xf9830 0x00 0xf6d38 0x03 0xf4628 0x06 0xf1f18 0x0a 0xef808 0x0d 0xed0f8 0x10 0xea9e8 0x14 0xe82d8 0x17 0xe5bc8 0x1a 0xe34b8 0x1e 0xe0da8 0x21 0xde698 0x24 0xdbf88 0x28 0xd9878 0x2b 0xd7168 0x2e 0xd4a58 0x32 0xd2348 0x35 0xcfc38 0x38 0xcd528 0x3c 0xcae18 0x3f 0xc8708 0x43 0xc5ff8 0x46 0xc38e8 0x49 0xc11d8 0x4c 0xbeac8 0x50 0xbc3b8 0x53 0xb9ca8 0x56 0xb7598 0x5a 0xb4e88 0x5d 0xb2778 0x60 0xb0068 0x64>;
++	};
++		
++	pwmab_a-regulator {	
++		pwms = <&pwm_ab 0x00 0x4e2 0x00>;
++		regulator-min-microvolt = <0xb0068>;
++		regulator-max-microvolt = <0xf9830>;
++		max-duty-cycle = <0x4e2>;
++		voltage-table = <0xf9830 0x00 0xf6d38 0x03 0xf4628 0x06 0xf1f18 0x0a 0xef808 0x0d 0xed0f8 0x10 0xea9e8 0x14 0xe82d8 0x17 0xe5bc8 0x1a 0xe34b8 0x1e 0xe0da8 0x21 0xde698 0x24 0xdbf88 0x28 0xd9878 0x2b 0xd7168 0x2e 0xd4a58 0x32 0xd2348 0x35 0xcfc38 0x38 0xcd528 0x3c 0xcae18 0x3f 0xc8708 0x43 0xc5ff8 0x46 0xc38e8 0x49 0xc11d8 0x4c 0xbeac8 0x50 0xbc3b8 0x53 0xb9ca8 0x56 0xb7598 0x5a 0xb4e88 0x5d 0xb2778 0x60 0xb0068 0x64>;
++	};	
++};
+-- 
+2.25.1
+
