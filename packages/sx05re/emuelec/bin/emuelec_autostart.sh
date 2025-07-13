@@ -87,13 +87,6 @@ if [ -f "${BACKUPFILE}" ]; then
 	emuelec-utils ee_backup restore no > /emuelec/logs/last-restore.log 2>&1
 fi
 
-# Flycast-dojo SAVE NET Restore
-if ! ls /storage/roms/bios/dc_dojo/*state.net* >/dev/null 2>&1; then
-    mkdir -p /storage/roms/bios/dc_dojo/
-    cp -r "/usr/share/flycast-dojo-data"/* "/storage/roms/bios/dc_dojo/"
-    echo "Flycast-dojo SAVE NET Restore"
-fi
-
 # Clean cache garbage when boot up.
 rm -rf /storage/.cache/cores/* &
 
