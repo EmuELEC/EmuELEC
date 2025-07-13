@@ -1,0 +1,24 @@
+[Unit]
+Description=Kodi Media Center
+After=network-online.target graphical.target
+Requires=graphical.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/usr/lib/kodi/kodi.conf
+EnvironmentFile=-/run/libreelec/kodi.conf
+EnvironmentFile=-/run/libreelec/debug/kodi.conf
+ExecCondition=/bin/sh -c '[ -n "$(cat /sys/devices/virtual/amhdmitx/amhdmitx0/disp_cap)" ] && exit 0 || exit 1'
+ExecStartPre=-/usr/lib/kodi/kodi-config
+ExecStart=/usr/lib/kodi/kodi.sh --standalone -fs ${KODI_ARGS} ${KODI_DEBUG}
+ExecStop=/bin/kill -TERM ${MAINPID}
+ExecStopPost=-/usr/lib/kodi/kodi-safe-mode
+TimeoutStopSec=30
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+LimitNOFILE=16384
+TimeoutStartSec=300
+
+[Install]
+WantedBy=kodi.target

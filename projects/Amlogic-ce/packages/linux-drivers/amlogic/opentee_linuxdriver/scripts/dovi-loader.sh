@@ -32,12 +32,17 @@ check_dovi_version() {
     fi
 }
 
-insmod_dovi() {
+insmod_dovi_ne() {
   [ ! -f ${DOVI_KO_ANDROID} ] && return 1
 
   modinfo ${DOVI_KO_ANDROID}
 
-  if check_dovi_version ${DOVI_KO_ANDROID} 5 15 137; then
+  DOVI_KO_STORAGE="/storage/dovi.ko"
+  if [ -f ${DOVI_KO_STORAGE} ]; then
+    message "loading dovi module from ce storage partition"
+    modinfo ${DOVI_KO_STORAGE}
+    insmod ${DOVI_KO_STORAGE}
+  elif check_dovi_version ${DOVI_KO_ANDROID} 5 4 210; then
     message "loading dovi module from android partition"
     insmod ${DOVI_KO_ANDROID}
   else
@@ -46,7 +51,7 @@ insmod_dovi() {
 [B][COLOR red]Android Dolby Vision kernel module is not compatible[/COLOR][/B]
 [COLOR red]No Dolby Vision media playback possible![/COLOR]
 
-Please upgrade Android firmware of your device to minimum Linux kernel version '5.15.137'.
+Please upgrade Android firmware of your device to minimum Linux kernel version '5.4.210'.
 Dolby Vision media will be displayed in HDR instead Dolby Vision until the firmware fulfill the minimum requirements.
 EOF
   fi
@@ -54,30 +59,18 @@ EOF
   return 0
 }
 
-load_dovi() {
-  # local dovi.ko
-  for DOVI_KO_STORAGE in /storage/.config/dovi.ko \
-                         /flash/dovi.ko \
-                         /storage/dovi.ko \
-                         ; do
-    if [ -f ${DOVI_KO_STORAGE} ]; then
-      message "loading dovi module from ce partition"
-      modinfo ${DOVI_KO_STORAGE}
-      insmod ${DOVI_KO_STORAGE} && return
-    fi
-  done
-
+load_dovi_ne() {
   # Android 12
   if [ -b /dev/oem ]; then
     mountpoint -q /android/oem || mount -o ro /dev/oem /android/oem
 
     DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
-    insmod_dovi && return
+    insmod_dovi_ne && return
   fi
 
   # Android 11
   # if mounted from tee-loader don't mount/unmount from dovi-loader
-  if ! ls /dev/mapper/dynpart-* &>/dev/null && [ -b /dev/super ]; then
+  if ! ls /dev/mapper/dynpart-* &>/dev/null; then
     dmsetup create --concise "$(parse-android-dynparts /dev/super)"
     systemctl set-environment dmsetup_remove=yes
   fi
@@ -96,39 +89,47 @@ load_dovi() {
     mountpoint -q /android/odm || mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
 
     DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
-    insmod_dovi && return
+    insmod_dovi_ne && return
   fi
 
-  # older Android
-  mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
-
-  for DOVI_KO_ANDROID in /android/vendor/lib/modules/dovi.ko \
-                         /android/vendor/lib/modules/dovi_vs10.ko \
-                         ; do
-    insmod_dovi && return
-  done
-
-  cleanup_dovi
+  cleanup_dovi_ne
 }
 
-cleanup_dovi() {
+cleanup_dovi_ne() {
   rmmod dovi 2>/dev/null
   mountpoint -q /android/odm && umount /android/odm
   mountpoint -q /android/oem && umount /android/oem
-  mountpoint -q /android/vendor && umount /android/vendor
   # unmount only if mounted from this script
   [ "${dmsetup_remove}" = "yes" ] && \
     ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
 }
 
-message "run dovi '${1}'"
+load_dovi_ng() {
+  mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
+  DOVI_KO="/android/vendor/lib/modules/dovi.ko"
+  if [ -f ${DOVI_KO} ]; then
+    message "loading dovi module"
+    modinfo ${DOVI_KO}
+    insmod  ${DOVI_KO}
+    return
+  fi
+
+  cleanup_dovi_ng
+}
+
+cleanup_dovi_ng() {
+  rmmod dovi 2>/dev/null
+  mountpoint -q /android/vendor && umount /android/vendor
+}
+
+message "run dovi '${1}' for ${COREELEC_DEVICE:8:2}"
 
 case "${1}" in
   start)
-    load_dovi
+    load_dovi_${COREELEC_DEVICE:8:2}
     ;;
   stop)
-    cleanup
+    cleanup_dovi_${COREELEC_DEVICE:8:2}
     ;;
 esac
 

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+mkdir -p /var/lib32
+if grep -qE "sm1|sc2|s4" /proc/device-tree/compatible; then
+    ln -sf /usr/lib/libMali.dvalin.so /var/lib/libMali.so
+    ln -sf /usr/lib32/libMali.dvalin.so /var/lib32/libMali.so
+elif grep -q "t7" /proc/device-tree/compatible; then
+    ln -sf /usr/lib/libMali.gondul.so /var/lib/libMali.so
+    ln -sf /usr/lib32/libMali.gondul.so /var/lib32/libMali.so
+fi

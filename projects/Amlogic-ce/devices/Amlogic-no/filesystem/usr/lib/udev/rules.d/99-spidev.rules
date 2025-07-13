@@ -1,1 +1,0 @@
-KERNEL=="spidev*", SUBSYSTEMS=="spidev", SYMLINK+="spidev0.0"

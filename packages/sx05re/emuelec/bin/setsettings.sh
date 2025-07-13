@@ -640,5 +640,3 @@ echo "menu_driver = ${EES}" >> ${RACONF}
 # Show bezel if enabled
 get_setting "bezel"
 [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} bezels.sh "none" "default" "${ISBEZEL}" "${IRBEZEL}" || ${TBASH} bezels.sh "${PLATFORM}" "${ROM}" "${ISBEZEL}" "${IRBEZEL}"
-
-sleep 3 && show_splash.sh "stopplayer"

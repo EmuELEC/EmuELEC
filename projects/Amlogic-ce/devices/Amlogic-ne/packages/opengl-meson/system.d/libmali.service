@@ -1,0 +1,11 @@
+[Unit]
+Description=Create libMali overlay for specific AML device
+After=var.mount
+Before=kodi.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/libmali-overlay-setup
+
+[Install]
+WantedBy=local-fs.target

@@ -1,5 +1,0 @@
---- a/configs/dummy_defconfig
-+++ b/configs/dummy_defconfig
-@@ -0,0 +1,2 @@
-+CONFIG_ARM=y
-+

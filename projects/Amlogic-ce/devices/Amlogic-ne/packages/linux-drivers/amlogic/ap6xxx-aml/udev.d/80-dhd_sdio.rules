@@ -1,0 +1,18 @@
+### Broadcom BCM43752 (AP6275S driver with dhd_sdio kernel module)
+### by default kernel module dhd is loaded first and retries few
+###   times until dhd_sdio is loaded (after almost 2 minutes)
+### to speed up load module manually
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4497", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4496", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4495", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:A806", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:A804", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:AAE8", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:AAE7", GOTO="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4362", GOTO="load_module"
+GOTO="end"
+
+LABEL="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", RUN{builtin}+="kmod load dhd_sdio"
+
+LABEL="end"

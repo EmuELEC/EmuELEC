@@ -30,7 +30,7 @@ make_target() {
        CONFIG_BCMDHD_DISABLE_WOWLAN=y \
        dhd
 
-  if [[ "$DEVICE" = "Amlogic-n"* ]]; then
+  if [[ "$DEVICE" = "Amlogic-ng"* ]]; then
     echo
     echo "building ap6275s"
     make -C  $PKG_BUILD/bcmdhd.100.10.545.x \

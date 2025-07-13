@@ -25,7 +25,7 @@ fi
 if [ "${WIREGUARD_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" wireguard-tools"
 
-  if [[ "${DEVICE}" = "Amlogic-n"* ]]; then
+  if [[ "${DEVICE}" = "Amlogic-ng"* ]]; then
     PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} wireguard-linux-compat"
   fi
 fi

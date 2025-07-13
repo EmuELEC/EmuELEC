@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present SumavisionQ5 (https://github.com/SumavisionQ5)
 # Modifications by Shanti Gilbert (https://github.com/shantigilbert)
-# 2025-present Mod by DiegroSan
 
 # 12/07/2019 use mpv for all splash 
 # 19/01/2020 use ffplay for all splash 
@@ -13,8 +12,6 @@
 
 ACTION_TYPE="${1}"
 PLATFORM="${2}"
->/emuelec/logs/logx.txt
-echo ${PLATFORM} >> /emuelec/logs/logx.txt
 
 GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
 BLANKSPLASH="/storage/.config/splash/blank.png"
@@ -27,14 +24,9 @@ if [ -f "/storage/roms/splash/intro.mp4" ]; then
     VIDEOSPLASH="/storage/roms/splash/intro.mp4"
 fi
 
-if [ -f "/storage/.config/splash/loading-game.mp4" ]; then
-    GAMELOADINGSPLASH="/storage/.config/splash/loading-game.mp4"
-fi
-
 # Convert the platform name to lowercase
 PLATFORM=${PLATFORM,,}
 PLAYER="ffplay"
-echo ${PLATFORM} >> /emuelec/logs/logx.txt
 
 case ${PLATFORM} in
  "arcade"|"fba"|"fbn"|"neogeo"|"mame"|cps*)
@@ -81,11 +73,6 @@ elif [ "${ACTION_TYPE}" == "blank" ]; then
 elif [ "${ACTION_TYPE}" == "gameloading" ]; then
     if [[ "${MODE}" == *"x"* ]]; then
         GAMELOADINGSPLASH="/storage/.config/splash/loading-game-std.png"
-
-        if [ -f "/storage/.config/splash/loading-game-std.mp4" ]; then
-            GAMELOADINGSPLASH="/storage/.config/splash/loading-game-std.mp4"
-        fi
-
     fi
 
     # Extended gameloading settings from emuelec.conf:
@@ -182,8 +169,6 @@ fi
 
 declare -a RES=( ${MODE} )
 SIZE=" -x ${RES[0]} -y ${RES[1]}"
-SCALE="${RES[0]}:${RES[1]}"
-EXTENSION="${SPLASH##*.}"
 
 [[ "${ACTION_TYPE}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
@@ -192,24 +177,9 @@ if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]];
         if [ "${SS_DEVICE}" == 1 ]; then
             ${PLAYER} "${SPLASH}" > /dev/null 2>&1
         else
-               if [[ "$EXTENSION" == "mp4" || "$EXTENSION" == "MP4" ]]; then
-                    if [[ -f "tmp/Plibretro.p" ]]; then
-                         ${PLAYER} -fs ${SIZE} -vf scale=${SCALE} "${SPLASH}" > /dev/null 2>&1
-                     else
-                         ${PLAYER} -fs -autoexit ${SIZE} -vf scale=${SCALE} "${SPLASH}" > /dev/null 2>&1
-                    fi
-                elif [ "${ACTION_TYPE}" == "exit" ]; then
-                # Game over presentation, 3 seconds for images or video duration + 3 seconds.
-                ${PLAYER} -fs ${SIZE} -vf scale=${SCALE}  "${SPLASH}" > /dev/null 2>&1 & sleep 3 && ACTION_TYPE="stopplayer"
-                else
-                   if [[ -f "tmp/Plibretro.p" ]]; then
-                     ${PLAYER} -fs ${SIZE} -vf scale=${SCALE} "${SPLASH}" > /dev/null 2>&1
-                   else
-                     ${PLAYER} -fs ${SIZE} -vf scale=${SCALE} -autoexit "${SPLASH}" > /dev/null 2>&1 & sleep 3 
-                   fi
-                fi
-            fi
-        fi 
+            ${PLAYER} -fs -autoexit ${SIZE} "${SPLASH}" > /dev/null 2>&1
+        fi
+    fi 
 else
     # Display intro video
     RND=$(get_ee_setting "ee_randombootvideo.enabled" == "1")
@@ -224,15 +194,10 @@ else
     if [ ${SS_DEVICE} -eq 1 ]; then
         ${PLAYER} "${SPLASH}" > /dev/null 2>&1
     else
-        ${PLAYER} -fs -autoexit ${SIZE} -vf scale=${SCALE}  "${SPLASH}" > /dev/null 2>&1
+        ${PLAYER} -fs -autoexit ${SIZE} "${SPLASH}" > /dev/null 2>&1
     fi
     touch "/storage/.config/emuelec/configs/novideo"
     # [ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
-fi
-
-if [ "${ACTION_TYPE}" == "stopplayer" ] ; then
-    killall "${PLAYER}"
-    #blank_buffer
 fi
 
 # Wait for the duration specified by ee_splash.delay in emuelec.conf

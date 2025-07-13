@@ -1,1 +1,0 @@
-../system-shutdown/disk-park.sh

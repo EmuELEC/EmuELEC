@@ -14,7 +14,6 @@ mt7601u.bin
 mt7662*.bin
 mediatek/mt7662u*.bin
 mediatek/mt7610u.bin
-mediatek/*MT7961*.bin
 
 ath6k/AR6004/hw1.?/bdata.bin
 ath9k_htc/*
@@ -22,4 +21,3 @@ brcm/*
 rtl_bt/*
 rtlwifi/*
 rtw88/*
-rtw89/*
