@@ -1,0 +1,43 @@
+From 2e0ddd267d196e1e65e0cdbf5e2933c57a1db278 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sun, 17 Nov 2019 09:20:38 +0100
+Subject: [PATCH 2/2] Embed image format plugins at Amlogic platform
+
+---
+ libsrc/db/CMakeLists.txt    | 6 ++++++
+ src/hyperiond/hyperiond.cpp | 5 +++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/libsrc/db/CMakeLists.txt b/libsrc/db/CMakeLists.txt
+index 1beb3fe5..a72ce10f 100644
+--- a/libsrc/db/CMakeLists.txt
++++ b/libsrc/db/CMakeLists.txt
+@@ -12,3 +12,9 @@ target_link_libraries(database
+ 	hyperion-utils
+ 	Qt${QT_VERSION_MAJOR}::Sql
+ )
++
++if (ENABLE_AMLOGIC)
++	target_link_libraries(database
++		${plugin_libs}
++	)
++endif()
+diff --git a/src/hyperiond/hyperiond.cpp b/src/hyperiond/hyperiond.cpp
+index 6c71475d..f40d6d2c 100644
+--- a/src/hyperiond/hyperiond.cpp
++++ b/src/hyperiond/hyperiond.cpp
+@@ -26,6 +26,11 @@
+ #include <webserver/WebServer.h>
+ #include "hyperiond.h"
+ 
++#ifdef ENABLE_AMLOGIC
++#include <QtPlugin>
++Q_IMPORT_PLUGIN(QGifPlugin)
++#endif
++
+ // Flatbuffer Server
+ #ifdef ENABLE_FLATBUF_SERVER
+ #include <flatbufserver/FlatBufferServer.h>
+-- 
+2.43.2
+

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+export PATH=/opt/bin:/opt/sbin:$PATH
+
+[ ! -d /storage/.opt ] && mkdir -p /storage/.opt
+
+if [ ! -f /opt/bin/opkg ]; then
+  wget -O - http://bin.entware.net/@ENTWARE_ARCH@/installer/generic.sh | /bin/sh
+
+  echo ""
+  read -p "Would you like to reboot now to finish installation (recommended) [y/N]? " choice
+  case "$choice" in
+    [yY]*)
+      reboot
+      ;;
+  esac
+else
+  echo "Entware is already installed."
+fi

@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: egl
+Description: Amlogic implementation of EGL
+Version: 0.99
+Libs: -L${libdir} -lEGL -lGLESv2
+Cflags: -I${includedir}/ 

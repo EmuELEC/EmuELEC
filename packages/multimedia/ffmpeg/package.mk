@@ -30,7 +30,7 @@ case "${PROJECT}" in
 esac
 
 case "${DEVICE}" in
-  Amlogic-ne|Amlogic-ng-dv)
+  Amlogic-ne|Amlogic-no|Amlogic-ng-dv)
     PKG_PATCH_DIRS+=" dv"
     ;;
 esac

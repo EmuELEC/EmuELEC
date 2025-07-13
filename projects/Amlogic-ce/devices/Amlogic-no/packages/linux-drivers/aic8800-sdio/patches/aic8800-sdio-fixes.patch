@@ -1,0 +1,39 @@
+From 39abee3ef0e84e21e3a5bc1d863475547e5dc500 Mon Sep 17 00:00:00 2001
+From: Peter <peter.vicman@gmail.com>
+Date: Thu, 29 Feb 2024 12:07:46 +0100
+Subject: [PATCH] fix from forum and fix for linux 5.15.119
+
+---
+ src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c    | 2 +-
+ src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
+index b95e754..599bda3 100644
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
+@@ -486,7 +486,7 @@ static int aicbsp_platform_power_on(void)
+ 		extern_wifi_set_enable(1);
+ 		mdelay(200);
+ 		sdio_reinit();
+-		set_power_control_lock(1);
++		//set_power_control_lock(1);
+ #endif
+ 
+ #ifdef CONFIG_PLATFORM_ROCKCHIP2
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h
+index 9287eca..10e3697 100644
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h
+@@ -43,7 +43,7 @@
+ #define HIGH_KERNEL_VERSION KERNEL_VERSION(5, 15, 41)
+ #define HIGH_KERNEL_VERSION2 KERNEL_VERSION(5, 15, 41)
+ #define HIGH_KERNEL_VERSION3 KERNEL_VERSION(5, 15, 104)
+-#define HIGH_KERNEL_VERSION4 KERNEL_VERSION(6, 1, 0)
++#define HIGH_KERNEL_VERSION4 KERNEL_VERSION(5, 15, 119)
+ #else
+ #define HIGH_KERNEL_VERSION KERNEL_VERSION(6, 0, 0)
+ #define HIGH_KERNEL_VERSION2 KERNEL_VERSION(6, 1, 0)
+-- 
+2.41.0
+

@@ -152,7 +152,10 @@ CLOUD_SYNC=$(get_ee_setting "${PLATFORM}.cloudsave")
 [[ "${CLOUD_SYNC}" == "1" ]] && ra_rclone.sh get "${PLATFORM}" "${ROMNAME}" &
 CLOUD_PID=$!
 
-emuelec-utils init_app_video "${PLATFORM}" "${ROMNAME}"
+# Loading start
+rm "tmp/Plibretro.p"
+[[ "${LIBRETRO}" = "yes" ]] && touch "tmp/Plibretro.p" && emuelec-utils init_app_video "${PLATFORM}" "${ROMNAME}" & 
+[[ "${LIBRETRO}" != "yes" ]] && emuelec-utils init_app_video "${PLATFORM}" "${ROMNAME}"
 
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 echo "${CONTROLLERCONFIG}" | tr -d '"' > "/tmp/controllerconfig.txt"
@@ -200,7 +203,10 @@ case ${PLATFORM} in
                 if [ "${EMU}" = "flycastsa" ]; then
             set_kill_keys "flycast"
             RUNTHIS='${TBASH} flycast.sh "${ROMNAME}"'
-        fi
+                elif [ "${EMU}" = "flycastsa_dojo" ]; then
+            set_kill_keys "flycastdojo"
+            RUNTHIS='flycastdojo.sh "${ROMNAME}"'
+                fi
                 ;;
         "psx")
                 if [ "${EMU}" = "duckstation" ]; then
@@ -497,12 +503,14 @@ else
 fi
 
 #blank_buffer
-
 # clear terminal window
         reset > /dev/tty < /dev/null 2>&1
         reset > /dev/tty0 < /dev/null 2>&1
         reset > /dev/tty1 < /dev/null 2>&1
         reset > /dev/console < /dev/null 2>&1
+        
+# END loading
+[[ "${LIBRETRO}" = "yes" ]] && ${TBASH} show_splash.sh "stopplayer"
 
 emuelec-utils end_app_video
 
@@ -601,7 +609,7 @@ if [[ "${ret_error}" != "0" ]]; then
     exit 1
 else
     echo "exit 0" >> ${EMUELECLOG}
+    echo "return_from_game" > /tmp/es_return_from_game
     blank_buffer
-	echo "return_from_game" > /tmp/es_return_from_game
     exit 0
 fi

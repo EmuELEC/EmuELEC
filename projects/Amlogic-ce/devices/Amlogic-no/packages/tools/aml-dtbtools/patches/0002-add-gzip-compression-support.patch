@@ -1,0 +1,606 @@
+From c642408b37b00dd9184445114a488796e0abf2e9 Mon Sep 17 00:00:00 2001
+From: Peter Vicman <peter.vicman@gmail.com>
+Date: Wed, 29 Jul 2020 10:00:36 +0200
+Subject: [PATCH 2/2] add gzip compression support
+
+---
+ Makefile     |   6 +-
+ dtbSplit.cpp |  83 +++++++++++++++++++--
+ dtbTool.c    |  83 +++++++++++++++++++--
+ gzip.c       | 199 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ gzip.h       |  52 ++++++++++++++
+ 5 files changed, 411 insertions(+), 12 deletions(-)
+ create mode 100644 gzip.c
+ create mode 100644 gzip.h
+
+diff --git a/Makefile b/Makefile
+index c28230b..7352475 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,9 @@
+ all: dtbTool dtbSplit
+ 
+ dtbTool: dtbTool.c
+-	$(CC) -o dtbTool dtbTool.c
++	$(CC) $(CFLAGS) $(LDFLAGS) -o dtbTool dtbTool.c gzip.c -lz
+ 
+ dtbSplit: dtbSplit.cpp
+-	$(CXX) -o dtbSplit -std=c++11 dtbSplit.cpp
++	$(CC) $(CFLAGS) -c gzip.c -Wno-pointer-arith
++	$(CXX) $(CXXFLAGS) -c dtbSplit.cpp -std=c++11
++	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o dtbSplit -std=c++11 dtbSplit.o gzip.o -lz
+diff --git a/dtbSplit.cpp b/dtbSplit.cpp
+index c92dea7..b234a34 100644
+--- a/dtbSplit.cpp
++++ b/dtbSplit.cpp
+@@ -34,10 +34,18 @@
+ #include <string>
+ #include <cstdio>
+ #include <vector>
++#include <streambuf>
++
++#include <arpa/inet.h>
++extern "C" {
++  #include "gzip.h"
++}
++
+ using namespace std;
+ 
+ #define AML_DT_HEADER 0x5f4c4d41
+ #define DT_HEADER_MAGIC		 0xedfe0dd0
++#define IS_GZIP_FORMAT(data)		((data & (0x0000FFFF)) == (0x00008B1F))
+ #define AML_DT_ID_VARI_TOTAL		3
+ 
+ #pragma pack(push, 1)
+@@ -81,7 +89,7 @@ uint32_t swap_bytes_u32(uint32_t b) {
+            (b << 24);
+ }
+ template<unsigned int ID_SIZE>
+-void dumpData(const uint32_t entries, const string &dest, ifstream &dtb) {
++void dumpData(const uint32_t entries, const string &dest, stringstream &dtb) {
+ 	typedef HeaderEntry<ID_SIZE> HeaderType;
+ 
+ 	vector<HeaderType> headers;
+@@ -112,13 +120,13 @@ void dumpData(const uint32_t entries, const string &dest, ifstream &dtb) {
+ 		} else {
+ 			id.write(h.soc, sizeof(h.soc));
+ 		}
+-		id << '-';
++		id << '_';
+ 		if ( h.plat[ID_SIZE-1] == 0 ) {
+ 			id << h.plat;
+ 		} else {
+ 			id.write(h.plat, sizeof(h.plat));
+ 		}
+-		id << '-';
++		id << '_';
+ 		if ( h.vari[ID_SIZE-1] == 0 ) {
+ 			id << h.vari;
+ 		} else {
+@@ -140,31 +148,90 @@ void dumpData(const uint32_t entries, const string &dest, ifstream &dtb) {
+ 		dtb.seekg(h.offset);
+ 		vector<char> data(dtheader.totalsize);
+ 		dtb.read(data.data(), data.size());
+-		ofstream output(dest + id.str() + ".dtb", ios::binary);
++		ofstream output(dest + "_" + id.str() + ".dtb", ios::binary);
+ 		output.write(data.data(), data.size());
+ 	}
+ }
+ 
+ int main(int argc, char **argv) {
++	unsigned char *bufIn;
++	unsigned char *bufOut;
++	long unsigned int lenup = GUNZIP_BUF_SIZE;
++	int ret;
++	stringstream dtb(std::stringstream::in | std::stringstream::out);
++
+ 	if ( argc < 3  ) {
+ 		cerr << "Usage: " << argv[0] << " boot.img out_prefix\n";
+ 		return 1;
+ 	}
+ 
+-	ifstream dtb(argv[1], ios::binary);
+-	if ( !dtb ) {
++	bufIn = (unsigned char *) calloc(1, GUNZIP_BUF_SIZE);
++	if (bufIn == NULL) {
++		cerr << "Cannot allocate memmory, compression skipped" << endl;
++		return 1;
++	}
++
++	bufOut = (unsigned char *) calloc(1, GUNZIP_BUF_SIZE);
++	if (bufOut == NULL) {
++		cerr << "Cannot allocate memmory, compression skipped" << endl;
++		free(bufIn);
++		return 1;
++	}
++  
++	ifstream dtbFile(argv[1], ios::binary);
++	if ( !dtbFile ) {
+ 		cerr << "Unable to open dtb file: " << argv[2] << endl;
++		free(bufIn);
++		free(bufOut);
+ 		return 1;
+ 	}
++
+ 	string dest;
+ 	if ( argc > 2 ) {
+ 		dest = argv[2];
+ 	}
++
+ 	Header header;
++	dtbFile.read((char*)&header, sizeof(header));
++
++	if ( IS_GZIP_FORMAT(header.magic) ) {
++		dtbFile.seekg(0, dtbFile.end);
++		size_t length = dtbFile.tellg();
++		dtbFile.seekg(0, dtbFile.beg);
++		length -= dtbFile.tellg();
++		
++		if (length > GUNZIP_BUF_SIZE) {
++			cerr << "Dtb file too big." << endl;
++			free(bufIn);
++			free(bufOut);
++			return 1;
++		}
++		
++		dtbFile.read((char *) bufIn, length);
++		ret = gunzip(bufOut, GUNZIP_BUF_SIZE, (unsigned char *)bufIn, &lenup);
++		if (ret != 0) {
++			cerr << "gzip error." << endl;
++			free(bufIn);
++			free(bufOut);
++			return 1;
++		}
++
++		for (unsigned i=0; i<lenup; ++i)
++			dtb << bufOut[i];
++	} else {
++		dtbFile.seekg(0);
++		
++  	char ch;
++  	while (dtbFile.get(ch))
++	    dtb << ch;
++	}
++
+ 	dtb.read((char*)&header, sizeof(header));
+ 
+ 	if ( header.magic != AML_DT_HEADER ) {
+ 		cerr << "Invalid AML DTB header." << endl;
++		free(bufIn);
++		free(bufOut);
+ 		return 1;
+ 	}
+ 	cout << "DTB Version: " << header.version << " entries: " << header.entry_count << endl;
+@@ -175,8 +242,12 @@ int main(int argc, char **argv) {
+ 		dumpData<16>(header.entry_count, dest, dtb);
+ 	} else {
+ 		cerr << "Unrecognized DTB version" << endl;
++		free(bufIn);
++		free(bufOut);
+ 		return 1;
+ 	}
+ 
++	free(bufIn);
++	free(bufOut);
+ 	return 0;
+ }
+\ No newline at end of file
+diff --git a/dtbTool.c b/dtbTool.c
+index 3335025..dcfc76c 100644
+--- a/dtbTool.c
++++ b/dtbTool.c
+@@ -39,6 +39,8 @@
+ #include <getopt.h>
+ #include <errno.h>
+ #include <unistd.h>
++#include <time.h>
++#include "gzip.h"
+ 
+ #define AML_DT_MAGIC     "AML_"  /* Master DTB magic */
+ #define AML_DT_VERSION   2       /* AML version */
+@@ -76,9 +78,74 @@ struct chipInfo_t *chip_list;
+ char *input_dir;
+ char *output_file;
+ char *dtc_path;
++int   compress_dtb;
+ int   verbose;
+ int   page_size = PAGE_SIZE_DEF;
+ 
++void compress_file(char *output_file)
++{
++  FILE *pFile;
++  unsigned char *bufIn;
++  unsigned char *bufOut;
++  long unsigned int bufOutLenp = GUNZIP_BUF_SIZE;
++  int r;
++  unsigned long bufInLen;
++  time_t now = time(NULL);
++
++  log_info("Compressing master DTB... ");
++  
++  bufIn = calloc(1, GUNZIP_BUF_SIZE);
++  if (bufIn == NULL) {
++    log_err("Cannot allocate memmory, compression skipped\n");
++    return;
++  }
++
++  bufOut = calloc(1, GUNZIP_BUF_SIZE);
++  if (bufOut == NULL) {
++    log_err("Cannot allocate memmory, compression skipped\n");
++    free(bufIn);
++    return;
++  }
++
++  pFile = fopen(output_file, "rb+");
++  if (pFile == NULL) {
++    log_err("Cannot open '%s'\n", output_file);
++    free(bufIn);
++    free(bufOut);
++    return;
++  }
++
++  bufInLen = fread(bufIn, 1, GUNZIP_BUF_SIZE, pFile);
++  if (bufInLen <= 0) {
++    log_err("Cannot read '%s'\n", output_file);
++    fclose(pFile);
++    free(bufIn);
++    free(bufOut);
++    return;
++  }
++
++  r = gzip(bufOut, &bufOutLenp, bufIn, bufInLen);
++  if (r < 0) {
++    log_err("Failed to compress data to dtb: %d!\n", r);
++    fclose(pFile);
++    free(bufIn);
++    free(bufOut);
++    return;
++  }
++
++  /* add time because Amlogic in u-boot expects it for multidtb */
++  memcpy(&bufOut[4], &now, 4);
++
++  rewind(pFile);
++  r = ftruncate(fileno(pFile), 0);
++  fwrite(bufOut, 1, bufOutLenp, pFile);
++  fclose(pFile);
++
++  free(bufIn);
++  free(bufOut);
++  log_info("completed\n");
++}
++
+ int entry_cmp(uint8_t *a, uint8_t *b)
+ {
+     return memcmp(a, b, INFO_ENTRY_SIZE);
+@@ -108,6 +175,7 @@ void print_help()
+     log_info("  --output-file/-o     output file\n");
+     log_info("  --dtc-path/-p        path to dtc\n");
+     log_info("  --page-size/-s       page size in bytes\n");
++    log_info("  --compress/-c       compress dtb\n");
+     log_info("  --verbose/-v         verbose\n");
+     log_info("  --help/-h            this help screen\n");
+ }
+@@ -120,12 +188,13 @@ int parse_commandline(int argc, char *const argv[])
+         {"output-file", 1, 0, 'o'},
+         {"dtc-path",    1, 0, 'p'},
+         {"page-size",   1, 0, 's'},
++        {"compress",    0, 0, 'c'},
+         {"verbose",     0, 0, 'v'},
+         {"help",        0, 0, 'h'},
+         {0, 0, 0, 0}
+     };
+ 
+-    while ((c = getopt_long(argc, argv, "-o:p:s:vh", long_options, NULL))
++    while ((c = getopt_long(argc, argv, "-o:p:s:cvh", long_options, NULL))
+            != -1) {
+         switch (c) {
+         case 1:
+@@ -155,6 +224,9 @@ int parse_commandline(int argc, char *const argv[])
+                 return RC_ERROR;
+             }
+             break;
++        case 'c':
++            compress_dtb = 1;
++            break;
+         case 'v':
+             verbose = 1;
+             break;
+@@ -440,7 +512,7 @@ int main(int argc, char **argv)
+     log_info("\nGenerating master DTB... ");
+ 
+     out_fd = open(output_file, O_WRONLY|O_CREAT | O_TRUNC, 0664);
+-    if (!out_fd < 0) {
++    if (out_fd < 0) {
+         log_err("Cannot create '%s'\n", output_file);
+         rc = RC_ERROR;
+         goto cleanup;
+@@ -529,17 +601,20 @@ int main(int argc, char **argv)
+     close(out_fd);
+ 
+     if (expected != wrote) {
+-        log_err("error writing output file, please rerun: size mismatch %lu vs %lu\n",
++        log_err("error writing output file, please rerun: size mismatch %zu vs %zu\n",
+                 expected, wrote);
+         rc = RC_ERROR;
+     } else
+-        log_dbg("Total wrote %lu bytes\n", wrote);
++        log_dbg("Total wrote %zu bytes\n", wrote);
+ 
+     if (rc != RC_SUCCESS)
+         unlink(output_file);
+     else
+         log_info("completed\n");
+ 
++    if (compress_dtb)
++      compress_file(output_file);
++
+ cleanup:
+     free(filler);
+     chip_deleteall();
+diff --git a/gzip.c b/gzip.c
+new file mode 100644
+index 0000000..457ab6c
+--- /dev/null
++++ b/gzip.c
+@@ -0,0 +1,199 @@
++/*
++ * Simple tool for CoreELEC installation on eMMC
++ *
++ * Copyright (C) 2019 Team CoreELEC, vpeter, Portisch
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ */
++
++#include "gzip.h"
++
++static void *zalloc(void *x, unsigned items, unsigned size)
++{
++  void *p;
++
++  size *= items;
++  size = (size + ZALLOC_ALIGNMENT - 1) & ~(ZALLOC_ALIGNMENT - 1);
++
++  p = malloc (size);
++  return (p);
++}
++
++static void zfree(void *x, void *addr)
++{
++  free (addr);
++}
++
++// Uncompress blocks compressed with zlib without headers
++static int zunzip(void *dst, int dstlen, unsigned char *src, unsigned long *lenp,
++            int stoponerr, int offset)
++{
++  z_stream s;
++  int r;
++
++  s.zalloc = zalloc;
++  s.zfree = zfree;
++
++  r = inflateInit2(&s, -MAX_WBITS);
++  if (r != Z_OK) {
++    printf ("Error: inflateInit2() returned %d\n", r);
++    return -1;
++  }
++
++  s.next_in = src + offset;
++  s.avail_in = *lenp - offset;
++  s.next_out = (unsigned char *)dst;
++  s.avail_out = dstlen;
++
++  do {
++    r = inflate(&s, Z_FINISH);
++    if (stoponerr == 1 && r != Z_STREAM_END &&
++        (s.avail_out == 0 || r != Z_BUF_ERROR)) {
++      printf("Error: inflate() returned %d\n", r);
++      inflateEnd(&s);
++      return -1;
++    }
++
++    s.avail_in = *lenp - offset - (int)(s.next_out - (unsigned char*)dst);
++  } while (r == Z_BUF_ERROR);
++
++  *lenp = s.next_out - (unsigned char *) dst;
++  inflateEnd(&s);
++  return 0;
++}
++
++//  Compress blocks with zlib
++static int zzip(void *dst, unsigned long *lenp, unsigned char *src,
++    unsigned long srclen, int stoponerr,
++    int (*func)(unsigned long, unsigned long))
++{
++  z_stream s;
++  int r, flush, orig, window;
++  unsigned long comp_len, left_len;
++
++  if (!srclen)
++    return 0;
++
++#ifndef CONFIG_GZIP
++  window = MAX_WBITS;
++#else
++  window = 2 * MAX_WBITS;
++#endif
++  orig = *lenp;
++  s.zalloc = zalloc;
++  s.zfree = zfree;
++  s.opaque = Z_NULL;
++
++  r = deflateInit2_(&s, Z_DEFAULT_COMPRESSION, Z_DEFLATED,  window,
++      DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY,
++      ZLIB_VERSION, sizeof(z_stream));
++  if (r != Z_OK) {
++    printf ("Error: deflateInit2_() returned %d\n", r);
++    return -1;
++  }
++
++  while (srclen > 0) {
++    comp_len = (srclen > CONFIG_GZIP_COMPRESS_DEF_SZ) ?
++        CONFIG_GZIP_COMPRESS_DEF_SZ : srclen;
++
++    s.next_in = src;
++    s.avail_in = comp_len;
++    flush = (srclen > CONFIG_GZIP_COMPRESS_DEF_SZ)?
++      Z_NO_FLUSH : Z_FINISH;
++
++    do {
++      left_len = (*lenp > CONFIG_GZIP_COMPRESS_DEF_SZ) ?
++          CONFIG_GZIP_COMPRESS_DEF_SZ : *lenp;
++      s.next_out = (unsigned char *)dst;
++      s.avail_out = left_len;
++
++      r = deflate(&s, flush);
++      if (r == Z_STREAM_ERROR && stoponerr == 1) {
++        printf("Error: deflate() returned %d\n", r);
++        r = -1;
++        goto bail;
++      }
++
++      if (!func) {
++        dst += (left_len - s.avail_out);
++        *lenp -= (left_len - s.avail_out);
++      } else if (left_len - s.avail_out > 0) {
++        r = func((unsigned long)dst,
++          left_len - s.avail_out);
++        if (r < 0)
++          goto bail;
++      }
++    } while (s.avail_out == 0 && (*lenp > 0));
++
++    if (s.avail_in) {
++      printf("Deflate failed to consume %u bytes", s.avail_in);
++      r = -1;
++      goto bail;
++    }
++
++    if (*lenp == 0) {
++      printf("Deflate need more space to compress "
++        "left %lu bytes\n", srclen);
++      r = -1;
++      goto bail;
++    }
++
++    srclen -= comp_len;
++    src += comp_len;
++  }
++
++  r = 0;
++bail:
++  deflateEnd(&s);
++  *lenp = orig - *lenp;
++  return r;
++}
++
++int gzip(void *dst, unsigned long *lenp,
++    unsigned char *src, unsigned long srclen)
++{
++  return zzip(dst, lenp, src, srclen, 1, NULL);
++}
++
++int gunzip(void *dst, int dstlen,
++    unsigned char *src, unsigned long *lenp)
++{
++  int i, flags;
++
++  // skip header
++  i = 10;
++  flags = src[3];
++  if (src[2] != Z_DEFLATED || (flags & RESERVED) != 0) {
++    puts ("Error: Bad gzipped data\n");
++    return (-1);
++  }
++
++  if ((flags & EXTRA_FIELD) != 0)
++    i = 12 + src[10] + (src[11] << 8);
++
++  if ((flags & ORIG_NAME) != 0)
++    while (src[i++] != 0)
++      ;
++
++  if ((flags & COMMENT) != 0)
++    while (src[i++] != 0)
++      ;
++
++  if ((flags & HEAD_CRC) != 0)
++    i += 2;
++
++  if (i >= *lenp) {
++    puts ("Error: gunzip out of data in header\n");
++    return (-1);
++  }
++
++  return zunzip(dst, dstlen, src, lenp, 1, i);
++}
+diff --git a/gzip.h b/gzip.h
+new file mode 100644
+index 0000000..47d3f53
+--- /dev/null
++++ b/gzip.h
+@@ -0,0 +1,52 @@
++/*
++ * Simple tool for CoreELEC installation on eMMC
++ *
++ * Copyright (C) 2019 Team CoreELEC, vpeter, Portisch
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ */
++
++#ifndef __ZLIB_H__
++#define __ZLIB_H__
++
++#include <stdio.h>
++#include <stdlib.h>
++#include "zlib.h"
++
++// enable gzip mode of zlib
++#define     CONFIG_GZIP
++
++// Maximum value for memLevel in deflateInit2
++#define     DEF_MEM_LEVEL                   8
++
++#ifndef     CONFIG_GZIP_COMPRESS_DEF_SZ
++#define     CONFIG_GZIP_COMPRESS_DEF_SZ     0x200
++#endif
++
++#define     ZALLOC_ALIGNMENT                16
++
++// gzip flag byte
++#define     ASCII_FLAG                      0x01 // bit 0 set: file probably ascii text
++#define     HEAD_CRC                        0x02 // bit 1 set: header CRC present
++#define     EXTRA_FIELD                     0x04 // bit 2 set: extra field present
++#define     ORIG_NAME                       0x08 // bit 3 set: original file name present
++#define     COMMENT                         0x10 // bit 4 set: file comment present
++#define     RESERVED                        0xE0 // bits 5..7: reserved
++
++#define     SZ_1M                           0x00100000UL
++#define     GUNZIP_BUF_SIZE                 (SZ_1M * 5UL)
++
++extern int gzip(void *dst, unsigned long *lenp,
++    unsigned char *src, unsigned long srclen);
++extern int gunzip(void *dst, int dstlen,
++    unsigned char *src, unsigned long *lenp);
++
++#endif
+-- 
+2.17.1
+

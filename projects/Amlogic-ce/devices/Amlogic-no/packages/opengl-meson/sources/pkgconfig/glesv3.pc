@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib
+includedir=${prefix}/include
+
+Name: glesv3
+Description: libhybris OpenGL ES 3.0 library
+Version: 0.1.0
+Libs: -L${libdir} -lGLESv3
+Cflags: -I${includedir}

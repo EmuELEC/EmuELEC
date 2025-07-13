@@ -27,6 +27,11 @@ elif [[ "${DEVICE}" == "Amlogic-ng" ]]; then
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/gondul/r12p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.gondul.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r12p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.dvalin.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so
+elif [[ "${DEVICE}" == "Amlogic-no" ]]; then
+    cp -rf ${PKG_BUILD}/Amlogic-no/* ${INSTALL}/
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/gondul/r37p0/fbdev/libMali_r1p0.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.gondul.so
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r37p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.dvalin.so
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/valhall/r41p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.valhall.so
 elif [[ "${DEVICE}" == "Amlogic-old" ]]; then
 	cp -rf ${PKG_BUILD}/Amlogic-old/* ${INSTALL}/
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so

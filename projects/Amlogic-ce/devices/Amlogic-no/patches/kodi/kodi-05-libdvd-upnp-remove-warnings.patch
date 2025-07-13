@@ -1,0 +1,87 @@
+remove distracted warnings
+
+warning: 'gcc_struct' attribute directive ignored
+  this is due to 'gcc_struct' being undefined for arm
+
+remove messages when files are installed
+-- Installing: /some/destination/path
+-- Up-to-date: /some/destination/path
+
+diff --git a/cmake/modules/FindLibDvdCSS.cmake b/cmake/modules/FindLibDvdCSS.cmake
+index deed2de5ac..9b4c418b81 100644
+--- a/cmake/modules/FindLibDvdCSS.cmake
++++ b/cmake/modules/FindLibDvdCSS.cmake
+@@ -51,6 +51,8 @@ if(NOT TARGET LibDvdCSS::LibDvdCSS)
+     endif()
+   endif()
+
++  string(APPEND LIBDVDCSS_CFLAGS " -Wno-array-parameter")
++
+   if(CORE_SYSTEM_NAME MATCHES windows)
+     set(CMAKE_ARGS -DDUMMY_DEFINE=ON
+                    ${LIBDVD_ADDITIONAL_ARGS})
+@@ -72,7 +74,7 @@ if(NOT TARGET LibDvdCSS::LibDvdCSS)
+                           --prefix=${DEPENDS_PATH}
+                           --libdir=${DEPENDS_PATH}/lib
+                           "CC=${CMAKE_C_COMPILER}"
+-                          "CFLAGS=${CMAKE_C_FLAGS}"
++                          "CFLAGS=${CMAKE_C_FLAGS} ${LIBDVDCSS_CFLAGS}"
+                           "LDFLAGS=${CMAKE_EXE_LINKER_FLAGS} ${LIBDVDCSS_FLAGS}")
+     set(BUILD_COMMAND ${MAKE_EXECUTABLE})
+     set(INSTALL_COMMAND ${MAKE_EXECUTABLE} install)
+diff --git a/cmake/modules/FindLibDvdNav.cmake b/cmake/modules/FindLibDvdNav.cmake
+index 503f559e10..bf070db8d3 100644
+--- a/cmake/modules/FindLibDvdNav.cmake
++++ b/cmake/modules/FindLibDvdNav.cmake
+@@ -47,6 +47,7 @@ if(NOT TARGET LibDvdNav::LibDvdNav)
+   endif()
+
+   string(APPEND LIBDVDNAV_CFLAGS "-D_XBMC")
++  string(APPEND LIBDVDNAV_CFLAGS " -Wno-double-promotion -Wno-return-type")
+
+   if(APPLE)
+     set(LIBDVDNAV_LDFLAGS "-framework CoreFoundation")
+diff --git a/cmake/modules/FindLibDvdRead.cmake b/cmake/modules/FindLibDvdRead.cmake
+index 4dead2d137..1a3ceb70cc 100644
+--- a/cmake/modules/FindLibDvdRead.cmake
++++ b/cmake/modules/FindLibDvdRead.cmake
+@@ -74,6 +74,13 @@ if(NOT TARGET LibDvdRead::LibDvdRead)
+     endif()
+     find_program(MAKE_EXECUTABLE make REQUIRED)
+
++    if(ARCH STREQUAL arm OR ARCH STREQUAL aarch64)
++      string(APPEND LIBDVDREAD_CFLAGS " -Wno-double-promotion -Wno-builtin-macro-redefined")
++      string(APPEND LIBDVDREAD_CFLAGS " -Wno-address-of-packed-member")
++      set (PATCH_COMMAND sed -i "s|((packed,gcc_struct))|((packed))|" src/dvdread/ifo_types.h &&
++                         sed -i "s|-Wsign-compare|-Wno-sign-compare|" configure.ac)
++    endif()
++
+     set(CONFIGURE_COMMAND ${AUTORECONF} -vif
+                   COMMAND ac_cv_path_GIT= ./configure
+                           --target=${HOST_ARCH}
+diff --git a/cmake/scripts/linux/Install.cmake b/cmake/scripts/linux/Install.cmake
+index a1974b2261..aa67ff0dd1 100644
+--- a/cmake/scripts/linux/Install.cmake
++++ b/cmake/scripts/linux/Install.cmake
+@@ -4,6 +4,9 @@ else()
+   set(USE_X11 0)
+ endif()
+
++# print neither "Installing" nor "Up-to-date" messages
++set(CMAKE_INSTALL_MESSAGE NEVER)
++
+ # CMake config
+ set(APP_BINARY ${APP_NAME_LC}${APP_BINARY_SUFFIX})
+ set(APP_PREFIX ${prefix})
+diff --git a/lib/libUPnP/CMakeLists.txt b/lib/libUPnP/CMakeLists.txt
+index 313893e41d..a33d9a7d4d 100644
+--- a/lib/libUPnP/CMakeLists.txt
++++ b/lib/libUPnP/CMakeLists.txt
+@@ -134,3 +134,7 @@ target_link_libraries(lib${APP_NAME_LC} PUBLIC upnp)
+ if(CORE_SYSTEM_NAME STREQUAL windowsstore)
+ 	set_target_properties(upnp PROPERTIES STATIC_LIBRARY_FLAGS "/ignore:4264")
+ endif()
++
++SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nonnull-compare -Wno-unused-label -Wno-double-promotion")
++# need only for CE21
++SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-copy")

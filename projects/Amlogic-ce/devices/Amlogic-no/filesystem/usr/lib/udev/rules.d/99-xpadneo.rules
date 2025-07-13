@@ -1,0 +1,24 @@
+# XPADNEO UDEV BINDING
+# by atar-axis (dollinger.florian@gmx.de)
+
+# in general those files with a higher leading number are processed
+# and executed _later_, that means assignment in those files can overwrite
+# assignments in other rules which are parsed earlier
+
+# every block is a rule. rules are collected from the .rules files
+# according to their name. on every kernel uevent, all rules are
+# compared to that event - one by one.
+
+# kernel versions        manual binding (bind/unbind)   bind uevent             hid_generic greedy      hid_microsoft support   gamepad     method
+# ---------------        ----------------------------   --------------          ------------------      ---------------------   -------     ------
+# [    ... - 2.6.13 [    no                             no                      yes                     no                      *           rmmod (not supported in xpadneo)
+# [ 2.6.13 - 4.14   [    yes                            no                      yes                     no                      *           1: add, hid_generic
+# [   4.14 - 4.16   [    yes                            yes                     yes                     no                      *           2: bind, hid_generc
+# [   4.16 - 4.20   [    yes                            yes                     no                      no                      *           automatic
+# [   4.20 - ...    ]    yes                            yes                     no                      yes                     02FD        3: bind, microsoft
+#                                                                                                                               02E0        automatic
+
+ACTION=="add", \
+KERNEL=="0005:045E:02FD.*|0005:045E:02E0.*", \
+SUBSYSTEM=="hid", \
+RUN:="/bin/sh -c 'echo xpadneo udev: $kernel > /dev/kmsg; modprobe hid_xpadneo; echo $kernel > /sys/bus/hid/drivers/hid-generic/unbind; echo $kernel > /sys/bus/hid/drivers/microsoft/unbind; echo $kernel > /sys/bus/hid/drivers/xpadneo/bind; echo xpadneo udev: ok > /dev/kmsg'"

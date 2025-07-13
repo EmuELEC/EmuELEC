@@ -24,6 +24,9 @@ case "${LINUX}" in
   gameforce-4.4|rockchip-4.4|odroid-go-a-4.4)
     OPT_ENABLE_KERNEL=4.4.0
     ;;
+  amlogic-5.15)
+    OPT_ENABLE_KERNEL=5.15.0
+    ;;
   amlogic-5.4)
     OPT_ENABLE_KERNEL=5.4.0
     ;;
@@ -31,7 +34,7 @@ case "${LINUX}" in
     OPT_ENABLE_KERNEL=3.0.0
     ;;
   *)
-    OPT_ENABLE_KERNEL=5.10.0
+    OPT_ENABLE_KERNEL=6.1.0
     ;;
 esac
 

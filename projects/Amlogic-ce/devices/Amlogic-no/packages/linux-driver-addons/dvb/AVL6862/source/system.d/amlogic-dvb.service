@@ -1,0 +1,12 @@
+[Unit]
+Description=Amlogic DVB module loader
+ConditionPathExists=/proc/device-tree/dvb/
+After=kernel-overlays.service
+
+[Service]
+Type=oneshot
+ExecStart=-/bin/sh -c "[ ! -f '/proc/device-tree/dvb/status' -a $(tr -d '\\0' < /proc/device-tree/dvb/compatible) = "amlogic,dvb" ] && /sbin/modprobe aml_fe"
+ExecStart=-/bin/sh -c "[ -f '/proc/device-tree/dvb/status' -a $(tr -d '\\0' < /proc/device-tree/dvb/status) = "okay" ] && /sbin/modprobe aml_fe"
+
+[Install]
+WantedBy=basic.target

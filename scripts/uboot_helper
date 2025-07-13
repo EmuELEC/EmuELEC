@@ -408,6 +408,8 @@ devices = \
     },
     'Amlogic-ng-dv': {
     },
+    'Amlogic-no': {
+    },
     'Amlogic-ne': {
     },
   },

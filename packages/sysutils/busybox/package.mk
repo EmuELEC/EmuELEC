@@ -24,7 +24,7 @@ if [ "${NFS_SUPPORT}" = yes ]; then
   PKG_DEPENDS_TARGET+=" rpcbind"
 fi
 
-if [ "${DEVICE}" = "Amlogic-ne" ]; then
+if [ "${DEVICE}" = "Amlogic-ng" ] || [ "${DEVICE}" = "Amlogic-no" ]; then
   PKG_DEPENDS_TARGET+=" pciutils"
 fi
 

@@ -21,7 +21,7 @@ pre_configure_target() {
     'Amlogic-old')
       DEVICE_PLATFORMS=('a64' 'AMLGX')
       ;;
-    'Amlogic-ng'|'Amlogic-ne'|'Amlogic-ogu')
+    'Amlogic-ng'|'Amlogic-no'|'Amlogic-ne'|'Amlogic-ogu')
       DEVICE_PLATFORMS=('n2' 'AMLG12B')
       ;;
     'OdroidGoAdvance'|'GameForce')

@@ -29,6 +29,9 @@ export PROJECT="${PROJECT:-Amlogic-ce}"
 # determines DEVICE, if not forced by user
 export DEVICE="${DEVICE:-Amlogic-ne}"
 
+# determines DEVICE, if not forced by user
+export DEVICE="${DEVICE:-Amlogic-no}"
+
 # default to Generic device if building Generic project without device set
 if [ "${PROJECT}" = "Generic" -a -z "${DEVICE}" ]; then
   export DEVICE="Generic"
