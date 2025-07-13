@@ -62,7 +62,7 @@
                      RTL8852BS-aml RTL8152-aml w1-aml"
 
 # Default size of system partition, in MB, eg. 512
-  SYSTEM_SIZE=2560
+  SYSTEM_SIZE=2048
 
 # Default system partition offset, in sectors, eg. 2048
   SYSTEM_PART_START=8192
