@@ -1,0 +1,91 @@
+From 156cfd51d056643a846c594ef6a5d5ebd7bd0a8e Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sun, 17 Nov 2019 09:20:38 +0100
+Subject: [PATCH 1/2] Remove unused libs for Amlogic platform
+
+---
+ src/hyperion-aml/CMakeLists.txt         | 4 ----
+ src/hyperion-framebuffer/CMakeLists.txt | 4 ----
+ src/hyperion-remote/CMakeLists.txt      | 4 ----
+ src/hyperion-v4l2/CMakeLists.txt        | 4 ----
+ src/hyperiond/CMakeLists.txt            | 4 ----
+ 5 files changed, 20 deletions(-)
+
+diff --git a/src/hyperion-aml/CMakeLists.txt b/src/hyperion-aml/CMakeLists.txt
+index 40b04df3..fea62f34 100644
+--- a/src/hyperion-aml/CMakeLists.txt
++++ b/src/hyperion-aml/CMakeLists.txt
+@@ -23,10 +23,6 @@ else()
+ 	target_link_libraries(${PROJECT_NAME} ssdp)
+ endif()
+ 
+-if(ENABLE_AMLOGIC)
+-	target_link_libraries(${PROJECT_NAME} pcre16 dl z)
+-endif()
+-
+ install (TARGETS ${PROJECT_NAME} DESTINATION "share/hyperion/bin" COMPONENT "hyperion_aml")
+ 
+ if(CMAKE_HOST_UNIX)
+diff --git a/src/hyperion-framebuffer/CMakeLists.txt b/src/hyperion-framebuffer/CMakeLists.txt
+index a9470f5c..8ac51da4 100644
+--- a/src/hyperion-framebuffer/CMakeLists.txt
++++ b/src/hyperion-framebuffer/CMakeLists.txt
+@@ -22,10 +22,6 @@ else()
+ 	target_link_libraries(${PROJECT_NAME} ssdp)
+ endif()
+ 
+-if(ENABLE_AMLOGIC)
+-	target_link_libraries(${PROJECT_NAME} pcre16 dl z)
+-endif()
+-
+ install (TARGETS ${PROJECT_NAME} DESTINATION "share/hyperion/bin" COMPONENT "hyperion_framebuffer")
+ 
+ if(CMAKE_HOST_UNIX)
+diff --git a/src/hyperion-remote/CMakeLists.txt b/src/hyperion-remote/CMakeLists.txt
+index ef60a7dc..8046fc15 100644
+--- a/src/hyperion-remote/CMakeLists.txt
++++ b/src/hyperion-remote/CMakeLists.txt
+@@ -21,10 +21,6 @@ target_link_libraries(${PROJECT_NAME}
+ 	Qt${QT_VERSION_MAJOR}::Widgets
+ )
+ 
+-if(ENABLE_AMLOGIC)
+-	target_link_libraries(${PROJECT_NAME} pcre16 dl z)
+-endif()
+-
+ if(ENABLE_MDNS)
+ 	target_link_libraries(${PROJECT_NAME} mdns)
+ else()
+diff --git a/src/hyperion-v4l2/CMakeLists.txt b/src/hyperion-v4l2/CMakeLists.txt
+index 37189cdc..92aadb28 100644
+--- a/src/hyperion-v4l2/CMakeLists.txt
++++ b/src/hyperion-v4l2/CMakeLists.txt
+@@ -22,10 +22,6 @@ else()
+ 	target_link_libraries(${PROJECT_NAME} ssdp)
+ endif()
+ 
+-if(ENABLE_AMLOGIC)
+-	target_link_libraries(${PROJECT_NAME} pcre16 dl z)
+-endif()
+-
+ install (TARGETS ${PROJECT_NAME} DESTINATION "share/hyperion/bin" COMPONENT "hyperion_v4l2")
+ 
+ if(CMAKE_HOST_UNIX)
+diff --git a/src/hyperiond/CMakeLists.txt b/src/hyperiond/CMakeLists.txt
+index 79a0b221..8ecbce4c 100644
+--- a/src/hyperiond/CMakeLists.txt
++++ b/src/hyperiond/CMakeLists.txt
+@@ -71,10 +71,6 @@ if(ENABLE_PROTOBUF_SERVER)
+ 	target_link_libraries(${PROJECT_NAME} protoserver)
+ endif()
+ 
+-if(ENABLE_AMLOGIC)
+-	target_link_libraries(${PROJECT_NAME} pcre16 dl z)
+-endif(ENABLE_AMLOGIC)
+-
+ if(ENABLE_DISPMANX)
+ 	target_link_libraries(${PROJECT_NAME} dispmanx-grabber)
+ endif (ENABLE_DISPMANX)
+-- 
+2.43.2
+

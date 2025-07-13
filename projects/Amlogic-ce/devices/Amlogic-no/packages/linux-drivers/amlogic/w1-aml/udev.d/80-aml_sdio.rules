@@ -1,0 +1,9 @@
+### Amlogic W150S1
+### this driver is split in two individual kernel modules
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="8888:8888", GOTO="load_module"
+GOTO="end"
+
+LABEL="load_module"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", RUN{builtin}+="kmod load aml_sdio", RUN{builtin}+="kmod load vlsicomm"
+
+LABEL="end"

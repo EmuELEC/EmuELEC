@@ -1,0 +1,11 @@
+[Unit]
+Description=Attach /dev/ttyS1 to BlueZ stack using bcm43xx type
+Wants=bluetooth.service
+Before=bluetooth.service
+After=dev-ttyS1.device
+
+[Service]
+Type=simple
+ExecStartPre=/usr/sbin/rfkill unblock bluetooth
+ExecStart=/usr/bin/hciattach -n -s 115200 /dev/ttyS1 bcm43xx 2000000
+ExecStopPost=/usr/sbin/rfkill block bluetooth

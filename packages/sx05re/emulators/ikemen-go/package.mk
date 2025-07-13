@@ -5,7 +5,8 @@
 #
 
 PKG_NAME="ikemen-go"
-PKG_VERSION="dda76beac02a884de867bf48e67b9ba24fe766f3"
+PKG_VERSION="86bd3bf7b378eb31239624c698b295d399f96873"
+PKG_GIT_CLONE_BRANCH="SDL2"
 PKG_REV="1"
 PKG_ARCH="any" 
 PKG_LICENSE="MIT"
@@ -16,6 +17,7 @@ PKG_TOOLCHAIN="manual"
 PKG_SHORTDESC="Open-source fighting game engine"
 PKG_LONGDESC="Ikemen GO is an open-source fighting game engine."
 PKG_IS_TARGET=y
+GET_HANDLER_SUPPORT="git"
 
 pre_configure_target() {
    

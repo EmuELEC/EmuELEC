@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32000">
+		<setting type="lsep" />
+		<setting label="32001" type="labelenum" id="strip_color" values="red|yellow|purple|blue|deepblue|magenta|green|orange" default="red"/>
+		<setting label="32007" type="labelenum" id="number_leds" values="1|all|8|6|4|2" default="all"/>
+		<setting label="32002" type="labelenum" id="solid_effect" values="effect|solid" default="effect"/>
+		<setting label="32003" type="labelenum" id="solid_color_type_on" values="name|hex" default="name"/>
+		<setting label="32004" type="text" id="color_on"      default="101010"/>
+		<setting label="32005" type="text" id="color_off"     default="000000"/>
+		<setting label="32006" type="text" id="color_suspend" default="800080"/>
+    </category>
+</settings>

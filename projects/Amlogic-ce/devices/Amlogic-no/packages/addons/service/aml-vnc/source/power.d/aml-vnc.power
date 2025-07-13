@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2016-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+. /etc/profile
+
+SERVICE="service.aml-vnc.service"
+
+case "$1" in
+  pre)
+    if systemctl is-active "$SERVICE" &>/dev/null ; then
+      systemctl stop "$SERVICE"
+    fi
+    ;;
+  post)
+    if systemctl is-enabled "$SERVICE" &>/dev/null ; then
+      systemctl start "$SERVICE"
+    fi
+    ;;
+esac

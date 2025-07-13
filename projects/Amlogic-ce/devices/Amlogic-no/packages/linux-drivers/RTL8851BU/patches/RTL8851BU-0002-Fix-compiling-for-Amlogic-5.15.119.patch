@@ -1,0 +1,167 @@
+From 0c438fad4d255bffece393c8fd9dc57ec7a52d79 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Mon, 25 Nov 2024 11:44:36 +0100
+Subject: [PATCH] Fix compiling for Amlogic 5.15.119
+
+---
+ os_dep/linux/ioctl_cfg80211.c | 24 ++++++++++++------------
+ os_dep/linux/wifi_regd.c      |  6 +++---
+ os_dep/osdep_service_linux.c  |  4 ++++
+ 3 files changed, 19 insertions(+), 15 deletions(-)
+
+diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
+index 4f124b1..b18e22c 100644
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -235,7 +235,7 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter,
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+ 	struct cfg80211_chan_def chdef;
+-	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
++	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	u16 punct_bitmap = 0; /*TBD*/
+ 	#endif
+ 
+@@ -268,7 +268,7 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter,
+ 	if (!rtw_cfg80211_allow_ch_switch_notify(adapter))
+ 		goto exit;
+ 
+-	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
++	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, link_id, punct_bitmap);
+ 	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
+ 	/* ToDo CONFIG_RTW_MLD */
+@@ -1030,7 +1030,7 @@ check_bss:
+ 		#endif
+ 
+ 		#if defined(CPTCFG_VERSION) || LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
+-		#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
++		#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)
+ 		/* ToDo CONFIG_RTW_MLD */
+ 		roam_info.links[0].bssid = cur_network->network.MacAddress;
+ 		#else
+@@ -1812,7 +1812,7 @@ exit:
+ }
+ 
+ static int cfg80211_rtw_add_key(struct wiphy *wiphy, struct net_device *ndev
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	, int link_id
+ #endif
+ 	, u8 key_index
+@@ -1979,7 +1979,7 @@ addkey_end:
+ }
+ 
+ static int cfg80211_rtw_get_key(struct wiphy *wiphy, struct net_device *ndev
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	, int link_id
+ #endif
+ 	, u8 keyid
+@@ -2180,7 +2180,7 @@ exit:
+ }
+ 
+ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	, int link_id
+ #endif
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+@@ -2206,7 +2206,7 @@ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev
+ }
+ 
+ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy, struct net_device *ndev
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	, int link_id
+ #endif
+ 	, u8 key_index
+@@ -2261,7 +2261,7 @@ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy, struct net_device *
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
+ int cfg80211_rtw_set_default_mgmt_key(struct wiphy *wiphy, struct net_device *ndev
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	, int link_id
+ #endif
+ 	, u8 key_index)
+@@ -5704,7 +5704,7 @@ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *nd
+ }
+ 
+ static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	, unsigned int link_id
+ #endif
+ )
+@@ -6706,7 +6706,7 @@ static int cfg80211_rtw_set_monitor_channel(struct wiphy *wiphy
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+ static int cfg80211_rtw_get_channel(struct wiphy *wiphy,
+ 	struct wireless_dev *wdev,
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)) || defined(CONFIG_MLD_KERNEL_PATCH)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) || defined(CONFIG_MLD_KERNEL_PATCH)
+ 	unsigned int link_id,
+ #endif
+ 	struct cfg80211_chan_def *chandef)
+@@ -8588,7 +8588,7 @@ void dump_mesh_config(void *sel, const struct mesh_config *conf)
+ 	RTW_PRINT_SEL(sel, "path_refresh_time:%u\n", conf->path_refresh_time);
+ 	RTW_PRINT_SEL(sel, "min_discovery_timeout:%u\n", conf->min_discovery_timeout);
+ 	RTW_PRINT_SEL(sel, "dot11MeshHWMPactivePathTimeout:%u\n", conf->dot11MeshHWMPactivePathTimeout);
+-	RTW_PRINT_SEL(sel, "dot11MeshHWMPpreqMinInterval:%u\n", conf->dot11MeshHWMPpreqMinInterval);	
++	RTW_PRINT_SEL(sel, "dot11MeshHWMPpreqMinInterval:%u\n", conf->dot11MeshHWMPpreqMinInterval);
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 3, 0))
+ 	RTW_PRINT_SEL(sel, "dot11MeshHWMPperrMinInterval:%u\n", conf->dot11MeshHWMPperrMinInterval);
+ #endif
+@@ -11313,7 +11313,7 @@ void rtw_wdev_unregister(struct wireless_dev *wdev)
+ 	rtw_cfg80211_indicate_scan_done(adapter, _TRUE);
+ 
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(COMPAT_KERNEL_RELEASE)
+-	#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
++	#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)))
+ 	/* ToDo CONFIG_RTW_MLD */
+ 	if (wdev->valid_links && wdev->links[0].client.current_bss)
+ 	#else
+diff --git a/os_dep/linux/wifi_regd.c b/os_dep/linux/wifi_regd.c
+index 06458c8..a8cdbad 100644
+--- a/os_dep/linux/wifi_regd.c
++++ b/os_dep/linux/wifi_regd.c
+@@ -149,10 +149,10 @@ static void rtw_regd_schedule_dfs_chan_update(struct wiphy *wiphy)
+ 		rtw_regd_set_du_chdef(wiphy);
+ 	}
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
+ 	/* ToDo CONFIG_RTW_MLD */
+ 	cfg80211_ch_switch_notify(wiphy_data->du_wdev->netdev, &wiphy_data->du_chdef, 0, 0);
+-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))
+ 	cfg80211_ch_switch_notify(wiphy_data->du_wdev->netdev, &wiphy_data->du_chdef, 0);
+ #else
+ 	cfg80211_ch_switch_notify(wiphy_data->du_wdev->netdev, &wiphy_data->du_chdef);
+@@ -1054,7 +1054,7 @@ static void rtw_cfg80211_cac_event(struct rf_ctl_t *rfctl, u8 band_idx
+ 			continue;
+ 		if (!iface->rtw_wdev)
+ 			continue;
+-#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
++#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))
+ 		async = !((iface->rtw_wdev)->links[0].ap.chandef.chan);
+ #else
+ 		async = !iface->rtw_wdev->chandef.chan;
+diff --git a/os_dep/osdep_service_linux.c b/os_dep/osdep_service_linux.c
+index b1bc4b1..012bc56 100644
+--- a/os_dep/osdep_service_linux.c
++++ b/os_dep/osdep_service_linux.c
+@@ -15,6 +15,10 @@
+ #define _OSDEP_SERVICE_LINUX_C_
+ #include <drv_types.h>
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))
++MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
++#endif
++
+ #ifdef DBG_MEMORY_LEAK
+ ATOMIC_T _malloc_cnt = ATOMIC_INIT(0);
+ ATOMIC_T _malloc_size = ATOMIC_INIT(0);
+-- 
+2.43.0
+

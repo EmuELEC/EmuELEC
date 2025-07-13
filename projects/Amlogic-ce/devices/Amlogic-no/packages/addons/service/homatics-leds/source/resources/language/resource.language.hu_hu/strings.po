@@ -1,0 +1,74 @@
+ Kodi Media Center language file
+# Addon Name: Homatics LED setup
+# Addon id: service.homatics-leds
+# Addon Provider: Team CoreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#32000"
+msgid "LED"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Effect color"
+msgstr "Ledek színe"
+
+msgctxt "#32002"
+msgid "Effect or solid"
+msgstr "Effekt vagy egyszerű szín"
+
+msgctxt "#32003"
+msgid "Color by name or hex"
+msgstr "Szín neve vagy hex kód"
+
+msgctxt "#32004"
+msgid "Solid color On"
+msgstr "Led színe: box bekapcsolva"
+
+msgctxt "#32005"
+msgid "Solid color Off"
+msgstr "Led színe: box kikapcsolva"
+
+msgctxt "#32006"
+msgid "Solid color Suspend"
+msgstr "Led színe: box alvó állapot"
+
+msgctxt "#32007"
+msgid "Number of LEDs On"
+msgstr "Ledek száma"
+
+msgctxt "#32009"
+msgid "Set red Knight Rider effect"
+msgstr "Vörös Knight rider effekt beállítása"
+
+msgctxt "#32010"
+msgid "Set blue Knight Rider effect"
+msgstr "Kék Knight rider effekt"
+
+msgctxt "#32011"
+msgid "Set green Knight Rider effect"
+msgstr "Zöld Knight rider effekt"
+
+msgctxt "#32012"
+msgid "Set purple Knight Rider effect"
+msgstr "Lila Knight rider effekt"
+
+msgctxt "#32013"
+msgid "Set yellow Knight Rider effect"
+msgstr "Sárga Knight rider effekt"
+
+msgctxt "#32014"
+msgid "Set deepblue Knight Rider effect"
+msgstr "Sötétkék Knight rider effekt"
+
+msgctxt "#32015"
+msgid "Set magenta Knight Rider effect"
+msgstr "Magenta Knight rider effekt"
+
+msgctxt "#32016"
+msgid "Set orange Knight Rider effect"
+msgstr "Narancs Knight rider effekt"
+
+msgctxt "#32017"
+msgid "Set straight purple color"
+msgstr "Állíts be sima lila színt"

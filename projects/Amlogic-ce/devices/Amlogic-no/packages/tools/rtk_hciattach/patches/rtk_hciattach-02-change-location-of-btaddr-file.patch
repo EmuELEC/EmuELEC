@@ -1,0 +1,25 @@
+From ca8ab97b2d72632858867110d76b1d06123485c9 Mon Sep 17 00:00:00 2001
+From: Stanislav Vlasic <svlasic@gmail.com>
+Date: Mon, 15 Aug 2022 00:06:37 +0200
+Subject: [PATCH] Change location of btaddr file
+
+---
+ realtek/rtk_hciattach/rtb_fwc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rtb_fwc.c b/rtb_fwc.c
+index 5e9e370..cac9309 100644
+--- a/rtb_fwc.c
++++ b/rtb_fwc.c
+@@ -39,7 +39,7 @@
+ #define FIRMWARE_DIRECTORY	"/lib/firmware/rtlbt/"
+ #define BT_CONFIG_DIRECTORY	"/lib/firmware/rtlbt/"
+ #define EXTRA_CONFIG_FILE	"/opt/rtk_btconfig.txt"
+-#define BT_ADDR_FILE		"/opt/bdaddr"
++#define BT_ADDR_FILE		"/storage/.config/btaddr"
+ #define BDADDR_STRING_LEN	17
+ 
+ struct list_head {
+-- 
+2.37.2
+

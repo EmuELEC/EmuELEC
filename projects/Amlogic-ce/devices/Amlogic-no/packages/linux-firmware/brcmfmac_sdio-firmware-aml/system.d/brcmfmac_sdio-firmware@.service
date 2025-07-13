@@ -1,0 +1,9 @@
+[Unit]
+Description=Broadcom sdio firmware update for %I
+Wants=bluetooth.service
+Before=bluetooth.service
+After=dev-ttyS1.device
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/brcm_patchram_plus --patchram /usr/lib/kernel-overlays/base/lib/firmware/brcm/%I.hcd --baudrate 2000000 --use_baudrate_for_download /dev/ttyS1 --enable_hci --no2bytes --tosleep=50000

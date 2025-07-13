@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="30000">
+		<setting type="lsep" />
+		<setting id="AML_VNC_PORT" type="number" label="30001" default="5900" />
+		<setting id="AML_VNC_AUTH" type="bool" label="30002" default="true" />
+		<setting id="AML_VNC_PWD" type="text" label="30003" option="hidden" default="coreelec" visible="eq(-1,true)" />
+		<setting id="AML_VNC_STAT" type="bool" label="30004" default="false" />
+		<setting id="AML_VNC_NAME" type="text" label="30005" default="CoreELEC" enable="eq(-1,true)" />
+    </category>
+</settings>

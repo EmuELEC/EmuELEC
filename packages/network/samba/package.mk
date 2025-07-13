@@ -177,6 +177,7 @@ post_makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib/samba
     cp ${PKG_DIR}/scripts/samba-config ${INSTALL}/usr/lib/samba
     cp ${PKG_DIR}/scripts/samba-autoshare ${INSTALL}/usr/lib/samba
+    cp ${PKG_DIR}/scripts/smbpasswd ${INSTALL}/usr/lib/samba
 
   if find_file_path config/smb.conf; then
     mkdir -p ${INSTALL}/etc/samba
@@ -201,6 +202,12 @@ post_makeinstall_target() {
     mkdir -p ${INSTALL}/usr/share/services
       cp -P ${PKG_DIR}/default.d/*.conf ${INSTALL}/usr/share/services
   fi
+  
+  chmod +x ${INSTALL}/usr/sbin/*
+  chmod +x ${INSTALL}/usr/bin/*
+  chmod +x ${INSTALL}/usr/sbin/*
+  chmod +x ${INSTALL}/usr/lib/samba/*
+  chmod +x ${INSTALL}/usr/libexec/samba/*
 }
 
 post_install() {

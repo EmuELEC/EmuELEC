@@ -57,7 +57,7 @@ PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
                        -DSDL_HIDAPI_JOYSTICK=OFF"
 
 case "${DEVICE}" in
-  'Amlogic-ng'|'Amlogic-old')  # We should've used PROJECT=Amlogic-ce logically, but using these two device names here saves a comparasion (only device needs to be compared)
+  'Amlogic-ng'|'Amlogic-no'|'Amlogic-old')  # We should've used PROJECT=Amlogic-ce logically, but using these two device names here saves a comparasion (only device needs to be compared)
     PKG_PATCH_DIRS="Amlogic"
     PKG_CMAKE_OPTS_TARGET+=" -DSDL_MALI=ON -DSDL_KMSDRM=OFF"
   ;;

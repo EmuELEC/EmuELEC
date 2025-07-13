@@ -1,0 +1,13 @@
+[Unit]
+Description=IR remote control support
+Before=graphical.target kodi.service
+After=multi-user.target
+ConditionPathExists=/proc/device-tree/meson-ir/compatible
+ConditionPathExists=/proc/device-tree/meson-remote/compatible
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/coreelec/remote-config
+
+[Install]
+WantedBy=graphical.target

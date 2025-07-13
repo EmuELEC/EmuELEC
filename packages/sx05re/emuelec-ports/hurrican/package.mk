@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="hurrican"
-PKG_VERSION="a7098c899f41c16ccae2e7b555ddcf9f9b07680c"
+PKG_VERSION="3f4bfd340730c0dc4443dd35e4d9a310ecf612ad"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

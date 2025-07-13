@@ -1,0 +1,22 @@
+115
+- Add support for new fb decoder
+114
+- Update to 2.0.16
+113
+- Update to 2.0.15
+112
+- fix dependencies and add new suspend/resume support suspend/resume support by PR hyperion-project/hyperion.ng#1535
+111
+- Update to 2.0.14
+110
+- Update to 2.0.13
+109
+- Update to 2.0.12
+108
+- Update to 2.0.0-alpha.11
+...
+101
+- Add Platform script
+100
+
+- Initial Release @e438bc6

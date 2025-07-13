@@ -1,0 +1,14 @@
+set socket path for easier usage of display command
+
+--- a/tmux.c	2022-08-07 03:30:02.000000000 +0200
++++ b/tmux.c	2022-10-27 19:09:38.616947150 +0200
+@@ -265,6 +265,9 @@ main(int argc, char **argv)
+ #endif
+ 
+ 	label = path = NULL;
++
++	path = xstrdup("/var/run/tmate.sock");
++
+ 	while ((opt = getopt(argc, argv, "h2c:CdFf:lL:qS:uUVvk:n:r:a:")) != -1) {
+ 		switch (opt) {
+ 		case '2':

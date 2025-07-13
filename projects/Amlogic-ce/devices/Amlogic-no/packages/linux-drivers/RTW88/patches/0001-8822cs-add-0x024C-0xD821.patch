@@ -1,0 +1,25 @@
+From 9643604d5edbe8feb528239f32d13c8a5a022555 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 5 Dec 2023 14:27:13 +0100
+Subject: [PATCH 1/2] 8822cs: add 0x024C 0xD821
+
+---
+ rtw8822cs.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/rtw8822cs.c b/rtw8822cs.c
+index 5d68b9a..32d682d 100644
+--- a/rtw8822cs.c
++++ b/rtw8822cs.c
+@@ -11,6 +11,8 @@
+ 
+ static const struct sdio_device_id rtw_8822cs_id_table[] =  {
+ 	{
++		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
++			    SDIO_DEVICE_ID_REALTEK_RTW8821DS),
+ 		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
+ 			    SDIO_DEVICE_ID_REALTEK_RTW8822CS),
+ 		.driver_data = (kernel_ulong_t)&rtw8822c_hw_spec,
+-- 
+2.42.0
+

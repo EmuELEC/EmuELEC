@@ -38,8 +38,14 @@ makeinstall_target() {
       cp -p ${DIR_ARM}/dvalin/r25p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.dvalin.so
       cp -p ${DIR_ARM}/gondul/r25p0/fbdev/libMali.so ${SYSROOT_PREFIX}/usr/lib/
     ;;
+   Amlogic-no)
+      cp -p "${DIR_ARM}/gondul/r25p0/fbdev/libMali-r1p0.so" "${INSTALL}/usr/lib32/libMali.gondul.so"
+      cp -p ${DIR_ARM}/dvalin/r25p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.dvalin.so
+      cp -p ${DIR_ARM}/valhall/r41p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.valhall.so
+      cp -p ${DIR_ARM}/gondul/r25p0/fbdev/libMali.so ${SYSROOT_PREFIX}/usr/lib/
+    ;;
     *)
-      echo "${PKG_NAME}: Trying to install for device ${DEVICE} when only Amlogic-ng, Amlogic-old and Amlogic-ne are supported" 1>&2
+      echo "${PKG_NAME}: Trying to install for device ${DEVICE} when only Amlogic-ng, Amlogic-no, Amlogic-old and Amlogic-ne are supported" 1>&2
       return 1
     ;;
   esac

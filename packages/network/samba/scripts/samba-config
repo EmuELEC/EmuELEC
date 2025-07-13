@@ -118,4 +118,8 @@ fi
 
 mv -f ${SMB_TMP} ${SMB_CONF}
 
+#win11 superior only with password. root:123, previous version does not need password, enter anonymously.
+#copy authenticated password
+cp -f /usr/lib/samba/smbpasswd /run/samba/smbpasswd
+
 exit 0

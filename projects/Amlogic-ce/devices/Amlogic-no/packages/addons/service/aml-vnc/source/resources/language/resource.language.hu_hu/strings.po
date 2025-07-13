@@ -1,0 +1,35 @@
+# Kodi Media Center language file
+# Addon Name: Amlogic VNC Server
+# Addon id: service.aml-vnc
+# Addon Provider: Team CoreELEC
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Server settings"
+msgstr "Szerver beállítások"
+
+msgctxt "#30001"
+msgid "Port"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Use authentication"
+msgstr "Hitelesítés használata"
+
+msgctxt "#30003"
+msgid "Password"
+msgstr "Jelszó"
+
+msgctxt "#30004"
+msgid "Use static name instead of hostname"
+msgstr "Statikus név használata a hosztnév helyett"
+
+msgctxt "#30005"
+msgid "Name to be displayed"
+msgstr "Megjelenített név"

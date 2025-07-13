@@ -1,0 +1,39 @@
+#!/bin/sh
+
+OSRELEASEFILE="/etc/os-release"
+USRCONFFILE="/storage/.config/vfd.conf"
+SYSCONFDIR="/etc/openvfd.conf.d"
+PROC_DT="/proc/device-tree"
+DT_ID=$(dtname)
+
+case $DT_ID in
+  *odroid_hc4*)
+    SYSCONFFILE="$SYSCONFDIR/hc4.conf"
+    ;;
+esac
+
+if [ "$(tr -d '\0' < $PROC_DT/openvfd/compatible)" = "open,vfd" ]; then
+  if [ -f "$USRCONFFILE" ]; then
+    source "$USRCONFFILE"
+  elif [ -f "$SYSCONFFILE" ]; then
+    source "$SYSCONFFILE"
+  else
+    exit 0
+  fi
+  OS_SPLASH_OPT=""
+  if [ -f "$OSRELEASEFILE" ]; then
+    source "$OSRELEASEFILE"
+    OS_SPLASH_OPT="-s CE${VERSION_ID%%.*}"
+  fi
+  /sbin/modprobe openvfd vfd_gpio_clk=${vfd_gpio_clk} \
+                         vfd_gpio_dat=${vfd_gpio_dat} \
+                         vfd_gpio_stb=${vfd_gpio_stb:-0,0,0xFF} \
+                         vfd_gpio0=${vfd_gpio0:-0,0,0xFF} \
+                         vfd_gpio1=${vfd_gpio1:-0,0,0xFF} \
+                         vfd_gpio2=${vfd_gpio2:-0,0,0xFF} \
+                         vfd_gpio3=${vfd_gpio3:-0,0,0xFF} \
+                         vfd_gpio_protocol=${vfd_gpio_protocol:-0,0} \
+                         vfd_chars=${vfd_chars} vfd_dot_bits=${vfd_dot_bits} \
+                         vfd_display_type=${vfd_display_type}
+  /usr/sbin/OpenVFDService $OS_SPLASH_OPT ${clock_12h_format:+-12h}
+fi

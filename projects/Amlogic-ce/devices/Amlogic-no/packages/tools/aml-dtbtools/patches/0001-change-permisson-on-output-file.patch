@@ -1,0 +1,48 @@
+From a2b989862cef8a0f64e3c4b2f5ed7f08b776eb17 Mon Sep 17 00:00:00 2001
+From: Peter Vicman <peter.vicman@gmail.com>
+Date: Wed, 29 Jul 2020 09:57:32 +0200
+Subject: [PATCH 1/2] change permisson on output file
+
+---
+ dtbTool.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/dtbTool.c b/dtbTool.c
+index 385a03e..3335025 100644
+--- a/dtbTool.c
++++ b/dtbTool.c
+@@ -377,7 +377,7 @@ int main(int argc, char **argv)
+             flen = strlen(dp->d_name);
+             if ((flen > 4) &&
+                 (strncmp(&dp->d_name[flen-4], ".dtb", 4) == 0)) {
+-                log_info("Found file: %s ... ", dp->d_name);
++                log_info("Found file: %s\n  ", dp->d_name);
+ 
+                 flen = strlen(input_dir) + strlen(dp->d_name) + 1;
+                 filename = (char *)malloc(flen);
+@@ -439,7 +439,7 @@ int main(int argc, char **argv)
+ 
+     log_info("\nGenerating master DTB... ");
+ 
+-    out_fd = open(output_file, O_WRONLY|O_CREAT | O_TRUNC, S_IRUSR|S_IWUSR);
++    out_fd = open(output_file, O_WRONLY|O_CREAT | O_TRUNC, 0664);
+     if (!out_fd < 0) {
+         log_err("Cannot create '%s'\n", output_file);
+         rc = RC_ERROR;
+@@ -529,11 +529,11 @@ int main(int argc, char **argv)
+     close(out_fd);
+ 
+     if (expected != wrote) {
+-        log_err("error writing output file, please rerun: size mismatch %d vs %d\n",
++        log_err("error writing output file, please rerun: size mismatch %lu vs %lu\n",
+                 expected, wrote);
+         rc = RC_ERROR;
+     } else
+-        log_dbg("Total wrote %u bytes\n", wrote);
++        log_dbg("Total wrote %lu bytes\n", wrote);
+ 
+     if (rc != RC_SUCCESS)
+         unlink(output_file);
+-- 
+2.17.1
+

@@ -1,0 +1,9 @@
+################################################################################
+# udev rules file for loading brcmfmac_sdio-firmware-aml
+################################################################################
+
+### Broadcom AP6275p/BCM43752 bluetooth device
+SUBSYSTEMS=="pci", ATTRS{vendor}=="0x14e4", ACTION=="add", \
+  TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware-aml.service"
+
+LABEL="end"

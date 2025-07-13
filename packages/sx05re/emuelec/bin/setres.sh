@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 # Copyright (C) 2022-present Joshua L (https://github.com/Langerz82)
+# 2025-present DiegroSan (https://github.com/Diegrosan)
 
 # Read the video output mode and set it for emuelec to avoid video flicking.
 
@@ -16,6 +17,26 @@
 
 FILE_MODE="/sys/class/display/mode"
 PLATFORM=""
+
+#here we look for the best framebuffer; the default is fb0, but on some devices it is fb1. Here we choose the best available,
+#thus achieving the best video performance. 
+max_area=0
+max_fb=""
+
+for fb in /sys/class/graphics/fb*/virtual_size; do
+    if [ -f "$fb" ]; then
+        fb_num=$(echo "$fb" | grep -o 'fb[0-9]*' | sed 's/fb//')
+        size=$(cat "$fb")
+        width=$(echo "$size" | cut -d',' -f1)
+        height=$(echo "$size" | cut -d',' -f2)
+        area=$((width * height))
+              
+        if [ $area -gt $max_area ]; then
+            max_area=$area
+            max_fb=$fb_num
+        fi
+    fi
+done
 
 switch_resolution()
 {
@@ -92,10 +113,10 @@ set_main_framebuffer() {
 
   if [[ -n "${FBW}" && "${FBW}" > 0 && -n "${FBH}" && "${FBH}" > 0 ]]; then
     MFBH=$(( FBH*2 ))
-    fbset -fb /dev/fb0 -g ${FBW} ${FBH} ${FBW} ${MFBH} ${BPP}
-    echo 0 0 $(( FBW-1 )) $(( FBH-1 )) > /sys/class/graphics/fb0/free_scale_axis
-    echo 0 > /sys/class/graphics/fb0/free_scale
-    echo 0 > /sys/class/graphics/fb0/freescale_mode
+    fbset -fb /dev/fb$max_fb -g ${FBW} ${FBH} ${FBW} ${MFBH} ${BPP}
+    [[ -f "/sys/class/graphics/fb$max_fb/free_scale_axis" ]] && echo 0 0 $(( FBW-1 )) $(( FBH-1 )) > /sys/class/graphics/fb$max_fb/free_scale_axis
+    [[ -f "/sys/class/graphics/fb$max_fb/free_scale" ]] && echo 0 > /sys/class/graphics/fb$max_fb/free_scale
+    [[ -f "/sys/class/graphics/fb$max_fb/freescale_mode" ]] && echo 0 > /sys/class/graphics/fb$max_fb/freescale_mode
   fi
 }
 
@@ -103,9 +124,9 @@ set_fb_borders() {
 	local CUSTOM_OFFSETS=( ${1} ${2} ${3} ${4} )
 	local COUNT_ARGS=${#CUSTOM_OFFSETS[@]}
 	if [[ "${COUNT_ARGS}" == "4" ]]; then
-	  echo ${CUSTOM_OFFSETS[@]} > /sys/class/graphics/fb0/window_axis
-	  echo 1 > /sys/class/graphics/fb0/freescale_mode
-	  echo 0x10001 > /sys/class/graphics/fb0/free_scale
+	  echo ${CUSTOM_OFFSETS[@]} > /sys/class/graphics/fb$max_fb/window_axis
+	  echo 1 > /sys/class/graphics/fb$max_fb/freescale_mode
+	  echo 0x10001 > /sys/class/graphics/fb$max_fb/free_scale
 	fi
 }
 
@@ -157,7 +178,7 @@ if [[ -n "${BUFF}" ]] && [[ ${BUFF} > 0 ]]; then
 fi
 
 # This is needed to reset scaling.
-echo 0 > /sys/class/ppmgr/ppscaler
+[[ -f "/sys/class/ppmgr/ppscaler" ]] && echo 0 > /sys/class/ppmgr/ppscaler
 
 # Option too Custom set the CVBS Resolution by creating a cvbs_resolution.txt file.
 # File contents must just 2 different integers seperated by a space. e.g. 800 600.
@@ -205,7 +226,7 @@ fi
 CURRENT_MODE=$( cat ${FILE_MODE} )
 if [[ "${CURRENT_MODE}" == "${MODE}" ]]; then
   echo "SET MAIN FRAME BUFFER"
-  set_main_framebuffer ${FBW} ${FBH}
+  set_main_framebuffer ${FBW} ${FBH} 
   blank_buffer
 fi
 
@@ -279,3 +300,4 @@ if [[ ! -z "${BORDER_VALS}" ]]; then
 	set_fb_borders ${A1} ${A2} ${A3} ${A4}
 fi
 # End Legacy code
+
