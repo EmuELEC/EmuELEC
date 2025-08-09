@@ -23,10 +23,6 @@ if [ "${ARCH}" == "arm" ]; then
     PKG_PATCH_DIRS="arm"
 fi
 
-post_unpack() {
-  ( cd "${PKG_BUILD}" && git submodule update --init --recursive )
-}
-
 pre_configure_target() {
   export CXXFLAGS="${CXXFLAGS} -Wno-error=array-bounds -Wswitch -Wsign-compare -I$(get_install_dir asio)/usr/include"
 }
