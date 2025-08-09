@@ -21,10 +21,6 @@ if [ "${ARCH}" == "arm" ]; then
     PKG_PATCH_DIRS="arm"
 fi
 
-post_unpack() {
-  ( cd "${PKG_BUILD}" && git submodule update --init --recursive )
-}
-
 pre_configure_target() {
   export CXXFLAGS="${CXXFLAGS} -Wno-error=array-bounds -Wswitch -Wsign-compare -I$(get_install_dir asio)/usr/include"
   PKG_CMAKE_OPTS_TARGET+=" -DUSE_GLES=ON -DUSE_VULKAN=OFF -DUSE_HOST_SDL=ON -DENABLE_CTEST=OFF -DTEST_AUTOMATION=OFF -DASAN=OFF "
