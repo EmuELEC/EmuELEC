@@ -21,7 +21,6 @@ BLANKSPLASH="/storage/.config/splash/blank.png"
 DEFAULTSPLASH="/storage/.config/splash/splash-1080.png"
 VIDEOSPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
 RANDOMVIDEO="/storage/roms/splash/introvideos"
-DURATION="5"
 
 [ -f "/storage/roms/splash/intro.mp4" ] && VIDEOSPLASH="/storage/roms/splash/intro.mp4"
 [ -f "/storage/.config/splash/loading-game.mp4" ] && GAMELOADINGSPLASH="/storage/.config/splash/loading-game.mp4"
