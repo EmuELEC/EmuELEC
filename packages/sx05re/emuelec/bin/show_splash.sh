@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present SumavisionQ5 (https://github.com/SumavisionQ5)
 # Modifications by Shanti Gilbert (https://github.com/shantigilbert)
@@ -189,9 +187,9 @@ if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ "${VIDEO}" != "1" ]
   else
     # ffplay branch
     if [[ "${EXTENSION,,}" = "mp4" ]]; then
-      ffplay -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" -an "${SPLASH}" > /dev/null 2>&1
+      ffplay -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" "${SPLASH}" > /dev/null 2>&1
     else
-      ffplay -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" -loop 1 -t 3 -an "${SPLASH}" > /dev/null 2>&1
+      ffplay -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" -loop 1 -t 3 "${SPLASH}" > /dev/null 2>&1
     fi
   fi
 else
