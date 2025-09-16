@@ -154,7 +154,7 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="Odroid_N2 Odroid_N2L Odroid_C4 Odroid_HC4 LePotato LaFrite Radxa_Zero Radxa_Zero2"
+    SUBDEVICES="Odroid_N2"
 
   # TEE supported SoC
     TEE_SOC="S905X4"
