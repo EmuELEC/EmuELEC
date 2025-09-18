@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
+# Copyright (C) 2019-present SumavisionQ5 (https://github.com/SumavisionQ5)
+# Modifications by Shanti Gilbert (https://github.com/shantigilbert)
+# 2025-present Mod by DiegroSan
+
+# 12/07/2019 use mpv for all splash 
+# 19/01/2020 use ffplay for all splash 
+# 06/02/2020 move splash to roms folder and add global splash support
 
 # Source predefined functions and variables
 . /etc/profile
