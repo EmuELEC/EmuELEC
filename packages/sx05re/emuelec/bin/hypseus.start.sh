@@ -9,6 +9,8 @@ name=${name%.*}
 config="/storage/.config/emuelec/configs/hypseus"
 configfile="${config}/hypinput.ini"
 
+export AUDIODEV=hw:0,0
+
 if [[ ! -f "${config}/ee_updated" ]]; then
     cp "/usr/config/emuelec/configs/hypseus/hypinput_gamepad.ini" "${configfile}"
 fi

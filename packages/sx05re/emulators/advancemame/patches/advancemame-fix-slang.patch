@@ -1,6 +1,6 @@
---- a/configure.ac
-+++ b/configure.ac
-@@ -717,40 +717,28 @@
+--- a/configure.ac	2025-04-16 09:30:03.284454900 +0200
++++ b/configure.ac	2025-04-16 22:31:02.634757319 +0200
+@@ -732,38 +732,27 @@
  	[ac_lib_slang=auto]
  )
  if test $ac_lib_slang = auto; then
@@ -11,9 +11,9 @@
 -		CFLAGS="SLANG_CFLAGS $CFLAGS"
 -		LIBS="$SLANG_LIBS $LIBS"
 -                AC_MSG_CHECKING([for linking slang])
--                AC_TRY_LINK([
+-                AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 -				#include <slang.h>
--			], [
+-			]], [[
 -				if (SLang_init_tty(-1, 0, 0) < 0) {
 -					perror("SLang_init_tty");
 -					return 1;
@@ -21,7 +21,7 @@
 -
 -				SLang_reset_tty();
 -				return 0;
--			],[ac_lib_slang=yes],[ac_lib_slang=no])
+-			]])],[ac_lib_slang=yes],[ac_lib_slang=no])
 -		AC_MSG_RESULT([$ac_lib_slang])
 -		CFLAGS="$ac_save_CFLAGS"
 -		LIBS="$ac_save_LIBS"
@@ -44,18 +44,19 @@
 +	)
  fi
  if test $ac_lib_slang = yes; then
- 	AC_CHECK_HEADERS([slang.h slang/slang.h], [break])
- 	ac_lib_video="$ac_lib_video slang"
- 	ac_lib_text_flag=yes
+-	AC_CHECK_HEADERS([slang.h slang/slang.h], [break])
+-	ac_lib_video="$ac_lib_video slang"
+-	ac_lib_text_flag=yes
++ 	AC_CHECK_HEADERS([slang.h slang/slang.h], [break])
++ 	ac_lib_video="$ac_lib_video slang"
++ 	ac_lib_text_flag=yes
  fi
 -AC_SUBST([SLANGCFLAGS],[$SLANG_CFLAGS])
 -AC_SUBST([SLANGLIBS],[$SLANG_LIBS])
  AC_SUBST([CONF_LIB_SLANG],[$ac_lib_slang])
--
  
- dnl Checks for ncurses
- AC_ARG_ENABLE(
-@@ -760,36 +748,27 @@
+ 
+@@ -775,34 +764,27 @@
  	[ac_lib_ncurses=auto]
  )
  if test $ac_lib_ncurses = auto; then
@@ -66,14 +67,14 @@
 -		CFLAGS="$NCURSES_CFLAGS $CFLAGS"
 -		LIBS="$NCURSES_LIBS $LIBS"
 -		AC_MSG_CHECKING([for linking ncurses])
--		AC_TRY_LINK([
+-		AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 -				#include <ncurses.h>
--			], [
+-			]], [[
 -				initscr();
 -				noecho();
 -				curs_set(FALSE);
 -				endwin();
--			],[ac_lib_ncurses=yes],[ac_lib_ncurses=no])
+-			]])],[ac_lib_ncurses=yes],[ac_lib_ncurses=no])
 -                AC_MSG_RESULT([$ac_lib_ncurses])
 -                CFLAGS="$ac_save_CFLAGS"
 -                LIBS="$ac_save_LIBS"
@@ -96,13 +97,14 @@
 +	)
  fi
  if test $ac_lib_ncurses = yes; then
- 	ac_lib_video="$ac_lib_video ncurses"
- 	ac_lib_text_flag=yes
+-	ac_lib_video="$ac_lib_video ncurses"
+-	ac_lib_text_flag=yes
++ 	ac_lib_video="$ac_lib_video ncurses"
++ 	ac_lib_text_flag=yes
  fi
 -AC_SUBST([NCURSESCFLAGS],[$NCURSES_CFLAGS])
 -AC_SUBST([NCURSESLIBS],[$NCURSES_LIBS])
++
  AC_SUBST([CONF_LIB_NCURSES],[$ac_lib_ncurses])
--
  
- dnl Checks for freetype
- AC_ARG_ENABLE(
+ 

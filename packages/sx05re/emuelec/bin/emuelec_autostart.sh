@@ -30,6 +30,11 @@ elif [ "${EE_DEVICE}" == "Amlogic-ng" ]; then
 elif [ "${EE_DEVICE}" == "Amlogic-no" ]; then
     rm "/storage/.config/asound.conf" > /dev/null 2>&1
     cp "/storage/.config/asound.conf-amlogic-no" "/storage/.config/asound.conf"
+    
+    AUDIO_DEVICE_NO=$(get_ee_setting ee_audio_device)
+    if [ "${AUDIO_DEVICE_NO,,}" = "auto" ] || [ -z "${AUDIO_DEVICE_NO}" ]; then
+    set_ee_setting "ee_audio_device" "0,2"
+    fi
 fi
 
 HOSTNAME=$(get_ee_setting system.hostname)
