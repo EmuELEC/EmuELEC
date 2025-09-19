@@ -57,25 +57,6 @@ index cd046fe..67cea2d 100644
  // this is which version of the .dat file format we are using
  #define DAT_VERSION 2
  
---- a/src/manymouse/manymouse.c
-+++ b/src/manymouse/manymouse.c
-@@ -17,7 +17,6 @@
- extern const ManyMouseDriver *ManyMouseDriver_evdev;
- extern const ManyMouseDriver *ManyMouseDriver_hidmanager;
- extern const ManyMouseDriver *ManyMouseDriver_hidutilities;
--extern const ManyMouseDriver *ManyMouseDriver_xinput2;
- 
- /*
-  * These have to be in the favored order...obviously it doesn't matter if the
-@@ -31,7 +30,6 @@
-  */
- static const ManyMouseDriver **mice_drivers[] =
- {
--    &ManyMouseDriver_xinput2,
-     &ManyMouseDriver_evdev,
-     &ManyMouseDriver_windows,
-     &ManyMouseDriver_hidmanager,
-
 --- a/src/manymouse/CMakeLists.txt
 +++ b/src/manymouse/CMakeLists.txt
 @@ -1,7 +1,8 @@

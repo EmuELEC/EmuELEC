@@ -9,9 +9,22 @@ PKG_SITE="https://github.com/dolphin-emu/dolphin"
 PKG_URL="${PKG_SITE}.git"
 PKG_DEPENDS_TARGET="toolchain qt-everywhere libevdev"
 PKG_LONGDESC="Dolphin is a GameCube / Wii emulator, allowing you to play games for these two platforms on PC with improvements. "
-PKG_BUILD_FLAGS="-lto"
+PKG_BUILD_FLAGS="lto"
 
-PKG_CMAKE_OPTS_TARGET=" -DENABLE_LTO=ON -DDISTRIBUTOR='EmuELEC' -DBUILD_SHARED_LIBS=OFF -DTHREADS_PTHREAD_ARG=OFF -DENABLE_FBDEV=ON -DENABLE_EGL=ON -DENABLE_X11=OFF -DENABLE_NOGUI=ON -DUSE_DISCORD_PRESENCE=OFF -DENABLE_QT=OFF -DCMAKE_BUILD_TYPE=Release"
+# Configure CMake for LTO with BFD linker
+PKG_CMAKE_OPTS_TARGET=" -DENABLE_LTO=ON \
+                        -DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=bfd' \
+                        -DCMAKE_SHARED_LINKER_FLAGS='-fuse-ld=bfd' \
+                        -DDISTRIBUTOR='EmuELEC' \
+                        -DBUILD_SHARED_LIBS=OFF \
+                        -DTHREADS_PTHREAD_ARG=OFF \
+                        -DENABLE_FBDEV=ON \
+                        -DENABLE_EGL=ON \
+                        -DENABLE_X11=OFF \
+                        -DENABLE_NOGUI=ON \
+                        -DUSE_DISCORD_PRESENCE=OFF \
+                        -DENABLE_QT=OFF \
+                        -DCMAKE_BUILD_TYPE=Release"
 
 makeinstall_target() {
 export CXXFLAGS="`echo ${CXXFLAGS} | sed -e "s|-O.|-O3|g"`"

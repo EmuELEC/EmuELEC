@@ -368,7 +368,7 @@ yabause"
 
 LIBRETRO_S922X_CORES="beetle-saturn \
 mesen \
-multiemu \
+mame \
 mesen-s \
 quicknes \
 virtualjaguar"

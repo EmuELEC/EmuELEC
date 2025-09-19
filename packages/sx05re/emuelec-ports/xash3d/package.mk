@@ -3,7 +3,7 @@
 # Copyright (C) 2022-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="xash3d"
-PKG_VERSION="8af0e2c8b42e02d5a4c589c42d868580011de950"
+PKG_VERSION="b59ba5a1275e052626cea9577da32c634ae5527c"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/FWGS/xash3d-fwgs"
 PKG_URL="https://github.com/FWGS/xash3d-fwgs.git"
@@ -19,7 +19,6 @@ cd ${PKG_BUILD}
 	--prefix=/usr \
 	--sdl2=${PKG_ORIG_SYSROOT_PREFIX}/usr \
 	--64bits \
-	--disable-vgui \
 	--disable-gl \
 	--enable-gles2"
   ./waf configure ${ARGS}

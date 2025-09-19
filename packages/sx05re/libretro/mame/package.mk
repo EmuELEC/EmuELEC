@@ -2,8 +2,8 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="mame"
-PKG_VERSION="20db0f242e4e11a476b548dd57d2ef9cc3e84f03"
-PKG_SHA256="8c414d6dea547d6819cc91be5bfbe1a6ce8d7ec71083e42046c489ebff7c4c73"
+PKG_VERSION="e42c983a90d3334bed659ecc12939ca935bef1c3"
+PKG_SHA256="aa4641216839118834da79682c64d5d08355f32f2f1d6314a4035ca66e1176ce"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame"
@@ -39,6 +39,7 @@ PKG_MAKE_OPTS_TARGET="REGENIE=1 \
 		      ARCH= \
 		      TARGET=mame \
 		      SUBTARGET=mame \
+		      OPTIMIZE=fast \
 		      OSD=retro \
 		      USE_SYSTEM_LIB_EXPAT=1 \
 		      USE_SYSTEM_LIB_ZLIB=1 \
@@ -64,4 +65,11 @@ makeinstall_target() {
   cp *.so ${INSTALL}/usr/lib/libretro/
   mkdir -p ${INSTALL}/usr/config/retroarch/savefiles/mame/hi
   cp plugins/hiscore/hiscore.dat ${INSTALL}/usr/config/retroarch/savefiles/mame/hi
+  mkdir -p ${INSTALL}/usr/config/emuelec/configs/mame
+  cp -rf ${PKG_DIR}/config/* ${INSTALL}/usr/config/emuelec/configs/mame
+  mkdir -p ${INSTALL}/usr/config/emuelec/configs/mame/hash
+  cp -rf $PKG_BUILD/hash/fmtowns_cd.xml ${INSTALL}/usr/config/emuelec/configs/mame/hash
+  cp -rf $PKG_BUILD/hash/apple*.xml ${INSTALL}/usr/config/emuelec/configs/mame/hash
+  mkdir -p ${INSTALL}/usr/bin
+  cp -rf ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin
 }

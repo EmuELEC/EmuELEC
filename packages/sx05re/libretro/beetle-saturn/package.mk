@@ -2,9 +2,8 @@
 # Copyright (C) 2024-present Team EmuELEC (https://emuelec.org)
 
 PKG_NAME="beetle-saturn"
-PKG_VERSION="a3f853a89157a6d562072dac9fc74c86bb3a6e54"
-#PKG_SHA256="b8a7a359c490607187f2dd2ca49af3463731d3816a0b4411aab49dbc2abdc71e"
-PKG_GIT_CLONE_BRANCH="libchdr-update"
+PKG_VERSION="ccba5265f60f8e64a1984c9d14d383606193ea6a"
+PKG_SHA256="f6d23a233a4b66038d20ba13f7b13666bab258478d9e62a4ebfac6dd8eefe2d8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

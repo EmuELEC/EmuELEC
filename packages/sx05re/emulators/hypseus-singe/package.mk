@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="hypseus-singe"
-PKG_VERSION="fc34a26cd097b29aef8b1bebc1db786a28f0f6ae"
+PKG_VERSION="1d8ad1526511d966b6b78a3149b492ca124c1a0a"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL3"

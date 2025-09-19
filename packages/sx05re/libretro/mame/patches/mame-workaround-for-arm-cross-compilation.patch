@@ -70,16 +70,6 @@ diff --git a/3rdparty/bx/src/os.cpp b/3rdparty/bx/src/os.cpp
 index 12586aa8..ae2836ad 100644
 --- a/3rdparty/bx/src/os.cpp
 +++ b/3rdparty/bx/src/os.cpp
-@@ -27,7 +27,8 @@
- 	|| BX_PLATFORM_NX         \
- 	|| BX_PLATFORM_OSX        \
- 	|| BX_PLATFORM_PS4        \
--	|| BX_PLATFORM_RPI
-+	|| BX_PLATFORM_RPI		  \
-+	|| BX_PLATFORM_LINUX_NO_GL
- #	include <sched.h> // sched_yield
- #	if BX_PLATFORM_BSD       \
- 	|| BX_PLATFORM_HAIKU     \
 @@ -45,7 +46,8 @@
  #	if BX_PLATFORM_ANDROID
  #		include <malloc.h> // mallinfo
