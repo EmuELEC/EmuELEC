@@ -8,8 +8,6 @@
 
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
-blank_buffer
-
 if [ -f "/usr/bin/odroidgoa_utils.sh" ]; then
     DEFBRIGHT=$(get_ee_setting brightness.level)
     RACONF=/storage/.config/retroarch/retroarch.cfg
@@ -532,7 +530,6 @@ else
    ret_error=${?}
 fi
 
-#blank_buffer
 # clear terminal window
         reset > /dev/tty < /dev/null 2>&1
         reset > /dev/tty0 < /dev/null 2>&1
@@ -635,11 +632,11 @@ if [[ "${ret_error}" != "0" ]]; then
 
     # Since the error was not because of missing BIOS but we did get an error, display the log to find out
     [[ "${ret_bios}" == "0" ]] && text_viewer -e -w -t "Error! ${PLATFORM}-${EMULATOR}-${CORE}-${ROMNAME}" -f 24 ${EMUELECLOG}
-    blank_buffer
+    emuelec-utils blank_buffer
     exit 1
 else
     echo "exit 0" >> ${EMUELECLOG}
     echo "return_from_game" > /tmp/es_return_from_game
-    blank_buffer
+    emuelec-utils blank_buffer
     exit 0
 fi

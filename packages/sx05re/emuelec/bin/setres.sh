@@ -44,7 +44,6 @@ switch_resolution()
 
   # Here we first clear the primary display buffer of leftover artifacts then set
   # the secondary small buffers flag to stop copying across.
-#  blank_buffer >> /dev/null
 	echo 1 > /sys/class/graphics/fb${max_fb}/blank
   case ${MODE} in
     480cvbs|576cvbs|480p*|480i*|576p*|720p*|1080p*|1440p*|2160p*|576i*|720i*|1080i*|1440i*|2160i*|*x*)
@@ -224,7 +223,7 @@ fi
 CURRENT_SIZE="$( fbset -fb /dev/fb${max_fb} | grep geometry | cut -d' ' -f2-3 )"
 NEW_SIZE="${FBW} ${FBH}"
 if [[ "${CURRENT_SIZE}" != "${NEW_SIZE}" ]]; then
-	blank_buffer
+	emuelec-utils blank_buffer
   echo "SET MAIN FRAME BUFFER"
   set_main_framebuffer ${FBW} ${FBH} 
 fi

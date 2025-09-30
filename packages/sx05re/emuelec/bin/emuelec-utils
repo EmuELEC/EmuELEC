@@ -452,6 +452,13 @@ function createMultidisc() {
   echo -e "\n"
 }
 
+function blank_buffer() {
+# Clears screen buffer
+  # Blank the buffer.
+  dd if=/dev/zero of=/dev/fb0 bs=256K conv=sync,noerror,notrunc > /dev/null 2>&1
+  dd if=/dev/zero of=/dev/fb1 bs=256K conv=sync,noerror,notrunc > /dev/null 2>&1
+}
+
 function init_app_video() {
 	local PLATFORM=$1
 	local ROMNAME=$2
@@ -486,6 +493,8 @@ function end_app_video() {
 
 	# Show exit splash
 	${TBASH} show_splash.sh exit
+ 	
+	blank_buffer
 
 	fbfix 0
 	fbfix 1
