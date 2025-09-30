@@ -200,10 +200,12 @@ if [[ ! -z "${CUSTOM_RES}" ]]; then
   fi
 fi
 
-
-[[ ${OLD_MODE} != ${MODE} ]] && switch_resolution ${MODE}
+BLANK_BUFFER_CALLED=0
+if [[ ${OLD_MODE} != ${MODE} ]]; then
+	blank_buffer && BLANK_BUFFER_CALLED=1
+	switch_resolution ${MODE}
+fi
 MODE=$( cat ${FILE_MODE} )
-
 
 declare -a SIZE=($( get_resolution_size ${MODE} ${FBW} ${FBH}))
 
@@ -223,7 +225,7 @@ fi
 CURRENT_SIZE="$( fbset -fb /dev/fb${max_fb} | grep geometry | cut -d' ' -f2-3 )"
 NEW_SIZE="${FBW} ${FBH}"
 if [[ "${CURRENT_SIZE}" != "${NEW_SIZE}" ]]; then
-	blank_buffer >> /dev/null
+	[[ "${BLANK_BUFFER_CALLED}" == 0 ]] && blank_buffer
   echo "SET MAIN FRAME BUFFER"
   set_main_framebuffer ${FBW} ${FBH} 
 fi
