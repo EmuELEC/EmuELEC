@@ -457,20 +457,21 @@ function init_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
-	blank_buffer
-
 	[[ -f "/tmp/EE_LASTVIDEO" ]] && return
 
 	echo "$(cat /sys/class/display/mode)" > /tmp/EE_LASTVIDEO
 	local VIDEO_EMU=$(get_ee_setting nativevideo "${PLATFORM}" "${BASEROMNAME}")
 	[[ -z "$VIDEO_EMU" ]] && VIDEO_EMU=$(cat /tmp/EE_LASTVIDEO)
 
+	# Set the display video to that of the emulator setting.
+	[ ! -z "${VIDEO_EMU}" ] && ${TBASH} setres.sh "${VIDEO_EMU}" "${PLATFORM}" "${BASEROMNAME}" # set display
+
 	# Show splash screen if enabled
 	local SPL=$(get_ee_setting ee_splash.enabled)
 	[ "${SPL}" -eq "1" ] && ${TBASH} show_splash.sh gameloading "${PLATFORM}" "${ROMNAME}"
 
-	# Set the display video to that of the emulator setting.
-	[ ! -z "${VIDEO_EMU}" ] && ${TBASH} setres.sh "${VIDEO_EMU}" "${PLATFORM}" "${BASEROMNAME}" # set display
+	fbfix 0
+	fbfix 1
 }
 
 function end_app_video() {
@@ -484,7 +485,8 @@ function end_app_video() {
 	# Show exit splash
 	${TBASH} show_splash.sh exit
 
-  blank_buffer
+	fbfix 0
+	fbfix 1
 
 	rm /tmp/EE_LASTVIDEO
 }
