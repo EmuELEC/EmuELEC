@@ -45,13 +45,14 @@ switch_resolution()
   # Here we first clear the primary display buffer of leftover artifacts then set
   # the secondary small buffers flag to stop copying across.
 #  blank_buffer >> /dev/null
-
+	echo 1 > /sys/class/graphics/fb${max_fb}/blank
   case ${MODE} in
     480cvbs|576cvbs|480p*|480i*|576p*|720p*|1080p*|1440p*|2160p*|576i*|720i*|1080i*|1440i*|2160i*|*x*)
       echo null > "${FILE_MODE}"
       sleep 1
       echo ${MODE} > "${FILE_MODE}"
   esac
+	echo 0 > /sys/class/graphics/fb${max_fb}/blank
 	NEW_MODE=$( cat ${FILE_MODE} )
 	[[ "${NEW_MODE}" != "${MODE}" ]] && exit 1
 }
@@ -200,9 +201,7 @@ if [[ ! -z "${CUSTOM_RES}" ]]; then
   fi
 fi
 
-BLANK_BUFFER_CALLED=0
 if [[ ${OLD_MODE} != ${MODE} ]]; then
-	blank_buffer && BLANK_BUFFER_CALLED=1
 	switch_resolution ${MODE}
 fi
 MODE=$( cat ${FILE_MODE} )
@@ -225,7 +224,7 @@ fi
 CURRENT_SIZE="$( fbset -fb /dev/fb${max_fb} | grep geometry | cut -d' ' -f2-3 )"
 NEW_SIZE="${FBW} ${FBH}"
 if [[ "${CURRENT_SIZE}" != "${NEW_SIZE}" ]]; then
-	[[ "${BLANK_BUFFER_CALLED}" == 0 ]] && blank_buffer
+	blank_buffer
   echo "SET MAIN FRAME BUFFER"
   set_main_framebuffer ${FBW} ${FBH} 
 fi
