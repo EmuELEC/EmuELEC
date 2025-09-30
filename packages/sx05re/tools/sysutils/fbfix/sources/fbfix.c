@@ -13,19 +13,19 @@
 int main(int argc, char *argv[])
 {
 		if (argc != 2) {
-				fprintf(stderr, "Usage: %s <fb index 0-9>\n", argv[0]);
+				fprintf(stderr, "Usage: %s <fb index 0-3>\n", argv[0]);
 				return 1;
 		}
 
 		// Validate argument
 		if (strlen(argv[1]) != 1 || !isdigit(argv[1][0])) {
-				fprintf(stderr, "Error: framebuffer index must be a single digit (0-9)\n");
+				fprintf(stderr, "Error: framebuffer index must be a single digit (0-3)\n");
 				return 1;
 		}
 
 		int fb_index = argv[1][0] - '0';
-		if (fb_index < 0 || fb_index > 9) {
-				fprintf(stderr, "Error: framebuffer index must be between 0 and 9\n");
+		if (fb_index < 0 || fb_index > 3) {
+				fprintf(stderr, "Error: framebuffer index must be between 0 and 3\n");
 				return 1;
 		}
 
