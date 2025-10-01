@@ -464,9 +464,10 @@ function init_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
+	fbfix 0
+	fbfix 1
+
   if [[ "${PLATFORM}" == "setup" ]]; then 
-		fbfix 0
-		fbfix 1
 		return
 	fi
 
@@ -492,9 +493,10 @@ function end_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
+	fbfix 0
+	fbfix 1
+
 	if [[ "${PLATFORM}" == "setup" ]]; then 
-		fbfix 0
-		fbfix 1
 		return
 	fi
 
