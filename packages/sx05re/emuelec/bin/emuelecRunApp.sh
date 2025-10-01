@@ -22,5 +22,5 @@ init_game
 
 "$@"
 
-[[ -z "${RUNEMU}" ]] && emuelec-utils end_app_video
+[[ -z "${RUNEMU}" ]] && emuelec-utils end_app_video "${PLATFORM}" "${ROMNAME}"
 end_game

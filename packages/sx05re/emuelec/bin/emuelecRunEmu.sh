@@ -539,7 +539,7 @@ fi
 # END loading
 [[ "${LIBRETRO}" = "yes" ]] && ${TBASH} show_splash.sh "stopplayer"
 
-emuelec-utils end_app_video
+emuelec-utils end_app_video "${PLATFORM}" "${ROMNAME}"
 
 emuelec-utils set_rotation "0" "${EMULATOR}"
 

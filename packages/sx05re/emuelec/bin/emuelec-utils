@@ -464,10 +464,7 @@ function init_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
-  if [[ "${PLATFORM}" == "setup" ]]; then
-		 touch /tmp/EE_SKIP_APP_VIDEO
-		 return
-	fi
+  [[ "${PLATFORM}" == "setup" ]] && return
 
 	[[ -f "/tmp/EE_LASTVIDEO" ]] && return
 
@@ -487,10 +484,11 @@ function init_app_video() {
 }
 
 function end_app_video() {
-	if [[ -f "/tmp/EE_SKIP_APP_VIDEO" ]]; then
-		rm /tmp/EE_SKIP_APP_VIDEO
-		return
-	fi
+	local PLATFORM=$1
+	local ROMNAME=$2
+	local BASEROMNAME=${ROMNAME##*/}
+
+	[[ "${PLATFORM}" == "setup" ]] && return
 
 	local LAST_VIDEO="$(cat /tmp/EE_LASTVIDEO)"
 
