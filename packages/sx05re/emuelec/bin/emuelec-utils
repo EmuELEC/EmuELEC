@@ -464,7 +464,11 @@ function init_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
-  [[ "${PLATFORM}" == "setup" ]] && return
+  if [[ "${PLATFORM}" == "setup" ]]; then 
+		fbfix 0
+		fbfix 1
+		return
+	fi
 
 	[[ -f "/tmp/EE_LASTVIDEO" ]] && return
 
@@ -488,7 +492,11 @@ function end_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
-	[[ "${PLATFORM}" == "setup" ]] && return
+	if [[ "${PLATFORM}" == "setup" ]]; then 
+		fbfix 0
+		fbfix 1
+		return
+	fi
 
 	local LAST_VIDEO="$(cat /tmp/EE_LASTVIDEO)"
 
