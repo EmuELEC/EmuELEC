@@ -464,7 +464,10 @@ function init_app_video() {
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
-  [[ "${PLATFORM}" == "setup" ]] && return
+  if [[ "${PLATFORM}" == "setup" ]]; then
+		 touch /tmp/EE_SKIP_APP_VIDEO
+		 return
+	fi
 
 	[[ -f "/tmp/EE_LASTVIDEO" ]] && return
 
@@ -484,6 +487,11 @@ function init_app_video() {
 }
 
 function end_app_video() {
+	if [[ -f "/tmp/EE_SKIP_APP_VIDEO" ]]; then
+		rm /tmp/EE_SKIP_APP_VIDEO
+		return
+	fi
+
 	local LAST_VIDEO="$(cat /tmp/EE_LASTVIDEO)"
 
 	[[ ! -f "/tmp/EE_LASTVIDEO" ]] && return
@@ -500,6 +508,7 @@ function end_app_video() {
 	fbfix 1
 
 	rm /tmp/EE_LASTVIDEO
+	rm /tmp/EE_SKIP_APP_VIDEO
 }
 
 function set_gptokeyb() {
