@@ -467,13 +467,14 @@ function init_app_video() {
 	fbfix 0
 	fbfix 1
 
-	echo $BASEROMNAME > /tmp/ee_romname
-
 	if [[ "${PLATFORM}" == "ports" ]] && [[ "${BASEROMNAME}" == "PortMaster.sh" ]]; then 
 		return
 	fi
 	
   if [[ "${PLATFORM}" == "setup" ]]; then 
+		blank_buffer
+		fbfix 0
+		fbfix 1
 		return
 	fi
 
