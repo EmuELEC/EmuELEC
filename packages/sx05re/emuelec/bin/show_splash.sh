@@ -29,7 +29,7 @@ PLATFORM=${PLATFORM,,}
 PLAYER_VID="ffplay"
 PLAYER_IMG="mpv"
 
-have_mpv=0; command -v mpv >/dev/null 2>&1 && have_mpv=1
+have_mpv=0
 
 case ${PLATFORM} in
   arcade|fba|fbn|neogeo|mame|cps*) PLATFORM="arcade" ;;
