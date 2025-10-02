@@ -134,7 +134,7 @@ if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]];
       if [ "${have_mpv}" -eq 1 ]; then
         ${PLAYER_IMG} --fullscreen --no-keepaspect --vf="${MPV_VF}" --image-display-duration=${DURATION} "${SPLASH}" >/dev/null 2>&1
       else
-        ffplay -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" -t ${DURATION} -loop 1 -framerate 1 -i "${SPLASH}" >/dev/null 2>&1
+        ffplay -fs -loglevel error -nostats -vf "${FILTER_FILL}" -autoexit -i "${SPLASH}" >/dev/null 2>&1 && [[ -n "${DURATION}" ]] && [[ "${DURATION}" -gt 0 ]] && sleep ${DURATION}
       fi
     elif is_video "${SPLASH}"; then
       if [ -n "${DURATION}" ] && [ "${DURATION}" -gt 0 ]; then
