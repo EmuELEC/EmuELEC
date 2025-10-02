@@ -122,26 +122,28 @@ if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]];
   if [ "${ACTION_TYPE}" != "intro" ]; then
     LOADING_DURATION="$(get_ee_setting ee_splash_loading_duration)"
     DURATION="${LOADING_DURATION}"
-		[ -z "${DURATION}" ] && DURATION=3
 
     if [ "${ACTION_TYPE}" = "exit" ]; then
 			EXIT_DURATION="$(get_ee_setting ee_splash_exit_duration)"
 			DURATION="${EXIT_DURATION}"
-			[ -z "${DURATION}" ] && DURATION=3
     fi
+
+		if [ -z "${DURATION}" ] || [ ! -n ${DURATION} ] || [ ${DURATION} -lt 3 ]; then
+			DURATION=3
+		fi
 
     if is_image "${SPLASH}"; then
       if [ "${have_mpv}" -eq 1 ]; then
         ${PLAYER_IMG} --fullscreen --no-keepaspect --vf="${MPV_VF}" --image-display-duration=${DURATION} "${SPLASH}" >/dev/null 2>&1
       else
-        ffplay -fs -loglevel error -nostats -vf "${FILTER_FILL}" -autoexit -i "${SPLASH}" >/dev/null 2>&1 && [[ -n "${DURATION}" ]] && [[ "${DURATION}" -gt 0 ]] && sleep ${DURATION}
+        ffplay -autoexit -fs -loglevel error -nostats -vf "${FILTER_FILL}" -i "${SPLASH}" -t ${DURATION} >/dev/null 2>&1 && sleep ${DURATION}
       fi
     elif is_video "${SPLASH}"; then
       if [ -n "${DURATION}" ] && [ "${DURATION}" -gt 0 ]; then
         if [ "${PLAYER_VID}" = "ffplay" ]; then
           ${PLAYER_VID} -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" -t ${DURATION} -i "${SPLASH}" >/dev/null 2>&1
         else
-          ${PLAYER_VID} --fullscreen --no-keepaspect --vf="${MPV_VF}" --length=${DURATION} "${SPLASH}" >/dev/null 2>&1
+          ${PLAYER_VID} --fullscreen --no-keepaspect --vf="${MPV_VF}" --length=${DURATION} "${SPLASH}" -t 1 >/dev/null 2>&1
         fi
       else
         if [ "${PLAYER_VID}" = "ffplay" ]; then
