@@ -1,0 +1,436 @@
+From 96e7ce0bcd1d0ae84a9974f7fd7c18e37da9c449 Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 03:03:33 +1000
+Subject: [PATCH 1/8] Update README.md
+
+---
+ README.md | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/README.md b/README.md
+index 41d1d870..c83e3652 100644
+--- a/README.md
++++ b/README.md
+@@ -14,17 +14,21 @@ mame2010 requires that the following directories exist, and will create them if
+ 
+ libretro system subfolders:
+ 
+-- libretro system folder/mame2010/ - `cheat.zip` cheats file - not currently working
++- libretro system folder/mame2010/ - `cheat.zip` file DOES NOT work in here!
++- libretro system folder/mame2010/cheat/ unziped `.xml` cheat file(s) doesn't work in here!
++- libretro system folder/mame2010/ini
+ - libretro system folder/mame2010/artwork
+ - libretro system folder/mame2010/crosshairs
+ - libretro system folder/mame2010/fonts
+ - libretro system folder/mame2010/samples
+ 
+ libretro saves subfolders
++- libretro saves folder/mame2010/ - `cheat.zip` file ONLY works in here.
++- libretro saves folder/mame2010/cheat/ - unziped `.xml` cheat file(s) can be added in here (optional).
+ - libretro saves folder/mame2010/cfg
+ - libretro saves folder/mame2010/comment
+ - libretro saves folder/mame2010/ctrlr
+-- libretro saves folder/mame2010/ini
++- libretro saves folder/mame2010/ini/ - `mame.ini` file can be found in here.
+ - libretro saves folder/mame2010/input
+ - libretro saves folder/mame2010/memcard
+ - libretro saves folder/mame2010/nvram
+@@ -67,4 +71,4 @@ _Note: these controls are only operational for Player 1_
+ 	RETRO_DEVICE_ID_JOYPAD_L3           Test/Service Mode
+     RETRO_DEVICE_ID_JOYPAD_R3           Enter MAME UI
+ 	RETRO_DEVICE_ID_JOYPAD_A            MAME: IPT_UI_SELECT (Make selections in the MAME GUI)
+-      
+\ No newline at end of file
++      
+
+From 65e54808e9178c8d8f2b1ee8a8baf86de4e2e7c1 Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 03:44:37 +1000
+Subject: [PATCH 2/8] Update retromain.c
+
+Cheat enable Fixed.
+---
+ src/osd/retro/retromain.c | 37 +++++++++++++++++++++++++++++++------
+ 1 file changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/src/osd/retro/retromain.c b/src/osd/retro/retromain.c
+index c89edd5c..3f2c0e8d 100755
+--- a/src/osd/retro/retromain.c
++++ b/src/osd/retro/retromain.c
+@@ -63,6 +63,7 @@ static int mouse_mode = 1;
+ static bool videoapproach1_enable = false;
+ bool hide_nagscreen = false;
+ bool hide_gameinfo = false;
++bool cheat_enable = false;
+ bool hide_warnings = false;
+ 
+ static void update_geometry();
+@@ -226,6 +227,10 @@ void retro_init (void)
+     path_mkdir(libretro_save_directory);
+  
+     // content loaded from mame2010 subfolder within the libretro system folder
++    snprintf(cheatpath, sizeof(cheatpath), "%s%s%s", libretro_system_directory, path_default_slash(), "cheat");
++    path_mkdir(cheatpath);
++    snprintf(inipath, sizeof(inipath), "%s%s%s", libretro_system_directory, path_default_slash(), "ini");
++    path_mkdir(inipath);
+     snprintf(samplepath, sizeof(samplepath), "%s%s%s", libretro_system_directory, path_default_slash(), "samples");
+     path_mkdir(samplepath);
+     snprintf(artpath, sizeof(artpath), "%s%s%s", libretro_system_directory, path_default_slash(), "artwork");
+@@ -236,10 +241,12 @@ void retro_init (void)
+     path_mkdir(crosshairpath);
+ 
+     // user-generated content loaded from mame2010 subfolder within the libretro save folder
+-    snprintf(ctrlrpath, sizeof(ctrlrpath), "%s%s%s", libretro_save_directory, path_default_slash(), "ctrlr");
+-    path_mkdir(ctrlrpath);
++    snprintf(cheatpath, sizeof(cheatpath), "%s%s%s", libretro_save_directory, path_default_slash(), "cheat");
++    path_mkdir(cheatpath);
+     snprintf(inipath, sizeof(inipath), "%s%s%s", libretro_save_directory, path_default_slash(), "ini");
+     path_mkdir(inipath);
++    snprintf(ctrlrpath, sizeof(ctrlrpath), "%s%s%s", libretro_save_directory, path_default_slash(), "ctrlr");
++    path_mkdir(ctrlrpath);
+     snprintf(cfg_directory, sizeof(cfg_directory), "%s%s%s", libretro_save_directory, path_default_slash(), "cfg");
+     path_mkdir(cfg_directory);
+     snprintf(nvram_directory, sizeof(nvram_directory), "%s%s%s", libretro_save_directory, path_default_slash(), "nvram");
+@@ -589,6 +596,7 @@ void retro_set_environment(retro_environment_t cb)
+       //Shell for CPU overclock setting. Search mame_current_overclock for other pieces
+       //{ "mame_current_overclock", "Main CPU Overclock; 100|25|30|35|40|45|50|55|60|65|70|75|80|95|90|95|105|110|115|120" },
+       { "mame_current_videoapproach1_enable", "Video approach 1 Enabled; disabled|enabled" },
++      { "mame_current_cheat", "Cheat enable; disabled|enabled" },
+       { "mame_current_skip_nagscreen", "Hide nag screen; enabled|disabled" },
+       { "mame_current_skip_gameinfo", "Hide game info screen; disabled|enabled" },
+       { "mame_current_skip_warnings", "Hide warning screen; disabled|enabled" },
+@@ -659,6 +667,17 @@ static void check_variables(void)
+       if (!strcmp(var.value, "enabled"))
+          hide_gameinfo = true;
+    }
++   
++   var.key = "mame_current_cheat";
++   var.value = NULL;
++   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
++   {
++      retro_log(RETRO_LOG_INFO, "[MAME 2010] cheat_enable value: %s\n", var.value);
++      if (!strcmp(var.value, "disabled"))
++         cheat_enable = false;
++      if (!strcmp(var.value, "enabled"))
++         cheat_enable = true;
++   }
+ 
+    var.key = "mame_current_skip_warnings";
+    var.value = NULL;
+@@ -1943,7 +1962,7 @@ int executeGame(char* path) {
+ 
+ 	if (tate) {
+ 		if (screenRot == 3) {
+-			xargv[paramCount++] =(char*) "-rol";
++			xargv[paramCount++] = (char*) "-rol";
+ 		} else {
+ 			xargv[paramCount++] = (char*)(screenRot ? "-mouse" : "-ror");
+ 		}
+@@ -1956,15 +1975,21 @@ int executeGame(char* path) {
+ 	}
+ 
+ 	if(hide_gameinfo) {
+-		xargv[paramCount++] =(char*) "-skip_gameinfo";
++		xargv[paramCount++] = (char*) "-skip_gameinfo";
++	}
++	
++	if(cheat_enable) {
++		xargv[paramCount++] = (char*) "-cheat";
++	} else {
++		xargv[paramCount++] = (char*) "-nocheat";
+ 	}
+ 
+ 	if(hide_nagscreen) {
+-		xargv[paramCount++] =(char*) "-skip_nagscreen";
++		xargv[paramCount++] = (char*) "-skip_nagscreen";
+ 	}
+ 
+ 	if(hide_warnings) {
+-		xargv[paramCount++] =(char*) "-skip_warnings";
++		xargv[paramCount++] = (char*) "-skip_warnings";
+ 	}
+ 
+ 	xargv[paramCount++] = MgameName;
+
+From 84767238401ffe3844915d3668d22f3c96c6a5b6 Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 03:54:22 +1000
+Subject: [PATCH 3/8] Fixed Cheat Enable
+
+---
+ src/osd/retro/retromain.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/osd/retro/retromain.c b/src/osd/retro/retromain.c
+index 3f2c0e8d..338bbccc 100755
+--- a/src/osd/retro/retromain.c
++++ b/src/osd/retro/retromain.c
+@@ -63,8 +63,8 @@ static int mouse_mode = 1;
+ static bool videoapproach1_enable = false;
+ bool hide_nagscreen = false;
+ bool hide_gameinfo = false;
+-bool cheat_enable = false;
+ bool hide_warnings = false;
++bool cheat_enable = false;
+ 
+ static void update_geometry();
+ static unsigned int turbo_enable, turbo_state, turbo_delay = 5;
+
+From ab65119f992f4fbf7bd5fa5b20f2c5549ae49c7b Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 04:06:04 +1000
+Subject: [PATCH 4/8] Update README.md
+
+---
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index c83e3652..84fc98b8 100644
+--- a/README.md
++++ b/README.md
+@@ -22,7 +22,7 @@ libretro system subfolders:
+ - libretro system folder/mame2010/fonts
+ - libretro system folder/mame2010/samples
+ 
+-libretro saves subfolders
++libretro saves subfolders:
+ - libretro saves folder/mame2010/ - `cheat.zip` file ONLY works in here.
+ - libretro saves folder/mame2010/cheat/ - unziped `.xml` cheat file(s) can be added in here (optional).
+ - libretro saves folder/mame2010/cfg
+
+From bf3c0dfc50a6c762dd1f1bd033e6f15573fc9da4 Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sun, 9 Jul 2023 23:30:39 +1000
+Subject: [PATCH 5/8] Delete README.md
+
+---
+ README.md | 74 -------------------------------------------------------
+ 1 file changed, 74 deletions(-)
+ delete mode 100644 README.md
+
+diff --git a/README.md b/README.md
+deleted file mode 100644
+index 84fc98b8..00000000
+--- a/README.md
++++ /dev/null
+@@ -1,74 +0,0 @@
+-# mame2010
+-
+-Port of MAME 0.139 for libretro, originally sourced from https://github.com/mamedev/mame/releases/download/mame0139/mame0139s.zip
+-
+-The OSD code is highly inspired by other MAME ports :
+- 
+-- mame2003 : https://github.com/libretro/mame2003-libretro
+-- ps3 mame0.125 port     : http://www.volny.cz/molej/ps3/mame_ps3.htm
+-- mame4droid             : http://code.google.com/p/imame4all/source/browse/
+-
+-## Directories
+-
+-mame2010 requires that the following directories exist, and will create them if they are missing.
+-
+-libretro system subfolders:
+-
+-- libretro system folder/mame2010/ - `cheat.zip` file DOES NOT work in here!
+-- libretro system folder/mame2010/cheat/ unziped `.xml` cheat file(s) doesn't work in here!
+-- libretro system folder/mame2010/ini
+-- libretro system folder/mame2010/artwork
+-- libretro system folder/mame2010/crosshairs
+-- libretro system folder/mame2010/fonts
+-- libretro system folder/mame2010/samples
+-
+-libretro saves subfolders:
+-- libretro saves folder/mame2010/ - `cheat.zip` file ONLY works in here.
+-- libretro saves folder/mame2010/cheat/ - unziped `.xml` cheat file(s) can be added in here (optional).
+-- libretro saves folder/mame2010/cfg
+-- libretro saves folder/mame2010/comment
+-- libretro saves folder/mame2010/ctrlr
+-- libretro saves folder/mame2010/ini/ - `mame.ini` file can be found in here.
+-- libretro saves folder/mame2010/input
+-- libretro saves folder/mame2010/memcard
+-- libretro saves folder/mame2010/nvram
+-
+-
+-## Default Player 1 and 2 Controls: 
+-
+-	RETRO_DEVICE_ID_JOYPAD_START        MAME: KEY_START
+-	RETRO_DEVICE_ID_JOYPAD_SELECT       MAME: KEY_COIN
+-	RETRO_DEVICE_ID_JOYPAD_A            MAME: KEY_BUTTON_1
+-	RETRO_DEVICE_ID_JOYPAD_B            MAME: KEY_BUTTON_2
+-	RETRO_DEVICE_ID_JOYPAD_X            MAME: KEY_BUTTON_3
+-	RETRO_DEVICE_ID_JOYPAD_Y            MAME: KEY_BUTTON_4
+-	RETRO_DEVICE_ID_JOYPAD_L            MAME: KEY_BUTTON_5
+-	RETRO_DEVICE_ID_JOYPAD_R            MAME: KEY_BUTTON_6
+-	RETRO_DEVICE_ID_JOYPAD_L2           MAME: KEY_BUTTON_7
+-	RETRO_DEVICE_ID_JOYPAD_UP           MAME: KEY_JOYSTICK_U
+-	RETRO_DEVICE_ID_JOYPAD_DOWN         MAME: KEY_JOYSTICK_D
+-	RETRO_DEVICE_ID_JOYPAD_LEFT         MAME: KEY_JOYSTICK_L
+-	RETRO_DEVICE_ID_JOYPAD_RIGHT        MAME: KEY_JOYSTICK_R
+-	RETRO_DEVICE_ID_JOYPAD_R2           Turbo Button
+-
+-## Default Player 3 and 4 Controls: 
+-
+-	RETRO_DEVICE_ID_JOYPAD_START        MAME: KEY_START
+-	RETRO_DEVICE_ID_JOYPAD_SELECT       MAME: KEY_COIN
+-	RETRO_DEVICE_ID_JOYPAD_A            MAME: KEY_BUTTON_1
+-	RETRO_DEVICE_ID_JOYPAD_B            MAME: KEY_BUTTON_2
+-	RETRO_DEVICE_ID_JOYPAD_X            MAME: KEY_BUTTON_3
+-	RETRO_DEVICE_ID_JOYPAD_UP           MAME: KEY_JOYSTICK_U
+-	RETRO_DEVICE_ID_JOYPAD_DOWN         MAME: KEY_JOYSTICK_D
+-	RETRO_DEVICE_ID_JOYPAD_LEFT         MAME: KEY_JOYSTICK_L
+-	RETRO_DEVICE_ID_JOYPAD_RIGHT        MAME: KEY_JOYSTICK_R
+-	RETRO_DEVICE_ID_JOYPAD_R2           Turbo Button
+-    
+-## Native MAME UI Controls:
+-
+-_Note: these controls are only operational for Player 1_
+-
+-	RETRO_DEVICE_ID_JOYPAD_L3           Test/Service Mode
+-    RETRO_DEVICE_ID_JOYPAD_R3           Enter MAME UI
+-	RETRO_DEVICE_ID_JOYPAD_A            MAME: IPT_UI_SELECT (Make selections in the MAME GUI)
+-      
+
+From fb4a3ab2945178797af7cbd406c6f414fb61e23d Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Mon, 10 Jul 2023 00:02:04 +1000
+Subject: [PATCH 6/8] README.md
+
+---
+ README.md | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+ create mode 100644 README.md
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 00000000..40d4288d
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,74 @@
++# mame2010
++
++Port of MAME 0.139 for libretro, originally sourced from https://github.com/mamedev/mame/releases/download/mame0139/mame0139s.zip
++
++The OSD code is highly inspired by other MAME ports :
++ 
++- mame2003 : https://github.com/libretro/mame2003-libretro
++- ps3 mame0.125 port     : http://www.volny.cz/molej/ps3/mame_ps3.htm
++- mame4droid             : http://code.google.com/p/imame4all/source/browse/
++
++## Directories
++
++mame2010 requires that the following directories exist, and will create them if they are missing.
++
++libretro system subfolders:
++
++- libretro system folder/mame2010/ - `cheat.zip` file DOES NOT work in here!
++- libretro system folder/mame2010/cheat/ unziped `.xml` cheat file(s) doesn't work in here!
++- libretro system folder/mame2010/ini
++- libretro system folder/mame2010/artwork
++- libretro system folder/mame2010/crosshairs
++- libretro system folder/mame2010/fonts
++- libretro system folder/mame2010/samples
++
++libretro saves subfolders:
++- libretro saves folder/mame2010/ - `cheat.zip` file ONLY works in here.
++- libretro saves folder/mame2010/cheat/ - unziped `.xml` cheat file(s) can be added in here (optional).
++- libretro saves folder/mame2010/cfg
++- libretro saves folder/mame2010/comment
++- libretro saves folder/mame2010/ctrlr
++- libretro saves folder/mame2010/ini/ - `mame.ini` file can be found in here.
++- libretro saves folder/mame2010/input
++- libretro saves folder/mame2010/memcard
++- libretro saves folder/mame2010/nvram
++
++
++## Default Player 1 and 2 Controls: 
++
++	RETRO_DEVICE_ID_JOYPAD_START        MAME: KEY_START
++	RETRO_DEVICE_ID_JOYPAD_SELECT       MAME: KEY_COIN
++	RETRO_DEVICE_ID_JOYPAD_A            MAME: KEY_BUTTON_1
++	RETRO_DEVICE_ID_JOYPAD_B            MAME: KEY_BUTTON_2
++	RETRO_DEVICE_ID_JOYPAD_X            MAME: KEY_BUTTON_3
++	RETRO_DEVICE_ID_JOYPAD_Y            MAME: KEY_BUTTON_4
++	RETRO_DEVICE_ID_JOYPAD_L            MAME: KEY_BUTTON_5
++	RETRO_DEVICE_ID_JOYPAD_R            MAME: KEY_BUTTON_6
++	RETRO_DEVICE_ID_JOYPAD_L2           MAME: KEY_BUTTON_7
++	RETRO_DEVICE_ID_JOYPAD_UP           MAME: KEY_JOYSTICK_U
++	RETRO_DEVICE_ID_JOYPAD_DOWN         MAME: KEY_JOYSTICK_D
++	RETRO_DEVICE_ID_JOYPAD_LEFT         MAME: KEY_JOYSTICK_L
++	RETRO_DEVICE_ID_JOYPAD_RIGHT        MAME: KEY_JOYSTICK_R
++	RETRO_DEVICE_ID_JOYPAD_R2           Turbo Button
++
++## Default Player 3 and 4 Controls: 
++
++	RETRO_DEVICE_ID_JOYPAD_START        MAME: KEY_START
++	RETRO_DEVICE_ID_JOYPAD_SELECT       MAME: KEY_COIN
++	RETRO_DEVICE_ID_JOYPAD_A            MAME: KEY_BUTTON_1
++	RETRO_DEVICE_ID_JOYPAD_B            MAME: KEY_BUTTON_2
++	RETRO_DEVICE_ID_JOYPAD_X            MAME: KEY_BUTTON_3
++	RETRO_DEVICE_ID_JOYPAD_UP           MAME: KEY_JOYSTICK_U
++	RETRO_DEVICE_ID_JOYPAD_DOWN         MAME: KEY_JOYSTICK_D
++	RETRO_DEVICE_ID_JOYPAD_LEFT         MAME: KEY_JOYSTICK_L
++	RETRO_DEVICE_ID_JOYPAD_RIGHT        MAME: KEY_JOYSTICK_R
++	RETRO_DEVICE_ID_JOYPAD_R2           Turbo Button
++    
++## Native MAME UI Controls:
++
++_Note: these controls are only operational for Player 1_
++
++	RETRO_DEVICE_ID_JOYPAD_L3           Test/Service Mode
++    RETRO_DEVICE_ID_JOYPAD_R3           Enter MAME UI
++	RETRO_DEVICE_ID_JOYPAD_A            MAME: IPT_UI_SELECT (Make selections in the MAME GUI)
++      
+
+From 5c64e09ac113bdf19d2900a2c7b2171b46914f2d Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Mon, 10 Jul 2023 00:55:20 +1000
+Subject: [PATCH 7/8] Update README.md
+
+---
+ README.md | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index 40d4288d..6383fbcc 100644
+--- a/README.md
++++ b/README.md
+@@ -8,10 +8,15 @@ The OSD code is highly inspired by other MAME ports :
+ - ps3 mame0.125 port     : http://www.volny.cz/molej/ps3/mame_ps3.htm
+ - mame4droid             : http://code.google.com/p/imame4all/source/browse/
+ 
+-## Directories
++## Directories and Files
+ 
+ mame2010 requires that the following directories exist, and will create them if they are missing.
+ 
++mame2010 supports cheat that `cheat.zip` file must be in this subfolders: libretro saves folder/mame2010/cheat.zip
++
++Use `Cheat enable` switch it's under the Retroarch `Core Options` menu.
++Cheat will be activated and visible on the MAME cofig menu after restart the core.
++
+ libretro system subfolders:
+ 
+ - libretro system folder/mame2010/ - `cheat.zip` file DOES NOT work in here!
+
+From 8c967e7a911390514fdc1d45123b2392d9d9c1cb Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Mon, 10 Jul 2023 21:47:32 +1000
+Subject: [PATCH 8/8] Update README.md
+
+---
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index 6383fbcc..1eba3cda 100644
+--- a/README.md
++++ b/README.md
+@@ -15,7 +15,7 @@ mame2010 requires that the following directories exist, and will create them if
+ mame2010 supports cheat that `cheat.zip` file must be in this subfolders: libretro saves folder/mame2010/cheat.zip
+ 
+ Use `Cheat enable` switch it's under the Retroarch `Core Options` menu.
+-Cheat will be activated and visible on the MAME cofig menu after restart the core.
++Cheat will be activated and visible on the MAME config menu after restart the core.
+ 
+ libretro system subfolders:
+ 
