@@ -19,12 +19,12 @@
 ################################################################################
 
 PKG_NAME="mame2010"
-PKG_VERSION="7087c1090a8d73a2a80833150aaf85396ae4ab40"
-PKG_SHA256="45c32b83d0f9b86710373eaa9e210cdb3fdd818c27f9522780695768bd6f8400"
+PKG_VERSION="c5b413b71e0a290c57fc351562cd47ba75bac105"
+PKG_SHA256="38270732ef2b503583e96a3c83cd5ba8d4ca6510d1f24f2b00bf6703eb74070d"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
-PKG_SITE="https://github.com/worstcase-scenario/mame2010-libretro"
+PKG_SITE="https://github.com/libretro/mame2010-libretro"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
