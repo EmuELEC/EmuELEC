@@ -8,7 +8,7 @@ DT_ID=$(cat /proc/device-tree/amlogic-dt-id 2>/dev/null | tr -d '\0')
 
 # Check if Fire TV Cube (g12brevb_raven_2g) 
 if [ "${DT_ID}" = "g12brevb_raven_2g" ]; then
-  /sbin/reboot quiescent
+  /bin/systemctl reboot --reboot-argument=quiescent
 else
   if /usr/sbin/fw_printenv whereToBootFrom > /dev/null 2>&1; then
     /usr/sbin/fw_setenv whereToBootFrom internal
