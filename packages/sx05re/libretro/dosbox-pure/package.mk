@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="dosbox-pure"
-PKG_VERSION="a1c81ef494d2ac7a136b330edecbe855fb38b18a"
+PKG_VERSION="d743cfd9342c083ef6d3cecfc08c9af28a1481c8"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/schellingb/dosbox-pure"
 PKG_URL="${PKG_SITE}.git"
