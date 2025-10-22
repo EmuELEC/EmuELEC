@@ -1,0 +1,512 @@
+From 49df807e8c646e6d06543b8787f0090848d4a7bf Mon Sep 17 00:00:00 2001
+From: Adventurous Programmer <47227694+Diegrosan@users.noreply.github.com>
+Date: Wed, 22 Oct 2025 14:48:17 -0300
+Subject: [PATCH] Enhance input handling with game controller support
+
+Added support for game controllers in the input handling system, including common mappings and loading from an external database.
+---
+ src/input_sdl.go | 363 +++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 253 insertions(+), 110 deletions(-)
+
+diff --git a/src/input_sdl.go b/src/input_sdl.go
+index 409b41790..8bdc12b95 100644
+--- a/src/input_sdl.go
++++ b/src/input_sdl.go
+@@ -1,11 +1,14 @@
+ //go:build sdl
++// +build sdl
+ 
+ package main
+ 
+ import (
+ 	"fmt"
++	"os"
+ 	"runtime"
+ 	"strconv"
++	"strings"
+ 
+ 	sdl "github.com/veandco/go-sdl2/sdl"
+ )
+@@ -13,7 +16,10 @@ import (
+ const MAX_JOYSTICK_COUNT = 4
+ 
+ type Input struct {
+-	joysticks [MAX_JOYSTICK_COUNT]*sdl.Joystick
++	joysticks        [MAX_JOYSTICK_COUNT]*sdl.Joystick
++	gameControllers  [MAX_JOYSTICK_COUNT]*sdl.GameController
++	useGameController [MAX_JOYSTICK_COUNT]bool
++	deviceIndex      [MAX_JOYSTICK_COUNT]int32
+ }
+ 
+ type Key = sdl.Keycode
+@@ -154,6 +160,76 @@ func init() {
+ 	for k, v := range KeyToStringLUT {
+ 		StringToKeyLUT[v] = k
+ 	}
++	
++	if err := sdl.InitSubSystem(sdl.INIT_GAMECONTROLLER); err != nil {
++		fmt.Printf("[init] Failed to initialize GameController: %v\n", err)
++	}
++	
++	AddCommonMappings()
++	LoadGameControllerDB()
++}
++
++func AddCommonMappings() {
++	fmt.Printf("[AddCommonMappings] Loading built-in controller mappings...\n")
++	
++	commonMappings := []string{
++		"030000005e0400008e02000014010000,Xbox 360 Controller,a:b0,b:b1,back:b6,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b8,leftshoulder:b4,leftstick:b9,lefttrigger:a2,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b10,righttrigger:a5,rightx:a3,righty:a4,start:b7,x:b2,y:b3,platform:Linux,",
++		"030000005e040000ea02000001030000,Xbox One Controller,a:b0,b:b1,back:b6,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b8,leftshoulder:b4,leftstick:b9,lefttrigger:a2,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b10,righttrigger:a5,rightx:a3,righty:a4,start:b7,x:b2,y:b3,platform:Linux,",
++		"030000004c050000c405000000010000,PS4 Controller,a:b1,b:b2,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Linux,",
++		"030000004c050000e60c000000010000,PS5 Controller,a:b1,b:b2,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Linux,",
++		"030000007e0500000920000001000000,Nintendo Switch Pro Controller,a:b0,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b2,y:b3,platform:Linux,",
++		"03000000790000001100000000000000,Generic USB Controller,a:b2,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a3,righty:a2,start:b9,x:b3,y:b0,platform:Linux,",
++	}
++	
++	count := 0
++	for _, mapping := range commonMappings {
++		if sdl.GameControllerAddMapping(mapping) >= 0 {
++			count++
++		}
++	}
++	
++	fmt.Printf("[AddCommonMappings] Loaded %d built-in mappings (will be overridden by gamecontrollerdb.txt if present)\n", count)
++}
++
++func LoadGameControllerDB() {
++	envPath := os.Getenv("SDL_GAMECONTROLLERDB")
++	
++	if envPath == "" {
++		fmt.Printf("[LoadGameControllerDB] SDL_GAMECONTROLLERDB environment variable not set\n")
++		fmt.Printf("[LoadGameControllerDB] Using built-in mappings as fallback\n")
++		return
++	}
++	
++	fmt.Printf("[LoadGameControllerDB] Searching for gamecontrollerdb.txt in:\n")
++	fmt.Printf("[LoadGameControllerDB]   - %s (SDL_GAMECONTROLLERDB env variable)\n", envPath)
++	
++	if _, err := os.Stat(envPath); err != nil {
++		fmt.Printf("[LoadGameControllerDB] File not found: %s\n", envPath)
++		fmt.Printf("[LoadGameControllerDB] Using built-in mappings as fallback\n")
++		return
++	}
++	
++	data, err := os.ReadFile(envPath)
++	if err != nil {
++		fmt.Printf("[LoadGameControllerDB] Failed to read file: %v\n", err)
++		fmt.Printf("[LoadGameControllerDB] Using built-in mappings as fallback\n")
++		return
++	}
++	
++	lines := strings.Split(string(data), "\n")
++	count := 0
++	for _, line := range lines {
++		line = strings.TrimSpace(line)
++		if len(line) == 0 || strings.HasPrefix(line, "#") {
++			continue
++		}
++		if sdl.GameControllerAddMapping(line) >= 0 {
++			count++
++		}
++	}
++	
++	fmt.Printf("[LoadGameControllerDB] Loaded %d mappings from: %s\n", count, envPath)
++	fmt.Printf("[LoadGameControllerDB] External database has PRIORITY over built-in mappings\n")
+ }
+ 
+ func StringToKey(s string) sdl.Keycode {
+@@ -170,7 +246,6 @@ func KeyToString(k sdl.Keycode) string {
+ 	return ""
+ }
+ 
+-// to be fix: doesn't work toggle Full Screen
+ func NewModifierKey(ctrl, alt, shift bool) (mod ModifierKey) {
+ 	if ctrl {
+ 		mod |= sdl.KMOD_CTRL
+@@ -194,29 +269,48 @@ func (input *Input) IsJoystickPresent(joy int) bool {
+ 	if joy < 0 || joy >= len(input.joysticks) {
+ 		return false
+ 	}
+-	return input.joysticks[joy].Attached()
++	if input.gameControllers[joy] != nil {
++		return true
++	}
++	if input.joysticks[joy] != nil {
++		return input.joysticks[joy].Attached()
++	}
++	return false
+ }
+ 
+ func (input *Input) GetJoystickName(joy int) string {
+ 	if joy < 0 || joy >= len(input.joysticks) {
+ 		return ""
+ 	}
+-	return input.joysticks[joy].Name()
++	if input.gameControllers[joy] != nil {
++		return input.gameControllers[joy].Name()
++	}
++	if input.joysticks[joy] != nil {
++		return input.joysticks[joy].Name()
++	}
++	return ""
+ }
+ 
+ func (input *Input) GetJoystickAxis(joy int, axis int) int16 {
+ 	if joy < 0 || joy >= len(input.joysticks) {
+ 		return 0
+ 	}
+-	return input.joysticks[joy].Axis(axis)
++	if input.joysticks[joy] != nil {
++		return input.joysticks[joy].Axis(axis)
++	}
++	return 0
+ }
+ 
+ func (input *Input) GetJoystickAxes(joy int) []int16 {
+ 	if joy < 0 || joy >= len(input.joysticks) {
+ 		return []int16{}
+ 	}
+-	axes := make([]int16, input.joysticks[joy].NumAxes())
+-	for i := range axes {
++	if input.joysticks[joy] == nil {
++		return []int16{}
++	}
++	numAxes := input.joysticks[joy].NumAxes()
++	axes := make([]int16, numAxes)
++	for i := 0; i < numAxes; i++ {
+ 		axes[i] = input.joysticks[joy].Axis(i)
+ 	}
+ 	return axes
+@@ -226,8 +320,12 @@ func (input *Input) GetJoystickButtons(joy int) []byte {
+ 	if joy < 0 || joy >= len(input.joysticks) {
+ 		return []byte{}
+ 	}
+-	buttons := make([]byte, input.joysticks[joy].NumButtons())
+-	for i := range buttons {
++	if input.joysticks[joy] == nil {
++		return []byte{}
++	}
++	numButtons := input.joysticks[joy].NumButtons()
++	buttons := make([]byte, numButtons)
++	for i := 0; i < numButtons; i++ {
+ 		buttons[i] = input.joysticks[joy].Button(i)
+ 	}
+ 	return buttons
+@@ -237,13 +335,26 @@ func (input *Input) GetJoystickHats(joy int) []byte {
+ 	if joy < 0 || joy >= len(input.joysticks) {
+ 		return []byte{}
+ 	}
+-	hats := make([]byte, input.joysticks[joy].NumHats())
+-	for i := range hats {
++	if input.joysticks[joy] == nil {
++		return []byte{}
++	}
++	numHats := input.joysticks[joy].NumHats()
++	hats := make([]byte, numHats)
++	for i := 0; i < numHats; i++ {
+ 		hats[i] = input.joysticks[joy].Hat(i)
+ 	}
+ 	return hats
+ }
+ 
++func getAxisValue(value int16, sensitivity int16) int16 {
++	if value > sensitivity {
++		return value
++	} else if value < -sensitivity {
++		return value
++	}
++	return 0
++}
++
+ func JoystickState(joy, button int) bool {
+ 	if joy < 0 {
+ 		return sys.keyState[Key(button)]
+@@ -251,81 +362,101 @@ func JoystickState(joy, button int) bool {
+ 	if joy >= input.GetMaxJoystickCount() {
+ 		return false
+ 	}
++	
+ 	js := input.joysticks[joy]
+-	if button >= js.NumButtons() { // only check for Hats or "axis for dpad" (max_button,max_button+1,max_button+2,max_button+3)
+-		if js.NumAxes() >= 2 { // check axes for dpad
+-			switch button { // check HAT0, AXIS1, AXIS2
+-			case sys.joystickConfig[joy].dU: // Up
+-				return (js.Axis(1) < -sys.controllerStickSensitivitySDL) || ((js.Hat(0) & 1) != 0)
+-			case sys.joystickConfig[joy].dR: // Right
+-				return (js.Axis(0) > sys.controllerStickSensitivitySDL) || ((js.Hat(0) & 2) != 0)
+-			case sys.joystickConfig[joy].dD: // Down
+-				return (js.Axis(1) > sys.controllerStickSensitivitySDL) || ((js.Hat(0) & 4) != 0)
+-			case sys.joystickConfig[joy].dL: // Left
+-				return (js.Axis(0) < -sys.controllerStickSensitivitySDL) || ((js.Hat(0) & 8) != 0)
+-			default: // invalid button code if > max_button+3
+-				return false
+-			}
+-		} else {
+-			switch button { // check HAT0 only
+-			case sys.joystickConfig[joy].dU: // Up
+-				return js.Hat(0)&1 != 0
+-			case sys.joystickConfig[joy].dR: // Right
+-				return js.Hat(0)&2 != 0
+-			case sys.joystickConfig[joy].dD: // Down
+-				return js.Hat(0)&4 != 0
+-			case sys.joystickConfig[joy].dL: // Left
+-				return js.Hat(0)&8 != 0
+-			default: // invalid button code if > max_button+3
+-				return false
++	if js == nil {
++		return false
++	}
++	
++	isDpadButton := button == sys.joystickConfig[joy].dU ||
++		button == sys.joystickConfig[joy].dR ||
++		button == sys.joystickConfig[joy].dD ||
++		button == sys.joystickConfig[joy].dL
++	
++	if isDpadButton {
++		if js.NumHats() > 0 {
++			hatValue := js.Hat(0)
++			switch button {
++			case sys.joystickConfig[joy].dU:
++				if hatValue&sdl.HAT_UP != 0 {
++					return true
++				}
++			case sys.joystickConfig[joy].dR:
++				if hatValue&sdl.HAT_RIGHT != 0 {
++					return true
++				}
++			case sys.joystickConfig[joy].dD:
++				if hatValue&sdl.HAT_DOWN != 0 {
++					return true
++				}
++			case sys.joystickConfig[joy].dL:
++				if hatValue&sdl.HAT_LEFT != 0 {
++					return true
++				}
+ 			}
+ 		}
+-	} else if button >= 0 { // Check for button code (0,1,2,...,10,11,max_button-1)
++		
+ 		if js.NumAxes() >= 2 {
+-			switch button { // check BUTTON, AXIS1, AXIS2
+-			case sys.joystickConfig[joy].dU: // Up: check axis, d.pad(hat), button
+-				return (js.Axis(1) < -sys.controllerStickSensitivitySDL) || (js.Button(button) != 0)
+-			case sys.joystickConfig[joy].dR: // Right: check axis and d.pad(hat), button
+-				return (js.Axis(0) > sys.controllerStickSensitivitySDL) || (js.Button(button) != 0)
+-			case sys.joystickConfig[joy].dD: // Down: check axis and d.pad(hat), button
+-				return (js.Axis(1) > sys.controllerStickSensitivitySDL) || (js.Button(button) != 0)
+-			case sys.joystickConfig[joy].dL: // Left: check axis and d.pad(hat), button
+-				return (js.Axis(0) < -sys.controllerStickSensitivitySDL) || (js.Button(button) != 0)
+-			default: // Other (normal) button
+-				// if js.Button(button) != 0 {
+-				// 	fmt.Printf("[default] input.joysticks[%v].Button(%v)=%v\n", joy, button, js.Button(button))
+-				// }
+-				return js.Button(button) != 0
++			axis0 := getAxisValue(js.Axis(0), sys.controllerStickSensitivitySDL)
++			axis1 := getAxisValue(js.Axis(1), sys.controllerStickSensitivitySDL)
++			
++			switch button {
++			case sys.joystickConfig[joy].dU:
++				if axis1 < 0 {
++					return true
++				}
++			case sys.joystickConfig[joy].dR:
++				if axis0 > 0 {
++					return true
++				}
++			case sys.joystickConfig[joy].dD:
++				if axis1 > 0 {
++					return true
++				}
++			case sys.joystickConfig[joy].dL:
++				if axis0 < 0 {
++					return true
++				}
+ 			}
+-		} else { // check BUTTON only
++		}
++		
++		if button >= 0 && button < js.NumButtons() {
+ 			return js.Button(button) != 0
+ 		}
+-
+-	} else { // Check for Axis code, button is negatif (-1,-2,...,-10,-11,...)
++		
++		return false
++	}
++	
++	if button >= 0 && button < js.NumButtons() {
++		return js.Button(button) != 0
++	}
++	
++	if button < 0 {
+ 		var axis int
+-		if button&1 == 0 {
++		isPositive := (button & 1) == 0
++		
++		if isPositive {
+ 			axis = (-button - 1) / 2
+ 		} else {
+ 			axis = -button / 2
+ 		}
+-		if js.NumAxes() > axis {
+-			value := js.Axis(axis)
+-			if button&1 == 0 {
+-				return value > sys.controllerStickSensitivitySDL
++		
++		if axis < js.NumAxes() {
++			value := getAxisValue(js.Axis(axis), sys.controllerStickSensitivitySDL)
++			if isPositive {
++				return value > 0
+ 			} else {
+-				return -value > sys.controllerStickSensitivitySDL
++				return value < 0
+ 			}
+-		} else {
+-			return false
+ 		}
+-		return false
+ 	}
++	
++	return false
+ }
+ 
+-// Reads controllers and converts inputs to letters for later processing
+ func (ir *InputReader) LocalInput(in int) (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool) {
+ 	var U, D, L, R, a, b, c, x, y, z, s, d, w, m bool
+-	// Keyboard
++	
+ 	if in < len(sys.keyConfig) {
+ 		joy := sys.keyConfig[in].Joy
+ 		if joy == -1 {
+@@ -345,12 +476,12 @@ func (ir *InputReader) LocalInput(in int) (bool, bool, bool, bool, bool, bool, b
+ 			m = sys.keyConfig[in].m()
+ 		}
+ 	}
+-	// Joystick
++	
+ 	if in < len(sys.joystickConfig) {
+ 		sdl.JoystickUpdate()
+ 		joyS := sys.joystickConfig[in].Joy
+ 		if joyS >= 0 {
+-			U = U || sys.joystickConfig[in].U() // Does not override keyboard
++			U = U || sys.joystickConfig[in].U()
+ 			D = D || sys.joystickConfig[in].D()
+ 			L = L || sys.joystickConfig[in].L()
+ 			R = R || sys.joystickConfig[in].R()
+@@ -366,61 +497,73 @@ func (ir *InputReader) LocalInput(in int) (bool, bool, bool, bool, bool, bool, b
+ 			m = m || sys.joystickConfig[in].m()
+ 		}
+ 	}
+-	// Button assist is checked locally so the sent inputs are already processed
++	
+ 	if sys.inputButtonAssist {
+ 		a, b, c, x, y, z, s, d, w = ir.ButtonAssistCheck(a, b, c, x, y, z, s, d, w)
+ 	}
++	
+ 	return U, D, L, R, a, b, c, x, y, z, s, d, w, m
+ }
+ 
+ func checkAxisForDpad(joy int, axes *[]int16, base int) string {
+-	var s string
+-	if (*axes)[0] > sys.controllerStickSensitivitySDL { // right
+-		s = strconv.Itoa(2 + base)
+-		fmt.Printf("[input_sdl.go][checkAxisForDpad] AXIS for DPAD RIGHT joy=%v s: %v\n", joy, s)
+-	} else if -(*axes)[0] > sys.controllerStickSensitivitySDL { // left
+-		s = strconv.Itoa(1 + base)
+-		fmt.Printf("[input_sdl.go][checkAxisForDpad] AXIS for DPAD LEFT joy=%v s: %v\n", joy, s)
+-	}
+-	if (*axes)[1] > sys.controllerStickSensitivitySDL { // down
+-		s = strconv.Itoa(3 + base)
+-		fmt.Printf("[input_sdl.go][checkAxisForDpad] AXIS for DPAD DOWN joy=%v s: %v\n", joy, s)
+-	} else if -(*axes)[1] > sys.controllerStickSensitivitySDL { // up
+-		s = strconv.Itoa(base)
+-		fmt.Printf("[input_sdl.go][checkAxisForDpad] AXIS  for DPAD UP joy=%v s: %v\n", joy, s)
+-	}
+-	return s
++	if len(*axes) < 2 {
++		return ""
++	}
++	
++	axis0 := getAxisValue((*axes)[0], sys.controllerStickSensitivitySDL)
++	axis1 := getAxisValue((*axes)[1], sys.controllerStickSensitivitySDL)
++	
++	if axis0 > 0 {
++		return strconv.Itoa(2 + base)
++	} else if axis0 < 0 {
++		return strconv.Itoa(1 + base)
++	}
++	
++	if axis1 > 0 {
++		return strconv.Itoa(3 + base)
++	} else if axis1 < 0 {
++		return strconv.Itoa(base)
++	}
++	
++	return ""
+ }
+ 
+ func checkAxisForTrigger(joy int, axes *[]int16) string {
+-	var s string = ""
++	name := input.GetJoystickName(joy) + "." + runtime.GOOS + "." + runtime.GOARCH + ".sdl"
++	
++	restingTriggers := map[string][]int{
++		"XInput Gamepad (GLFW).windows.amd64.sdl":     {4, 5},
++		"PS4 Controller.windows.amd64.sdl":            {4, 5},
++		"Steam Virtual Gamepad.linux.amd64.glfw":      {2, 5},
++		"Steam Deck Controller.linux.amd64.sdl":       {2, 5},
++		"PS3 Controller.linux.amd64.sdl":              {2, 5},
++		"Logitech Dual Action.linux.amd64.sdl":        {2, 5},
++		"Gamepad.linux.arm64.sdl":                     {4, 5},
++	}
++	
++	exceptions := restingTriggers[name]
++	
+ 	for i := range *axes {
+-		if (*axes)[i] < -sys.controllerStickSensitivitySDL {
+-			name := input.GetJoystickName(joy) + "." + runtime.GOOS + "." + runtime.GOARCH + ".sdl"
+-			if (i == 4 || i == 5) && name == "XInput Gamepad (GLFW).windows.amd64.sdl" {
+-				// do nothing
+-			} else if (i == 4 || i == 5) && name == "PS4 Controller.windows.amd64.sdl" {
+-				// do nothing
+-			} else if (i == 2 || i == 5) && name == "Steam Virtual Gamepad.linux.amd64.glfw" {
+-				// do nothing
+-			} else if (i == 2 || i == 5) && name == "Steam Deck Controller.linux.amd64.sdl" {
+-				// do nothing
+-			} else if (i == 2 || i == 5) && name == "PS3 Controller.linux.amd64.sdl" {
+-				// do nothing
+-			} else if (i == 2 || i == 5) && name == "Logitech Dual Action.linux.amd64.sdl" {
+-				// do nothing
+-			} else if (i == 4 || i == 5) && name == "Gamepad.linux.arm64.sdl" {
+-				// do nothing
+-			} else {
+-				s = strconv.Itoa(-i*2 - 1)
+-				fmt.Printf("[input_sdl.go][checkAxisForTrigger] 1.AXIS joy=%v i=%v s:%v axes[i]=%v\n", joy, i, s, (*axes)[i])
++		value := getAxisValue((*axes)[i], sys.controllerStickSensitivitySDL)
++		
++		isException := false
++		for _, ex := range exceptions {
++			if i == ex && value < 0 {
++				isException = true
+ 				break
+ 			}
+-		} else if (*axes)[i] > sys.controllerStickSensitivitySDL {
+-			s = strconv.Itoa(-i*2 - 2)
+-			fmt.Printf("[input_sdl.go][checkAxisForTrigger] 2.AXIS joy=%v i=%v s:%v axes[i]=%v\n", joy, i, s, (*axes)[i])
+-			break
++		}
++		
++		if isException {
++			continue
++		}
++		
++		if value < 0 {
++			return strconv.Itoa(-i*2 - 1)
++		} else if value > 0 {
++			return strconv.Itoa(-i*2 - 2)
+ 		}
+ 	}
+-	return s
++	
++	return ""
+ }
