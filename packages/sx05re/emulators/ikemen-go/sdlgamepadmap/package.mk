@@ -7,10 +7,10 @@ PKG_VERSION="1.0"
 PKG_REV="1"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://salsa.debian.org/debian/joystick"
+PKG_SITE=""
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain SDL2_ttf SDL2"
-PKG_LONGDESC="evdev-joystick"
+PKG_LONGDESC="joystick map for ikemen-go"
 PKG_TOOLCHAIN="manual"
 
 configure_target() {
