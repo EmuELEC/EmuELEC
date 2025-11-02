@@ -39,7 +39,7 @@ CART="${1}"
 if [[ "${CART}" == *"/splore"* ]]; then
     /emuelec/bin/pico-8/pico8_dyn -splore -home /emuelec/configs/pico-8 -root_path /storage/roms/pico-8 -joystick 0
 else
-    /emuelec/bin/pico-8/pico8_dyn -run ${CART} -home /emuelec/configs/pico-8 -root_path /storage/roms/pico-8 -joystick 0
+    /emuelec/bin/pico-8/pico8_dyn -run "${CART}" -home /emuelec/configs/pico-8 -root_path /storage/roms/pico-8 -joystick 0
 fi
 
 if [[ "${EE_DEVICE}" == "Amlogic-old" ]]; then

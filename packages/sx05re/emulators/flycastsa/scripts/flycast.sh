@@ -20,4 +20,6 @@ if [[ "${AUTOGP}" != "0" ]]; then
   set_flycast_joy.sh
 fi
 
+flycastcheevos.sh
+
 flycast "${1}"

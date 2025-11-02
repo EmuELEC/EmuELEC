@@ -1,0 +1,105 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
+
+do_cleanup () {
+  echo
+  echo "update canceled"
+  echo
+  cd /storage/.update
+  rm -fr temp
+}
+
+do_reboot () {
+  cd /storage/.update
+  mv temp/* .
+  rmdir temp
+
+  if [ "${nocompat}" = "nocompat" -o "${nocompat}" = ".nocompat" ]; then
+    touch .nocompat
+  fi
+
+  echo -e "\nsyncing...\n"
+  sync
+  echo -e "rebooting...\n"
+  reboot
+  exit 0
+}
+
+show_error () {
+  do_cleanup
+  sync
+  echo -e "\ndownload error...\n"
+  exit 1
+}
+
+function ctrl_c() {
+  echo
+  do_cleanup
+  exit 1
+}
+
+trap ctrl_c INT
+
+url="${1}"
+file=$(readlink -f "${1}")  # get full path
+nocompat="${2}"
+
+mkdir -p /storage/.update/temp
+cd /storage/.update/temp
+echo
+
+case "${url}" in
+  https://mega\.nz/*)
+    echo
+    megadl "${url}"
+    [ $? -eq 0 ] && do_reboot || show_error
+    ;;
+  *://*)
+    case "${url}" in
+      *\.tar|*\.img.gz)
+        curl -f -L -O "${url}"
+        [ $? -eq 0 ] && do_reboot || show_error
+        ;;
+      *)
+        echo
+        echo "error: wrong url format <${url}>"
+        echo
+        exit 1
+        ;;
+    esac
+    ;;
+  *)
+    if [ -n "${file}" ]; then
+      if [ -f "${file}" ]; then
+        case "${file}" in
+          *\.tar|*\.img.gz)
+            echo -e "\ncopying file ${file}"
+            cp "${file}" .
+            [ $? -eq 0 ] && do_reboot || show_error
+            ;;
+          *)
+            echo
+            echo "error: wrong file format <${file}>"
+            echo
+            exit 1
+            ;;
+        esac
+      else
+        echo
+        echo "error: file <${file}> does not exist"
+        echo
+        exit 1
+      fi
+    fi
+
+    echo
+    echo "update-ce: missing url"
+    echo
+    echo "Usage: update-ce <url> [nocompat]"
+    echo "  <url> mega/http/ftp url or local file .tar or .img.gz"
+    echo "  [nocompat] disable compatibility checks and risk a non-booting system"
+    echo
+    exit 1
+    ;;
+esac

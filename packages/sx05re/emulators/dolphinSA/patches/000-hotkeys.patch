@@ -1,0 +1,177 @@
+diff --git a/Source/Core/Core/HW/GCPadEmu.cpp b/Source/Core/Core/HW/GCPadEmu.cpp
+index fbbcbc630e..9dc3641bfc 100644
+--- a/Source/Core/Core/HW/GCPadEmu.cpp
++++ b/Source/Core/Core/HW/GCPadEmu.cpp
+@@ -26,6 +26,7 @@ static const u16 button_bitmasks[] = {
+     PAD_BUTTON_Y,
+     PAD_TRIGGER_Z,
+     PAD_BUTTON_START,
++    PAD_BUTTON_HOTKEY,
+     0  // MIC HAX
+ };
+ 
+@@ -50,6 +51,9 @@ GCPad::GCPad(const unsigned int index) : m_index(index)
+   // i18n: The START/PAUSE button on GameCube controllers
+   m_buttons->AddInput(Translatability::Translate, START_BUTTON, _trans("START"));
+ 
++  // Hotkey Button
++  m_buttons->AddInput(Translatability::Translate, HOTKEY_BUTTON, _trans("HOTKEY"));
++
+   // sticks
+   groups.emplace_back(m_main_stick = new ControllerEmu::OctagonAnalogStick(
+                           MAIN_STICK_GROUP, _trans("Control Stick"), MAIN_STICK_GATE_RADIUS));
+diff --git a/Source/Core/Core/HW/GCPadEmu.h b/Source/Core/Core/HW/GCPadEmu.h
+index 2555ee05b1..c2230a606a 100644
+--- a/Source/Core/Core/HW/GCPadEmu.h
++++ b/Source/Core/Core/HW/GCPadEmu.h
+@@ -68,6 +68,7 @@ public:
+   static constexpr const char* Y_BUTTON = "Y";
+   static constexpr const char* Z_BUTTON = "Z";
+   static constexpr const char* START_BUTTON = "Start";
++  static constexpr const char* HOTKEY_BUTTON = "Hotkey";
+ 
+   // i18n: The left trigger button (labeled L on real controllers)
+   static constexpr const char* L_DIGITAL = _trans("L");
+diff --git a/Source/Core/DolphinNoGUI/PlatformFBDev.cpp b/Source/Core/DolphinNoGUI/PlatformFBDev.cpp
+index 53312bfa08..c166c06c40 100644
+--- a/Source/Core/DolphinNoGUI/PlatformFBDev.cpp
++++ b/Source/Core/DolphinNoGUI/PlatformFBDev.cpp
+@@ -11,6 +11,14 @@
+ #include "Core/State.h"
+ #include "Core/System.h"
+ 
++#include "Core/HW/GCPad.h"
++#include "InputCommon/GCPadStatus.h"
++#include <fmt/format.h>
++#include "Core/Config/GraphicsSettings.h"
++#include "Core/Config/MainSettings.h"
++#include "VideoCommon/VideoConfig.h"
++#include "VideoCommon/OnScreenDisplay.h"
++
+ #include <climits>
+ #include <cstdio>
+ #include <thread>
+@@ -78,9 +85,111 @@ void PlatformFBDev::MainLoop()
+ {
+   while (IsRunning())
+   {
++		static int hotkey = 0;
++		static int slot = 0;
++		static int fps = 0;
++		static int aspect = 0;
++		static int fforward = 0;
++		static int ires = 0;
++
+     UpdateRunningFlag();
+     Core::HostDispatchJobs(Core::System::GetInstance());
+ 
++		if(Pad::IsInitialized()) {
++		  GCPadStatus x = Pad::GetStatus(0);
++
++		  if( (x.button & PAD_BUTTON_HOTKEY) == PAD_BUTTON_HOTKEY) { // hotkey pressed
++		   if(hotkey == 1) {
++		     hotkey = 2;
++		   }
++		  } else {
++		   hotkey = 1; // assure hotkey is released between actions
++		  }
++
++		  if(hotkey == 2) { // hotkey pressed
++		   if( (x.button & PAD_BUTTON_START) == PAD_BUTTON_START) {
++		     RequestShutdown();
++		     hotkey = 0;
++		   }
++
++		   if( (x.button & PAD_TRIGGER_L) == PAD_TRIGGER_L) {
++		     State::Load(Core::System::GetInstance(), slot);
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_TRIGGER_R) == PAD_TRIGGER_R) {
++		     State::Save(Core::System::GetInstance(), slot);
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_BUTTON_DOWN) == PAD_BUTTON_DOWN) {
++		     if(slot > 0) slot--;
++		     Core::DisplayMessage(fmt::format("Slot {} selected", slot), 4000);
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_BUTTON_UP) == PAD_BUTTON_UP) {
++		     if(slot < 10) slot++;
++		     Core::DisplayMessage(fmt::format("Slot {} selected", slot), 4000);
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_BUTTON_A) == PAD_BUTTON_A) {
++		     Core::SaveScreenShot();
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_BUTTON_Y) == PAD_BUTTON_Y) {
++		     if(fps == 0) {
++		       Config::SetCurrent(Config::GFX_SHOW_FPS, true);
++		       fps = 1;
++		     } else {
++		       Config::SetCurrent(Config::GFX_SHOW_FPS, false);
++		       fps = 0;
++		     }
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_BUTTON_X) == PAD_BUTTON_X) {
++		     if(aspect == 0) {
++		       Config::SetCurrent(Config::GFX_ASPECT_RATIO, AspectMode::Stretch);
++		       aspect = 1;
++		     } else {
++		       Config::SetCurrent(Config::GFX_ASPECT_RATIO, AspectMode::Auto);
++		       aspect = 0;
++		     }
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_BUTTON_B) == PAD_BUTTON_B) {
++		     if(ires == 2) {
++		       Config::SetCurrent(Config::GFX_EFB_SCALE, 4);
++		       OSD::AddMessage("Internal Resolution: 720P");
++		       ires = 4;
++		     }
++		     else if(ires == 4) {
++		       Config::SetCurrent(Config::GFX_EFB_SCALE, 6);
++		       OSD::AddMessage("Internal Resolution: 1080P");
++		       ires = 6;
++		     } else {
++		       Config::SetCurrent(Config::GFX_EFB_SCALE, 2);
++		       OSD::AddMessage("Internal Resolution: 480P");
++		       ires = 2;
++		     }
++		     hotkey = 0;
++		   }
++		   if( (x.button & PAD_TRIGGER_Z) == PAD_TRIGGER_Z) {
++		    if(fforward == 0) {
++		      auto speed = Config::Get(Config::MAIN_EMULATION_SPEED) + 1.0;
++		      speed = (speed >= 0.95 && speed <= 1.05) ? 1.0 : speed;
++		      Config::SetCurrent(Config::MAIN_EMULATION_SPEED, speed);
++		      OSD::AddMessage("Fast Forward: ON");
++		      fforward = 1;
++		    } else {
++		      auto speed = Config::Get(Config::MAIN_EMULATION_SPEED) - 1.0;
++		      speed = (speed <= 0 || (speed >= 0.95 && speed <= 1.05)) ? 1.0 : speed;
++		      Config::SetCurrent(Config::MAIN_EMULATION_SPEED, speed);
++		      OSD::AddMessage("Fast Forward: OFF");
++		      fforward = 0;
++		    }
++		    hotkey = 0;
++			 }
++		 }
++		}
++
+     // TODO: Is this sleep appropriate?
+     std::this_thread::sleep_for(std::chrono::milliseconds(1));
+   }
+diff --git a/Source/Core/InputCommon/GCPadStatus.h b/Source/Core/InputCommon/GCPadStatus.h
+index 74849e5594..029ade5824 100644
+--- a/Source/Core/InputCommon/GCPadStatus.h
++++ b/Source/Core/InputCommon/GCPadStatus.h
+@@ -26,6 +26,7 @@ enum PadButton
+   PAD_BUTTON_X = 0x0400,
+   PAD_BUTTON_Y = 0x0800,
+   PAD_BUTTON_START = 0x1000,
++  PAD_BUTTON_HOTKEY = 0x2000,
+ };
+ 
+ struct GCPadStatus

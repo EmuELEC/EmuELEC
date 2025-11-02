@@ -6,6 +6,87 @@
 # Source predefined functions and variables
 . /etc/profile
 
+function set_rotation()
+{
+  local rotate=$1
+  local emulator=$2
+
+  if [[ "${emulator}" == "libretro" ]]; then
+		set_ra_setting "video_rotation" "${rotate}"
+		return		
+  fi
+
+  if [[ "${emulator}" == "retrorun" ]]; then
+		if [[ "${rotate}" == "0" ]]; then
+			set_rr_setting "retrorun_tate_mode" "disabled"
+			set_rr_setting "retrorun_swap_sticks" "false"
+			echo " "
+		else
+			set_rr_setting "retrorun_tate_mode" "enabled"
+			set_rr_setting "retrorun_swap_sticks" "true"
+			echo " -z "
+		fi
+		return
+	fi
+}
+
+function rotation_output() {
+    local emulator=$1
+    local core=$2
+
+    if [[ "${emulator}" == "libretro" ]]; then
+        echo "90 Degrees,180 Degrees,270 Degrees"
+    fi
+
+    if [[ "${emulator}" == "retrorun" ]]; then
+        echo "Tate Mode"
+    fi
+}
+
+function killall_midi()
+{
+	pkill -9 timidity
+  pkill -9 mt32d
+  pkill -9 fluidsynth
+	
+}
+
+function set_midi_source()
+{
+  local midi_source=$1
+  local midi_emulator=$2
+
+  killall_midi
+
+  [[ "${midi_emulator}" == "retrorun" ]] && return
+
+  local midi_output=OFF
+  
+  case ${midi_source} in
+    fluidsynth)
+      fluidsynth -is /storage/roms/bios/sc/SC-55.sf2 &
+      sleep 6
+      midi_output=$(cat /proc/asound/seq/clients | grep "Port   0 : \"S" | cut -d'"' -f2)
+      ;;
+    timidity)
+      timidity -iA --module 1 &
+      midi_output="TiMidity port 0"
+			;;
+    cm32l)
+      mt32d -o 1 -i 24 -f /roms/bios &
+      midi_output=Standard
+      ;;
+    mt32)
+      mt32d -o 2 -i 24 -f /roms/bios &
+      midi_output=Standard
+			;;
+esac
+
+  if [[ "${midi_emulator}" == "libretro" ]]; then
+    set_ra_setting "midi_output" "${midi_output}"
+  fi
+}
+
 function get_filenames_no_ext() {
 	local FN=($( ls -1 $1 | sed -e 's/\.[^.]*$//' ))
 	IFS=","
@@ -37,10 +118,10 @@ function audio() {
 	# but right now its mostly used on ES to change audio to alsa before launching or else ES hangs on GXL devices.
    if [[ "$1" == "alsa" ]]; then
 		set_audio alsa
-   elif [[ "$1" == "pulse" ]]; then
+   elif [[ "$1" == "pulse"* ]]; then
 		set_audio pulseaudio
    else
-		set_audio auto
+		set_audio default
    fi
 }
 
@@ -225,6 +306,13 @@ function dimensions() {
 	echo "${DIMENSIONS[*]}"
 }
 
+function midi_output() {
+	local emulator=$1
+	local core=$2
+
+	echo "fluidsynth,mt32,cm32l,timidity"
+}
+
 function resolutions() {
 # Returns a list of supported resolutions depending on device
 	RESOLUTIONS=()
@@ -300,6 +388,9 @@ function timezones() {
 }
 
 function small-cores() {
+	SCF=$(get_ee_setting ee_scf)
+	[ "${SCF}" != "1" ] && return 0
+ 	
 # Switch the small cores on the N2 on and off, we mostly have them off as the small cores are slower.
     if grep -q "g12b" /proc/device-tree/compatible; then
         case "$1" in
@@ -323,6 +414,11 @@ function unmount_all () {
     if /usr/bin/busybox mountpoint -q /storage/roms ; then
         umount /storage/roms > /dev/null 2>&1
     fi
+    
+    if /usr/bin/busybox mountpoint -q /storage/roms/ports_scripts ; then
+        umount /storage/roms/ports_scripts > /dev/null 2>&1
+    fi
+    
 }
 
 function createMultidisc() {
@@ -364,26 +460,63 @@ function createMultidisc() {
   echo -e "\n"
 }
 
+function blank_buffer() {
+# Clears screen buffer
+  # Blank the buffer.
+  dd if=/dev/zero of=/dev/fb0 bs=256K conv=sync,noerror,notrunc > /dev/null 2>&1
+  dd if=/dev/zero of=/dev/fb1 bs=256K conv=sync,noerror,notrunc > /dev/null 2>&1
+}
+
 function init_app_video() {
 	local PLATFORM=$1
 	local ROMNAME=$2
 	local BASEROMNAME=${ROMNAME##*/}
 
-	blank_buffer
+	[[ -f "/tmp/EE_LASTVIDEO" ]] && return
+
+  blank_buffer
+
+	if [[ "${PLATFORM}" == "ports" ]] && [[ "${BASEROMNAME}" == "PortMaster.sh" ]]; then
+		return
+	fi
+	
+  if [[ "${PLATFORM}" == "setup" ]]; then 
+		return
+	fi
 
 	echo "$(cat /sys/class/display/mode)" > /tmp/EE_LASTVIDEO
 	local VIDEO_EMU=$(get_ee_setting nativevideo "${PLATFORM}" "${BASEROMNAME}")
-	[[ -z "$VIDEO_EMU" ]] && VIDEO_EMU=$LAST_VIDEO
-	
+	[[ -z "$VIDEO_EMU" ]] && VIDEO_EMU=$(cat /tmp/EE_LASTVIDEO)
+
+	# Set the display video to that of the emulator setting.
+	[ ! -z "${VIDEO_EMU}" ] && ${TBASH} setres.sh "${VIDEO_EMU}" "${PLATFORM}" "${BASEROMNAME}" # set display
+
 	# Show splash screen if enabled
 	local SPL=$(get_ee_setting ee_splash.enabled)
 	[ "${SPL}" -eq "1" ] && ${TBASH} show_splash.sh gameloading "${PLATFORM}" "${ROMNAME}"
 
-	# Set the display video to that of the emulator setting.
-	[ ! -z "${VIDEO_EMU}" ] && ${TBASH} setres.sh ${VIDEO_EMU} ${PLATFORM} # set display
+  if [[ "${PLATFORM}" == "ports" ]]; then
+    fbfix $( emuelec-utils getmainfb )
+  fi
 }
 
 function end_app_video() {
+	local PLATFORM=$1
+	local ROMNAME=$2
+	local BASEROMNAME=${ROMNAME##*/}
+
+  [[ ! -f "/tmp/EE_LASTVIDEO" ]] && return
+
+	if [[ "${PLATFORM}" == "ports" ]] && [[ "${BASEROMNAME}" == "PortMaster.sh" ]]; then 
+		return
+	fi
+	
+	if [[ "${PLATFORM}" == "setup" ]]; then 
+		return
+	fi
+
+  blank_buffer
+
 	local LAST_VIDEO="$(cat /tmp/EE_LASTVIDEO)"
 
 	# Return to default mode
@@ -391,6 +524,30 @@ function end_app_video() {
 
 	# Show exit splash
 	${TBASH} show_splash.sh exit
+
+	blank_buffer
+
+	[[ -f "/tmp/EE_LASTVIDEO" ]] && rm /tmp/EE_LASTVIDEO
+}
+
+function getmainfb() {
+  local max_area=0
+  local max_fb=0
+  for fb in /sys/class/graphics/fb*/virtual_size; do
+      if [ -f "$fb" ]; then
+          local fb_num=$(echo "$fb" | grep -o 'fb[0-9]*' | sed 's/fb//')
+          local size=$(cat "$fb")
+          local width=$(echo "$size" | cut -d',' -f1)
+          local height=$(echo "$size" | cut -d',' -f2)
+          local area=$((width * height))
+
+          if [ $area -gt $max_area ]; then
+              max_area=$area
+              max_fb=$fb_num
+          fi
+      fi
+  done
+  echo $max_fb
 }
 
 function set_gptokeyb() {

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+. /etc/profile
+
+oe_setup_addon service.hyperion.ng
+
+exec hyperiond --userdata $ADDON_HOME &
+echo $! > /run/hyperiond.pid
+
+if [ -f "/usr/bin/Xorg" ]; then
+  exec hyperion-x11 &
+fi

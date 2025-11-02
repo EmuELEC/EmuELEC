@@ -20,15 +20,16 @@ pre_configure_target() {
   ${HOST_CC} timidity/calcnewt.c -o timidity/calcnewt_host -lm
 
   PKG_CONFIGURE_OPTS_TARGET="--host=${TARGET_NAME} \
-                             enable_audio=alsa \
-                             --with-default-output=alsa \
+                             --enable-alsa
+			     --with-default-output=alsa \
                              --with-default-path=/storage/.config/timidity \
                              lib_cv_va_copy=yes \
                              lib_cv___va_copy=yes \
                              lib_cv_va_val_copy=no \
                              ac_cv_c_bigendian=no \
                              --with-includes=${SYSROOT_PREFIX}/usr/include \
-                             --with-libraries=${SYSROOT_PREFIX}/usr/lib"
+                             --with-libraries=${SYSROOT_PREFIX}/usr/lib
+			     --enable-alsaseq"
 }
 
 makeinstall_target() {

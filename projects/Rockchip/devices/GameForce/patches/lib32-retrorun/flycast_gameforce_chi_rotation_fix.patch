@@ -1,22 +1,13 @@
 diff --git a/src/video.cpp b/src/video.cpp
-index 6c095c6..dff03ee 100755
+index d168eda..66238ee 100755
 --- a/src/video.cpp
 +++ b/src/video.cpp
-@@ -941,7 +941,7 @@ inline void prepareScreen(int width, int height)
-         y = 0;
-         h = go2_display_height_get(display);
-         w = go2_display_width_get(display);
--        isTate = (Retrorun_Core == RETRORUN_CORE_FLYCAST); // we rotate the screen (Tate) for some arcade games when apsect ratio < 0
-+        isTate = false; //(Retrorun_Core == RETRORUN_CORE_FLYCAST); // we rotate the screen (Tate) for some arcade games when apsect ratio < 0
-     }
- }
- int colorInc = 0;
-@@ -1565,7 +1565,7 @@ void core_video_refresh(const void *data, unsigned width, unsigned height, size_
- 
+@@ -763,7 +764,7 @@ void core_video_refresh(const void *data, unsigned width, unsigned height, size_
+
          real_aspect_ratio = aspect_ratio;
          _351BlitRotation = isTate ? GO2_ROTATION_DEGREES_270 : GO2_ROTATION_DEGREES_0;
 -        _351Rotation = isTate ? GO2_ROTATION_DEGREES_180 : GO2_ROTATION_DEGREES_270;
-+        _351Rotation = isTate ? GO2_ROTATION_DEGREES_180 : GO2_ROTATION_DEGREES_0;
++        _351Rotation = isTate ? GO2_ROTATION_DEGREES_270 : GO2_ROTATION_DEGREES_0; // test
          first_video_refresh = false;
      }
      if (height != currentHeight || width != currentWidth)

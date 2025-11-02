@@ -282,6 +282,7 @@ beetle-pcfx \
 beetle-supergrafx \
 beetle-vb \
 beetle-wswan \
+bk \
 bluemsx \
 cannonball \
 cap32 \
@@ -300,9 +301,13 @@ fuse-libretro \
 gambatte \
 gearboy \
 gearcoleco \
+geargrafx \
+gearlynx \
 gearsystem \
 genesis-plus-gx \
+genesis_plus_gx_cart_special \
 genesis-plus-gx-wide \
+geolith \
 gme \
 gpsp \
 gw-libretro \
@@ -324,10 +329,10 @@ pcsx_rearmed \
 picodrive \
 pocketcdg \
 pokemini \
-ppsspp \
 prboom \
 prosystem \
 puae \
+puae2021 \
 px68k \
 reminiscence \
 sameboy \
@@ -339,6 +344,7 @@ snes9x2005_plus \
 snes9x2010 \
 spring \
 stella \
+supafaust \
 tgbdual \
 tic-80 \
 tyrquake \
@@ -360,8 +366,8 @@ melonds \
 snes9x2005 \
 yabause"
 
-LIBRETRO_S922X_CORES="mesen \
-multiemu \
+LIBRETRO_S922X_CORES="beetle-saturn \
+mesen \
 mesen-s \
 quicknes \
 virtualjaguar"
@@ -446,12 +452,9 @@ virtualjaguar"
 "/tmp/cores/handy_libretro.so;"\
 "/tmp/cores/hatari_libretro.so;"\
 "/tmp/cores/mednafen_wswan_libretro.so;"\
-"/tmp/cores/mednafen_wswan_libretro.so;"\
 "/tmp/cores/nxengine_libretro.so;"\
 "/tmp/cores/chailove_libretro.so;"\
 "/tmp/cores/bluemsx_libretro.so;"\
-"/tmp/cores/vice_x64_libretro.so;"\
-"/tmp/cores/vice_x64_libretro.so;"\
 "/tmp/cores/vice_x64_libretro.so;"\
 "/tmp/cores/puae_libretro.so;"\
 "/tmp/cores/vice_xplus4_libretro.so;"\
@@ -468,24 +471,16 @@ virtualjaguar"
 "/tmp/cores/mame2010_libretro.so;"\
 "/tmp/cores/freeintv_libretro.so;"\
 "/tmp/cores/bluemsx_libretro.so;"\
-"/tmp/cores/bluemsx_libretro.so;"\
 "/tmp/cores/mednafen_supergrafx_libretro.so;"\
 "/tmp/cores/mednafen_pce_fast_libretro.so;"\
 "/tmp/cores/nestopia_libretro.so;"\
 "/tmp/cores/mgba_libretro.so;"\
-"/tmp/cores/mgba_libretro.so;"\
-"/tmp/cores/gambatte_libretro.so;"\
 "/tmp/cores/gambatte_libretro.so;"\
 "/tmp/cores/dolphin_libretro.so;"\
 "/tmp/cores/citra_libretro.so;"\
 "/tmp/cores/parallel_n64_libretro.so;"\
 "/tmp/cores/desmume_libretro.so;"\
-"/tmp/cores/desmume_libretro.so;"\
-"/tmp/cores/desmume_libretro.so;"\
-"/tmp/cores/desmume_libretro.so;"\
-"/tmp/cores/desmume_libretro.so;"\
 "/tmp/cores/nestopia_libretro.so;"\
-"/tmp/cores/snes9x2010_libretro.so;"\
 "/tmp/cores/snes9x2010_libretro.so;"\
 "/tmp/cores/mednafen_vb_libretro.so;"\
 "/tmp/cores/dolphin_libretro.so;"\
@@ -495,10 +490,8 @@ virtualjaguar"
 "/tmp/cores/picodrive_libretro.so;"\
 "/tmp/cores/flycast_libretro.so;"\
 "/tmp/cores/genesis_plus_gx_libretro.so;"\
-"/tmp/cores/genesis_plus_gx_libretro.so;"\
-"/tmp/cores/genesis_plus_gx_libretro.so;"\
+"/tmp/cores/genesis_plus_gx_cart_special_libretro.so;"\
 "/tmp/cores/picodrive_libretro.so;"\
-"/tmp/cores/genesis_plus_gx_libretro.so;"\
 "/tmp/cores/yabause_libretro.so;"\
 "/tmp/cores/fuse_libretro.so;"\
 "/tmp/cores/mednafen_ngp_libretro.so;"\
@@ -508,4 +501,5 @@ virtualjaguar"
 "/tmp/cores/pcsx_rearmed_libretro.so;"\
 "/tmp/cores/theodore_libretro.so;"\
 "/tmp/cores/tic80_libretro.so;"\
-"/tmp/cores/4do_libretro.so"
+"/tmp/cores/4do_libretro.so;"\
+"/tmp/cores/mednafen_saturn_libretro.so"

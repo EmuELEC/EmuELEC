@@ -17,9 +17,12 @@ if [ ! -L "${CONFIG_DIR}" ]; then
  ln -sf "/emuelec/configs/dolphin-emu" "${CONFIG_DIR}"
 fi
 
+mkdir -p /storage/roms/dolphin/dolphin-emu/StateSaves
+
 AUTOGP=$(get_ee_setting dolphin_auto_gamepad)
 if [[ "${AUTOGP}" != "0" ]]; then
-	/usr/bin/set_dolphin_joy.sh
+	set_dolphin_joy.sh
 fi
 
+fbfix $( emuelec-utils getmainfb )
 XDG_CONFIG_HOME=/emuelec/configs XDG_DATA_HOME=/storage/roms/dolphin /usr/bin/dolphin-emu-nogui -p fbdev "${1}"

@@ -23,8 +23,8 @@ pre_configure_target() {
 	PKG_CMAKE_OPTS_TARGET+=" -DANDROID=OFF \
 	                         -DENABLE_DISCORD_PRESENCE=OFF \
 	                         -DUSE_X11=OFF \
-                                 -DBUILD_LIBRETRO_CORE=OFF \
-				 -DBUILD_GO2_FRONTEND=OFF \
+                             -DBUILD_LIBRETRO_CORE=OFF \
+				             -DBUILD_GO2_FRONTEND=OFF \
 	                         -DBUILD_QT_FRONTEND=OFF \
 	                         -DBUILD_NOGUI_FRONTEND=ON \
 	                         -DCMAKE_BUILD_TYPE=Release \

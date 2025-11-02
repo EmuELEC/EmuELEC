@@ -6,7 +6,7 @@
 # Source predefined functions and variables
 . /etc/profile
 
-XHAS3D_LIBS="/usr/lib/xash3d/usr/valve"
+XHAS3D_LIBS="/usr/lib/xash3d/valve"
 
 # Exports for xash3d
 export XASH3D_BASEDIR=/storage/roms/ports/half-life

@@ -1,0 +1,43 @@
+#!/usr/bin/python -u
+
+################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2024-present Shanti Gilbert (https://github.com/shantigilbert)
+# Modifications made by:
+#   Langerz82 (https://github.com/Langerz82)
+################################################################################
+
+#!/usr/bin/env python
+
+import time
+from bluetool import Bluetooth
+
+if __name__ == "__main__":
+    bt = Bluetooth()
+    print('Scanning for available devices for 60 seconds, please wait...')
+    bt.make_discoverable();
+    bt.start_scanning(60)
+    print('Getting pairable devices, please wait...')
+    for x in range(0,10):
+        time.sleep(3)
+        devices = bt.get_available_devices()
+        for device in devices:
+            mac = device['mac_address'].decode('utf-8')
+            name = device['name'].decode('utf-8')
+            print("Icon:"+ str(bt.get_device_property(mac,'Icon')))
+            if ((not bt.get_device_property(mac,'Icon') and bt.get_device_property(mac,'Connected') == 1) or bt.get_device_property(mac,'Icon') == 'input-gaming'):
+                print('Found MAC: {}\tName: {}'.format(mac,name))
+                if bt.get_device_property(mac,'Trusted') == 1:
+                    continue
+                print('Found controller {} Name: {}, trusting...'.format(mac,name))
+                bt.trust(mac)
+                if bt.get_device_property(mac,'Trusted') == 1:
+                    print('Trusted {}, quick pause, then pairing...'.format(name))
+                    time.sleep(5)
+                    bt.pair(mac)
+                    if bt.get_device_property(mac,'Paired') == 1:
+                        print('Paired {}, quick pause, then connecting...'.format(name))
+                        time.sleep(5)
+                        bt.connect(mac)
+                        if bt.get_device_property(mac,'Connected') == 1:
+                            print('Connected {}, exiting...'.format(name))

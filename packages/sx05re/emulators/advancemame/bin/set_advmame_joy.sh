@@ -51,10 +51,14 @@ declare -A ADVMAME_VALUES=(
   ["a0,2"]="stick,y,down"
   ["a1,1"]="stick,x,left"
   ["a1,2"]="stick,x,right"
-  ["a2,1"]="1,0,0"
-  ["a2,2"]="1,0,1"
-  ["a5,1"]="2,1,0"
-  ["a5,2"]="2,1,1"
+  ["a2,1"]="stick2,x,left"
+  ["a2,2"]="stick2,x,right"
+  ["a3,1"]="stick3,y,up"
+  ["a3,2"]="stick3,y,down"
+  ["a4,1"]="stick2,x,left"
+  ["a4,2"]="stick2,x,right"
+  ["a5,1"]="stick3,y,up"
+  ["a5,2"]="stick3,y,down"
 )
 
 declare GC_ORDER=(
@@ -100,18 +104,14 @@ set_pad(){
   local DEVICE_GUID=${3}
   local JOY_NAME="${4}"
 
-  local GC_CONFIG=$(cat "${GCDB}" | grep "${DEVICE_GUID}" | grep "platform:Linux" | head -1)
+  local GC_CONFIG="${5}"
   echo "GC_CONFIG=${GC_CONFIG}"
   [[ -z ${GC_CONFIG} ]] && return
 
-  [[ -z "${JOY_NAME}" ]] && JOY_NAME=$(echo ${GC_CONFIG} | cut -d',' -f2)
-  [[ -z "${JOY_NAME}" ]] && return
+  local GAMEPAD="$(advj | grep "'${JOY_NAME}'" | cut -d"'" -f2 | head -n 1 )"
+  [[ -z "${GAMEPAD}" ]] && return
 
-  local GAMEPAD="$(cat "/tmp/JOYPAD_NAMES/JOYPAD${1}.txt" | sed "s|,||g" | sed "s|_||g" | cut -d'"' -f 2 \
-    | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' \
-    | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')"
-
-  BTN_H0=$(advj | grep -B 1 -E "^joy [0-9] '${GAMEPAD}' .*" | grep sticks: | sed "s|sticks:\ ||" | tr -d ' ')
+  BTN_H0=$(advj | grep -B 1 -E "^joy ${P_INDEX}.*" | grep sticks: | sed "s|sticks:\ ||" | tr -d ' ')
   ADVMAME_VALUES["h0.1"]="stick${BTN_H0},y,up"
   ADVMAME_VALUES["h0.4"]="stick${BTN_H0},y,down"
   ADVMAME_VALUES["h0.8"]="stick${BTN_H0},x,left"
@@ -280,7 +280,7 @@ local INVERT_AXIS=$(get_ee_setting "advmame_invert_axis")
   fi
 }
 
-ADVMAME_REGEX="<emulator.*name\=\"AdvanceMame\" +features\=.*[ ,\"]joybtnremap[ ,\"].*/>"
+ADVMAME_REGEX="<emulator.*name=\"AdvanceMame\" +features=.*[ ,\"]joybtnremap[ ,\"].*/>"
 ADVMAME_REMAP=$(cat "${ES_FEATURES}" | grep -E "${ADVMAME_REGEX}")
 [[ ! -z "${ADVMAME_REMAP}" ]] && BTN_CFG=$(get_button_cfg)
 echo "BTN_CFG=${BTN_CFG}"

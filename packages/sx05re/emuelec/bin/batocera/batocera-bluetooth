@@ -35,7 +35,12 @@ do_remove() {
 }
 
 do_trust() {
-emuelec-bluetooth
+	local LEGACY=$(get_ee_setting ee_bluetooth_legacy.enabled)
+	if [[ "$LEGACY" == "1" ]]; then
+		emuelec-bluetooth-legacy
+	else
+		emuelec-bluetooth
+	fi
 }
 
 case "${ACTION}" in

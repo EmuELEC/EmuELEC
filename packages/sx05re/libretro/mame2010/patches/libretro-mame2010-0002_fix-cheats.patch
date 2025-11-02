@@ -1,0 +1,141 @@
+From 96e7ce0bcd1d0ae84a9974f7fd7c18e37da9c449 Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 03:03:33 +1000
+Subject: [PATCH 1/8] Update README.md
+
+---
+ README.md | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/osd/retro/retromain.c b/src/osd/retro/retromain.c
+index c89edd5c..3f2c0e8d 100755
+--- a/src/osd/retro/retromain.c
++++ b/src/osd/retro/retromain.c
+@@ -63,6 +63,7 @@ static int mouse_mode = 1;
+ static bool videoapproach1_enable = false;
+ bool hide_nagscreen = false;
+ bool hide_gameinfo = false;
++bool cheat_enable = false;
+ bool hide_warnings = false;
+ 
+ static void update_geometry();
+@@ -226,6 +227,10 @@ void retro_init (void)
+     path_mkdir(libretro_save_directory);
+  
+     // content loaded from mame2010 subfolder within the libretro system folder
++    snprintf(cheatpath, sizeof(cheatpath), "%s%s%s", libretro_system_directory, path_default_slash(), "cheat");
++    path_mkdir(cheatpath);
++    snprintf(inipath, sizeof(inipath), "%s%s%s", libretro_system_directory, path_default_slash(), "ini");
++    path_mkdir(inipath);
+     snprintf(samplepath, sizeof(samplepath), "%s%s%s", libretro_system_directory, path_default_slash(), "samples");
+     path_mkdir(samplepath);
+     snprintf(artpath, sizeof(artpath), "%s%s%s", libretro_system_directory, path_default_slash(), "artwork");
+@@ -236,10 +241,12 @@ void retro_init (void)
+     path_mkdir(crosshairpath);
+ 
+     // user-generated content loaded from mame2010 subfolder within the libretro save folder
+-    snprintf(ctrlrpath, sizeof(ctrlrpath), "%s%s%s", libretro_save_directory, path_default_slash(), "ctrlr");
+-    path_mkdir(ctrlrpath);
++    snprintf(cheatpath, sizeof(cheatpath), "%s%s%s", libretro_save_directory, path_default_slash(), "cheat");
++    path_mkdir(cheatpath);
+     snprintf(inipath, sizeof(inipath), "%s%s%s", libretro_save_directory, path_default_slash(), "ini");
+     path_mkdir(inipath);
++    snprintf(ctrlrpath, sizeof(ctrlrpath), "%s%s%s", libretro_save_directory, path_default_slash(), "ctrlr");
++    path_mkdir(ctrlrpath);
+     snprintf(cfg_directory, sizeof(cfg_directory), "%s%s%s", libretro_save_directory, path_default_slash(), "cfg");
+     path_mkdir(cfg_directory);
+     snprintf(nvram_directory, sizeof(nvram_directory), "%s%s%s", libretro_save_directory, path_default_slash(), "nvram");
+@@ -589,6 +596,7 @@ void retro_set_environment(retro_environment_t cb)
+       //Shell for CPU overclock setting. Search mame_current_overclock for other pieces
+       //{ "mame_current_overclock", "Main CPU Overclock; 100|25|30|35|40|45|50|55|60|65|70|75|80|95|90|95|105|110|115|120" },
+       { "mame_current_videoapproach1_enable", "Video approach 1 Enabled; disabled|enabled" },
++      { "mame_current_cheat", "Cheat enable; disabled|enabled" },
+       { "mame_current_skip_nagscreen", "Hide nag screen; enabled|disabled" },
+       { "mame_current_skip_gameinfo", "Hide game info screen; disabled|enabled" },
+       { "mame_current_skip_warnings", "Hide warning screen; disabled|enabled" },
+@@ -659,6 +667,17 @@ static void check_variables(void)
+       if (!strcmp(var.value, "enabled"))
+          hide_gameinfo = true;
+    }
++   
++   var.key = "mame_current_cheat";
++   var.value = NULL;
++   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
++   {
++      retro_log(RETRO_LOG_INFO, "[MAME 2010] cheat_enable value: %s\n", var.value);
++      if (!strcmp(var.value, "disabled"))
++         cheat_enable = false;
++      if (!strcmp(var.value, "enabled"))
++         cheat_enable = true;
++   }
+ 
+    var.key = "mame_current_skip_warnings";
+    var.value = NULL;
+@@ -1943,7 +1962,7 @@ int executeGame(char* path) {
+ 
+ 	if (tate) {
+ 		if (screenRot == 3) {
+-			xargv[paramCount++] =(char*) "-rol";
++			xargv[paramCount++] = (char*) "-rol";
+ 		} else {
+ 			xargv[paramCount++] = (char*)(screenRot ? "-mouse" : "-ror");
+ 		}
+@@ -1956,15 +1975,21 @@ int executeGame(char* path) {
+ 	}
+ 
+ 	if(hide_gameinfo) {
+-		xargv[paramCount++] =(char*) "-skip_gameinfo";
++		xargv[paramCount++] = (char*) "-skip_gameinfo";
++	}
++	
++	if(cheat_enable) {
++		xargv[paramCount++] = (char*) "-cheat";
++	} else {
++		xargv[paramCount++] = (char*) "-nocheat";
+ 	}
+ 
+ 	if(hide_nagscreen) {
+-		xargv[paramCount++] =(char*) "-skip_nagscreen";
++		xargv[paramCount++] = (char*) "-skip_nagscreen";
+ 	}
+ 
+ 	if(hide_warnings) {
+-		xargv[paramCount++] =(char*) "-skip_warnings";
++		xargv[paramCount++] = (char*) "-skip_warnings";
+ 	}
+ 
+ 	xargv[paramCount++] = MgameName;
+
+From 84767238401ffe3844915d3668d22f3c96c6a5b6 Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 03:54:22 +1000
+Subject: [PATCH 3/8] Fixed Cheat Enable
+
+---
+ src/osd/retro/retromain.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/osd/retro/retromain.c b/src/osd/retro/retromain.c
+index 3f2c0e8d..338bbccc 100755
+--- a/src/osd/retro/retromain.c
++++ b/src/osd/retro/retromain.c
+@@ -63,8 +63,8 @@ static int mouse_mode = 1;
+ static bool videoapproach1_enable = false;
+ bool hide_nagscreen = false;
+ bool hide_gameinfo = false;
+-bool cheat_enable = false;
+ bool hide_warnings = false;
++bool cheat_enable = false;
+ 
+ static void update_geometry();
+ static unsigned int turbo_enable, turbo_state, turbo_delay = 5;
+
+From ab65119f992f4fbf7bd5fa5b20f2c5549ae49c7b Mon Sep 17 00:00:00 2001
+From: RussellKR <46307397+RussellKR@users.noreply.github.com>
+Date: Sat, 1 Jul 2023 04:06:04 +1000
+Subject: [PATCH 4/8] Update README.md
+
+---
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+

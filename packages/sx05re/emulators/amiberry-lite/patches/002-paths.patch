@@ -1,0 +1,15 @@
+--- a/src/osdep/amiberry.cpp
++++ b/src/osdep/amiberry.cpp
+@@ -4429,8 +4429,10 @@
+ 		if (!my_existsdir(xdg_config_home.c_str()))
+ 			my_mkdir(xdg_config_home.c_str());
+ 
+-		amiberry_conf_file = xdg_config_home + "/amiberry.conf";
+-		amiberry_ini_file = xdg_config_home + "/amiberry.ini";
++		//amiberry_conf_file = xdg_config_home + "/amiberry.conf";
++		amiberry_conf_file = "/storage/.config/amiberry-lite/conf/amiberry-lite.conf";
++		//amiberry_ini_file = xdg_config_home + "/amiberry.ini";
++		amiberry_ini_file = "/storage/.config/amiberry-lite/conf/amiberry-lite.ini";
+ 	}
+ 	return my_existsfile2(amiberry_conf_file.c_str());
+ }

@@ -1,0 +1,11 @@
+--- a/yabause/src/retro_arena/CMakeLists.txt	2022-01-05 15:44:20.891135756 -0600
++++ b/yabause/src/retro_arena/CMakeLists.txt	2022-01-05 15:44:41.738849860 -0600
+@@ -22,7 +22,7 @@
+ add_subdirectory(nanogui-sdl)
+ 
+ #include( ../glfw/external_zlib.cmake )
+-include( ${CMAKE_SOURCE_DIR}/CMake/Packages/external_libpng.cmake )
++#include( ${CMAKE_SOURCE_DIR}/CMake/Packages/external_libpng.cmake )
+ 
+ #------------------------------------------------------------------------------
+ # nlohmann/json

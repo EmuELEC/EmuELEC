@@ -157,8 +157,7 @@ else
 		STORED_VOLUME=$(get_ee_setting audio.volume)
 		[[ ! -z "$STORED_VOLUME" ]] && VOLUME=$STORED_VOLUME
 
-    amixer set 'DAC Extra Digital Gain' 0dB
-    amixer set 'DAC Digital' "$VOLUME%"
+    amixer set Master "$VOLUME%"
 fi
 
 # We need to always use the newest es_systems.cfg if there was a recent update, we also need to update the ports gamelist.xml and es_features.cfg
@@ -171,8 +170,8 @@ OLDCFG="${ESDIR}/es_systems.cfg.${BUILDATE}.bak"
 CFG="${ESDIR}/es_systems.cfg"
 
 if [[ "${CVER}" != "${NVER}" ]]; then
-    mv "/storage/.config/emuelec/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml.${BUILDATE}.bak"
-    cp -rf "/usr/bin/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml"
+    #mv "/storage/.config/emuelec/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml.${BUILDATE}.bak"
+    #cp -rf "/usr/bin/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml"
     
     mv "${ESDIR}/es_features.cfg" "${ESDIR}/es_features.cfg.${BUILDATE}.bak"
     cp -rf "/usr/config/emulationstation/es_features.cfg" "${ESDIR}/es_features.cfg"
@@ -289,10 +288,24 @@ emuelec-utils setauddev
 # Checks and sets the resolution for starting ES.
 check_res.sh
 
+# START - SECTIONS TO WIPE PREVIOUS VERSION CONFIG DATA
 REMAP_VERSION="/emuelec/configs/JOY_REMAP_VERSION"
 if [[ ! -f "$REMAP_VERSION" ]]; then
 	grep -Ev "^.*\.joy_btn.*=.*$" /emuelec/configs/emuelec.conf > /tmp/emuelec.conf.bak && mv /tmp/emuelec.conf.bak /emuelec/configs/emuelec.conf
 	echo "2" > "${REMAP_VERSION}"
 fi
+
+FRAMEBUFFER_VERSION="/emuelec/configs/FRAMEBUFFER_VERSION"
+if [[ ! -f "$FRAMEBUFFER_VERSION" ]]; then
+	grep -Ev "^.*\framebuffer.*=.*$" /emuelec/configs/emuelec.conf > /tmp/emuelec.conf.bak && mv /tmp/emuelec.conf.bak /emuelec/configs/emuelec.conf
+	echo "2" > "${FRAMEBUFFER_VERSION}"
+fi
+# END - SECTIONS TO WIPE PREVIOUS VERSION CONFIG DATA
+
+RA_CORE_OPTION="/storage/.config/retroarch/retroarch-core-options.cfg"
+HAS_RA_CORE_OPTION_X68K_FDD_FIX=$(cat "${RA_CORE_OPTION}" | grep px68k_save_fdd_path)
+[[ -z "${HAS_RA_CORE_OPTION_X68K_FDD_FIX}" ]] && echo "px68k_save_fdd_path = \"disabled\"" >> "${RA_CORE_OPTION}"
+HAS_RA_CORE_OPTION_X68K_HDD_FIX=$(cat "${RA_CORE_OPTION}" | grep px68k_save_hdd_path)
+[[ -z "${HAS_RA_CORE_OPTION_X68K_HDD_FIX}" ]] && echo "px68k_save_hdd_path = \"disabled\"" >> "${RA_CORE_OPTION}"
 
 exit 0

@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="beetle-gba"
-PKG_VERSION="38182572571a48cb58057cde64b915237c4e2d58"
-PKG_SHA256="e4eaf64e9160b501cadf983a46b8a2a98c8b590a13ca9082793d9a11e17fdcaf"
+PKG_VERSION="6cee80685f735ea6c2373db2622a1f1ee9f39d39"
+PKG_SHA256="33ef14eb0141e98323cc8c3e997f668df348fea7b7bf5a97766c2c91af075fa7"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

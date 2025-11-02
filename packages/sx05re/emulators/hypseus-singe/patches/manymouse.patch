@@ -1,0 +1,18 @@
+--- a/src/manymouse/manymouse.c	2025-08-06 13:57:11.365331700 +0200
++++ b/src/manymouse/manymouse.c	2025-08-06 13:58:27.190043892 +0200
+@@ -15,7 +15,6 @@
+ 
+ extern const ManyMouseDriver *ManyMouseDriver_windows;
+ extern const ManyMouseDriver *ManyMouseDriver_evdev;
+-extern const ManyMouseDriver *ManyMouseDriver_xinput2;
+ extern const ManyMouseDriver *ManyMouseDriver_hidmanager;
+ extern const ManyMouseDriver *ManyMouseDriver_hidutilities;
+ 
+@@ -33,7 +32,6 @@
+ static const ManyMouseDriver **mice_drivers[] =
+ {
+     &ManyMouseDriver_evdev,
+-    &ManyMouseDriver_xinput2,
+     &ManyMouseDriver_windows,
+     &ManyMouseDriver_hidmanager,
+     &ManyMouseDriver_hidutilities

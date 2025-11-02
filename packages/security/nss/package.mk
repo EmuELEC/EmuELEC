@@ -21,7 +21,7 @@ make_host() {
   rm -rf ${PKG_BUILD}/dist
 
   INCLUDES="-I${TOOLCHAIN}/include" \
-  make BUILD_OPT=1 USE_64=1 \
+  make BUILD_OPT=1 USE_64=1 NSS_ENABLE_WERROR=0 \
      PREFIX=${TOOLCHAIN} \
      NSPR_INCLUDE_DIR=${TOOLCHAIN}/include/nspr \
      USE_SYSTEM_ZLIB=1 ZLIB_LIBS="-lz -L${TOOLCHAIN}/lib" \

@@ -1,0 +1,15 @@
+--- a/cheevos/cheevos.c	2024-12-22 21:25:46.767207900 +0100
++++ b/cheevos/cheevos.c	2024-12-22 21:31:50.025471176 +0100
+@@ -289,7 +289,11 @@
+ 
+    if (!cheevo)
+       return;
+-
++   char pixelcade[256];
++   snprintf(pixelcade, sizeof(pixelcade), "/storage/.emulationstation/scripts/achievements/pixelcade.sh %u \"%s\" \"%s\" > /dev/null 2>/dev/null",
++   cheevo->id, cheevo->title, cheevo->description);
++   //CHEEVOS_LOG(pixelcade);
++   system(pixelcade);
+    /* Show the on screen message. */
+    if (settings->bools.cheevos_visibility_unlock)
+    {

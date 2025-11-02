@@ -11,6 +11,6 @@ PKG_URL="https://github.com/munt/munt/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A software synthesiser emulating pre-GM MIDI devices such as the Roland MT-32."
 
-PKG_CMAKE_OPTS_TARGET="-Dmunt_WITH_MT32EMU_QT=0 \
+PKG_CMAKE_OPTS_TARGET="-Dmunt_WITH_MT32EMU_QT=OFF \
                        -Dmunt_WITH_MT32EMU_SMF2WAV=0 \
-                       -Dlibmt32emu_SHARED=1"
+                       -Dlibmt32emu_SHARED=1"                  

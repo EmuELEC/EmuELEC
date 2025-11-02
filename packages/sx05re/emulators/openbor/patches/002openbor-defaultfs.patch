@@ -1,11 +1,11 @@
 --- a/engine/openbor.c
 +++ b/engine/openbor.c
-@@ -2439,7 +2439,7 @@
-     savedata.logo = 0;
+@@ -2639,7 +2639,7 @@
+     savedata.logo = 1;
      savedata.uselog = 1;
      savedata.debuginfo = 0;
 -    savedata.fullscreen = 0;
 +    savedata.fullscreen = 1;
-     savedata.vsync = 1;
+     savedata.fpslimit = 1; // default to vsync
  
  	#if WII

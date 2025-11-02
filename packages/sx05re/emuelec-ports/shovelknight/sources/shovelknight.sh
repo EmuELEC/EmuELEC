@@ -10,5 +10,5 @@ export BOX64_LOG=0
 export BOX64_LD_LIBRARY_PATH=/emuelec/bin/box64/lib/
 export BOX64_DYNAREC=1
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/emuelec/bin/box64/lib/
-fbfix
+fbfix $( emuelec-utils getmainfb )
 /emuelec/bin/box64/box64 ShovelKnight

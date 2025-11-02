@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="fuse-libretro"
-PKG_VERSION="847dbbd6f787823ac9a5dfacdd68ab181063374e"
-PKG_SHA256="87ec7826021704e2aa6f35224f334201d4d6bf56cabd11e5c9ebc6e736360866"
+PKG_VERSION="cad85b7b1b864c65734f71aa4a510b6f6536881c"
+PKG_SHA256="6fda1a3ffc0d2faeebe27fae94e5b7790337dd96d1ea29922ad804a425d2852b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
@@ -35,7 +35,7 @@ PKG_LONGDESC="A port of the Fuse Unix Spectrum Emulator to libretro "
 PKG_TOOLCHAIN="make"
 
 make_target() {
-if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-ogu" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "Amlogic-ogu" ]; then
   make -f Makefile.libretro platform=rpi4_64
  else
   make -f Makefile.libretro platform=rpi3_64 

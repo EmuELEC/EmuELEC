@@ -1,0 +1,93 @@
+diff --git a/yabause/src/retro_arena/InputManager.cpp b/yabause/src/retro_arena/InputManager.cpp
+index bd806736..c32af4a7 100644
+--- a/yabause/src/retro_arena/InputManager.cpp
++++ b/yabause/src/retro_arena/InputManager.cpp
+@@ -213,7 +213,7 @@ int mapKeys( const json & configs ){
+ 
+   if( SDL_NumJoysticks() == 0 ){
+ 
+-    PADLOG("No joy stic is found force to keyboard\n");
++    PADLOG("No joystick is found force to keyboard\n");
+     padbits = PerPadAdd(&PORTDATA1);
+     if( configs.find("player1") == configs.end() ){
+       return setDefalutSettings(padbits);
+@@ -460,22 +460,22 @@ int getPlayerJsonFromInputConfig( int joy, InputConfig * inputconfig, json & pla
+   }
+ 
+   Input result;
+-  inputconfig->getInputByName("a", &result);
++  inputconfig->getInputByName("y", &result);
+   player[guid]["a"] ={ { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+   inputconfig->getInputByName("b", &result);
+   player[guid]["b"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+-  inputconfig->getInputByName("rightshoulder", &result);
++  inputconfig->getInputByName("a", &result);
+   player[guid]["c"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } } ;
+ 
+   inputconfig->getInputByName("x", &result);
+   player[guid]["x"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+-  inputconfig->getInputByName("y", &result);
++  inputconfig->getInputByName("leftshoulder", &result);
+   player[guid]["y"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+-  inputconfig->getInputByName("leftshoulder", &result);
++  inputconfig->getInputByName("rightshoulder", &result);
+   player[guid]["z"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+   inputconfig->getInputByName("lefttrigger", &result);
+@@ -1209,7 +1209,7 @@ void InputManager::writeDeviceConfig(InputConfig* config)
+ std::string InputManager::getConfigPath()
+ {
+   std::string path = getenv("HOME");
+-  path += "/.emulationstation/es_temporaryinput.cfg";
++  path = "/storage/roms/saturn/yabasanshiro/input.cfg";
+   return path;
+ }
+ 
+diff --git a/yabause/src/retro_arena/Preference.cpp b/yabause/src/retro_arena/Preference.cpp
+index 1108c843..49815002 100644
+--- a/yabause/src/retro_arena/Preference.cpp
++++ b/yabause/src/retro_arena/Preference.cpp
+@@ -17,7 +17,7 @@ Preference::Preference( const std::string & filename ){
+   }
+ 
+   std::string home_dir = getenv("HOME");
+-  home_dir += "/.yabasanshiro/";
++  home_dir = "/storage/.config/yabasanshiro/";
+ 
+   this->filename = home_dir + input_trace_filename + ".config";
+ 
+diff --git a/yabause/src/retro_arena/main.cpp b/yabause/src/retro_arena/main.cpp
+index 3b3b581c..dacfee8e 100644
+--- a/yabause/src/retro_arena/main.cpp
++++ b/yabause/src/retro_arena/main.cpp
+@@ -290,14 +290,14 @@ int main(int argc, char** argv)
+ 
+   // Inisialize home directory
+   std::string home_dir = getenv("HOME");
+-  home_dir += "/.yabasanshiro/";
++  home_dir = "/storage/roms/saturn/yabasanshiro/";
+   struct stat st = {0};
+   if (stat(home_dir.c_str(), &st) == -1) {
+     mkdir(home_dir.c_str(), 0700);
+   }  
+-  std::string bckup_dir = home_dir + "backup.bin";
++  std::string bckup_dir = "/storage/roms/bios/yabasanshiro/backup.bin";
+   strcpy( buppath, bckup_dir.c_str() );
+-  strcpy( s_savepath, home_dir.c_str() );
++  strcpy( s_savepath, "/storage/roms/savestates/saturn" );
+   g_keymap_filename = home_dir + "keymapv2.json";
+ 
+   std::string current_exec_name = argv[0]; // Name of the current exec program
+@@ -601,7 +601,7 @@ int main(int argc, char** argv)
+         if( ret == 0 ){
+           char pngname[256];
+           snprintf(pngname,256,"%s/%s_%d.png", s_savepath, cdip->itemnum, e.user.code);
+-          fs::copy(tmpfilename, pngname, fs::copy_options::overwrite_existing );
++          system((std::string("cp -f ") + tmpfilename + " " + pngname).c_str());
+         }
+         hideMenuScreen();
+       }

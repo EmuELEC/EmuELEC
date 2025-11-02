@@ -2,9 +2,9 @@
 # Copyright (C) 2022-present 7Ji (https://github.com/7Ji)
 
 PKG_NAME="eemount"
-PKG_VERSION="2321603bdc7a4c09cf805de0e3546512574d8360"
-PKG_SHA256="12cf5fc00291d319f3e598b3b09ac14d591ba86075a61a7a9ed6bd21db16fc78"
-PKG_SITE="https://github.com/7Ji/eemount"
+PKG_VERSION="7ec126a4dc2209eaa5c7cc25cd5e227b6157ae41"
+PKG_SHA256="4895c70bff8a3a9e1046d924cca71eadf5cb1774b63c2e48bab05635e26c690b"
+PKG_SITE="https://github.com/shantigilbert/eemount"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain systemd"
 PKG_LONGDESC="Multi-source ROMs mounting utility for EmuELEC"

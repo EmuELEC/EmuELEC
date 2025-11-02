@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib
+includedir=${prefix}/include
+
+Name: glesv1_cm
+Description: libhybris OpenGL ES 1.1 library
+Version: 0.1.0
+Libs: -L${libdir} -lGLESv1_CM
+Cflags: -I${includedir}

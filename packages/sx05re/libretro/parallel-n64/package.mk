@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="parallel-n64"
-PKG_VERSION="1b57f9199b1f8a4510f7f89f14afa9cabf9b3bdd"
-PKG_SHA256="2dec08f3026dd160a0129507f4c8891325c5d2444822135d2be3ccc4517e37bb"
+PKG_VERSION="50d3ddd55b5774da643d90d7ad1e3cbd2c618883"
+PKG_SHA256="ac9f9a8d36cd5a1a4859589ce95f4d9b1bd4bce1047c83dc6b6d1c5c4bcf87bf"
 PKG_REV="2"
 PKG_LICENSE="GPLv2"
 PKG_ARCH="arm"

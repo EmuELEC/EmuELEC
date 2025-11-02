@@ -1,0 +1,19 @@
+[Unit]
+Description=RetroArch emulator frontend
+ConditionPathExists=/var/lock/start.retro
+
+[Service]
+Environment=DISPLAY=:0.0
+Environment=SDL_MOUSE_RELATIVE=0
+Environment=FB_MULTI_BUFFER=2
+Environment=HOME=/storage
+ExecStartPre=/usr/bin/emustation-config retroarch
+ExecStart=/bin/bash -c '/usr/bin/retroarch $(cat /emuelec/configs/RA_ARGS)'
+KillMode=process
+TimeoutStopSec=3
+Restart=on-failure
+RestartSec=2
+StartLimitInterval=0
+
+[Install]
+WantedBy=emuelec.target

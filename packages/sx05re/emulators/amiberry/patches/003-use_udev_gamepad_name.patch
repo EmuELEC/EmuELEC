@@ -1,0 +1,136 @@
+--- a/src/osdep/retroarch.cpp
++++ b/src/osdep/retroarch.cpp
+@@ -71,7 +71,22 @@
+ 
+ 		if (param[0] != 'h') // check it isn't some kind of hat starting 'h' (so if D-pad uses buttons)
+ 		{
+-			button = abs(std::stoi(param));
++			try
++			{
++				button = abs(std::stoi(param));
++			}
++			catch (const std::invalid_argument& e)
++			{
++				write_log("Invalid argument in stoi for param='%s' in setting='%s' (line: %s)", 
++				param.c_str(), find_setting.c_str(), line.c_str());
++				button = -1; // fallback
++			}
++			catch (const std::out_of_range& e)
++			{
++				write_log("Out of range in stoi for param='%s' in setting='%s' (line: %s)", 
++				param.c_str(), find_setting.c_str(), line.c_str());
++				button = -1;
++			}
+ 		}
+ 
+ 		if (option == find_setting)
+--- a/src/osdep/amiberry_input.cpp
++++ b/src/osdep/amiberry_input.cpp
+--- <unnamed>
++++ <unnamed>
+@@ -1,6 +1,8 @@
+ #include <cstdio>
+ #include <cstring>
+ #include <cstdlib>
++#include <fstream>
++#include <sstream>
+ 
+ #include "sysdeps.h"
+ #include "options.h"
+@@ -1073,6 +1075,54 @@
+ 	return num_joystick;
+ }
+ 
++std::string get_udev_name_from_proc(SDL_Joystick* joystick)
++{
++	const char* joystick_path = SDL_JoystickPath(joystick);
++	if (joystick_path == nullptr)
++		return "";
++	
++	// Extract the event number from the path (e.g., "/dev/input/event5" -> "event5")
++	const char* last_slash = strrchr(joystick_path, '/');
++	if (last_slash == nullptr)
++		return "";
++	
++	std::string event_name = std::string(last_slash + 1);
++	
++	// Parse /proc/bus/input/devices to find the matching device
++	std::ifstream devices_file("/proc/bus/input/devices");
++	if (!devices_file.is_open())
++		return "";
++	
++	std::string line;
++	std::string current_name;
++	bool found_device = false;
++	
++	while (std::getline(devices_file, line))
++	{
++		// Look for Name line (e.g., N: Name="Microsoft X-Box 360 pad")
++		if (line.substr(0, 3) == "N: ")
++		{
++			size_t start = line.find('"');
++			size_t end = line.rfind('"');
++			if (start != std::string::npos && end != std::string::npos && end > start)
++				current_name = line.substr(start + 1, end - start - 1);
++		}
++		// Look for Handlers line containing our event device
++		else if (line.substr(0, 3) == "H: " && line.find(event_name) != std::string::npos)
++		{
++			found_device = true;
++			break;
++		}
++		// Empty line indicates new device section
++		else if (line.empty())
++		{
++			current_name.clear();
++		}
++	}
++	
++	return found_device ? current_name : "";
++}
++
+ // Helper functions
+ void open_as_game_controller(struct didata* did, const int i)
+ {
+@@ -1098,6 +1148,9 @@
+ 		did->joystick_name.assign(SDL_JoystickNameForIndex(i));
+ 	else
+ 		did->joystick_name = "";
++
++	// Get UDEV name from /proc/bus/input/devices
++	did->udev_name = get_udev_name_from_proc(did->joystick);
+ 
+ 	if (!did->controller_name.empty())
+ 		did->name = did->controller_name;
+@@ -1210,8 +1263,19 @@
+ 	}
+ 
+ 	const std::string retroarch_file = get_retroarch_file();
+-	const bool retroarch_config_exists = !retroarch_config_file.empty() && my_existsfile2(retroarch_config_file.c_str());
++	bool retroarch_config_exists = !retroarch_config_file.empty() && my_existsfile2(retroarch_config_file.c_str());
++
++	if (!retroarch_config_exists && !did->udev_name.empty())
++	{
++		const auto sanitized_name = sanitize_retroarch_name(did->udev_name);
++		retroarch_config_file = controllers + sanitized_name + ".cfg";
++		write_log("Joystick udev name: '%s', sanitized to: '%s'\n", did->joystick_name.c_str(), sanitized_name.c_str());
++		write_log("Checking for Retroarch cfg file using udev: '%s'\n", retroarch_config_file.c_str());
++	}
++	
++	retroarch_config_exists = !retroarch_config_file.empty() && my_existsfile2(retroarch_config_file.c_str());
+ 	const bool retroarch_file_exists = my_existsfile2(retroarch_file.c_str());
++	
+ 
+ 	if (retroarch_config_exists || retroarch_file_exists)
+ 	{
+
+--- a/src/osdep/amiberry_input.h
++++ b/src/osdep/amiberry_input.h
+@@ -49,6 +49,7 @@
+ 	int type{};
+ 	int acquired{};
+ 	std::string name{};
++	std::string udev_name{};
+ 	std::string controller_name{};
+ 	std::string joystick_name{};
+ 

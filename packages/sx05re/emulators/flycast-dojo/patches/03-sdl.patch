@@ -1,0 +1,14 @@
+--- a/core/sdl/sdl.cpp	2024-06-02 19:45:15.598400200 +0200
++++ b/core/sdl/sdl.cpp	2024-06-02 19:49:41.074683700 +0200
+@@ -200,6 +200,11 @@
+ #endif
+ 		std::string db = get_readonly_data_path("gamecontrollerdb.txt");
+ 		int rv = SDL_GameControllerAddMappingsFromFile(db.c_str());
++		if (rv < 0 && (nowide::getenv("SDL_GAMECONTROLLERCONFIG_FILE") != NULL))
++		{
++			db = (std::string) nowide::getenv("SDL_GAMECONTROLLERCONFIG_FILE");
++			rv = SDL_GameControllerAddMappingsFromFile(db.c_str());
++		}
+ 		if (rv < 0)
+ 		{
+ 			db = get_readonly_config_path("gamecontrollerdb.txt");

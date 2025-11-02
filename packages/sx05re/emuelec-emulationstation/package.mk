@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="a28697fc21b729ddc620f29afead80e5391d67fa"
+PKG_VERSION="09356d0dae6291008a074d8ac4f8c20678d822d2"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -28,6 +28,11 @@ fi
 PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} Crystal"
 
 pre_configure_target() {
+
+# build directly in ${PKG_BUILD} to avoid Python3 errors
+  cd ${PKG_BUILD}
+  rm -rf .${TARGET_NAME}
+
 PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1 -DGLES2=1 -DENABLE_TTS=1"
 
 # Read api_keys.txt if it exist to add the required keys for cheevos, thegamesdb and screenscrapper. You need to get your own API keys. 
@@ -55,6 +60,7 @@ fi
 }
 
 makeinstall_target() {
+
 	mkdir -p ${INSTALL}/usr/config/emuelec/configs/locale/i18n/charmaps
 	cp -rf ${PKG_BUILD}/locale/lang/* ${INSTALL}/usr/config/emuelec/configs/locale/
 	cp -PR "$(get_build_dir glibc)/localedata/charmaps/UTF-8" ${INSTALL}/usr/config/emuelec/configs/locale/i18n/charmaps/UTF-8
@@ -76,6 +82,9 @@ makeinstall_target() {
 	mkdir -p ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/scripts ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/*.cfg ${INSTALL}/usr/config/emulationstation
+
+	# Generate es_systems.cfg from json
+	python3 ${PKG_DIR}/generate_es_systems.py -i ${PKG_DIR}/config/es_systems.json -o ${INSTALL}/usr/config/emulationstation/es_systems.cfg -b manufacturer
 
 	chmod +x ${INSTALL}/usr/config/emulationstation/scripts/*
 	chmod +x ${INSTALL}/usr/config/emulationstation/scripts/configscripts/*
@@ -105,7 +114,7 @@ makeinstall_target() {
 # Remove unused cores
 CORESFILE="${INSTALL}/usr/config/emulationstation/es_systems.cfg"
 
-if [ "${DEVICE}" != "Amlogic-ng" ]; then
+if [[ "${DEVICE}" != "Amlogic-ng" || "${DEVICE}" != "Amlogic-ne" || "${DEVICE}" != "Amlogic-no" ]]; then
     if [[ ${DEVICE} == "OdroidGoAdvance" || "${DEVICE}" == "GameForce" ]]; then
         remove_cores="mesen-s quicknes mame2016 mesen"
     elif [ "${DEVICE}" == "Amlogic-old" ]; then

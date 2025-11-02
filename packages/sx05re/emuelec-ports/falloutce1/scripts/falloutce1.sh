@@ -1,5 +1,5 @@
 
-if ! test -f /storage/roms/ports/falloutcd1/fallout.cfg; then
+if ! test -f /storage/roms/ports/falloutce1/fallout.cfg; then
   cp /usr/config/emuelec/configs/falloutce1/fallout.cfg /storage/roms/ports/falloutce1/
 fi
 

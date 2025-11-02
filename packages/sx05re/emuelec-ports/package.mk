@@ -30,6 +30,7 @@ PKG_DEPENDS_TARGET+=" commander-genius \
                 supertuxkart \
                 chocolate-doom \
                 lzdoom \
+                gzdoom \
                 supermariowar \
                 bstone \
                 hurrican \

@@ -1,0 +1,13 @@
+diff --git a/src/game/singe.cpp b/src/game/singe.cpp
+index b6506b8..fb2af4e 100644
+--- a/src/game/singe.cpp
++++ b/src/game/singe.cpp
+@@ -28,6 +28,8 @@
+ 
+ #include "singe.h"
+ #include "singe/singe_interface.h"
++#include <plog/Log.h>
++#include <ctime>
+ 
+ // Win32 doesn't use strcasecmp, it uses stricmp (lame)
+ #ifdef WIN32

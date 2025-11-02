@@ -1,0 +1,33 @@
+# Kodi Media Center language file
+# Addon Name: Amlogic VNC Server
+# Addon id: service.aml-vnc
+# Addon Provider: Team CoreELEC
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "#30000"
+msgid "Server settings"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Port"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Use authentication"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Password"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Use static name instead of hostname"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Name to be displayed"
+msgstr ""

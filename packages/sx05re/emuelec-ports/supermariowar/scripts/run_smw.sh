@@ -2,11 +2,14 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
+# Modified 2024-present DiegroSan (github)
 
 # Source predefined functions and variables
 . /etc/profile
 
-DATA="https://github.com/mmatyas/supermariowar-data/archive/master.zip"
+DATA="https://github.com/mmatyas/supermariowar-data/archive/da13a367e5a41c59d59f8c0a7fb8248a2f72750c.zip"
+DATAFILE=$(basename "$DATA")
+DATANAME=$(basename "$DATA" .zip)
 DATAFOLDER="/storage/roms/ports/smw/data"
 CONFIGFOLDER="/emuelec/configs/smw"
 
@@ -14,8 +17,8 @@ mkdir -p "${DATAFOLDER}"
 mkdir -p "${CONFIGFOLDER}"
 cd "${DATAFOLDER}"
 
+gptokeyb &
 if [ ! -f "${CONFIGFOLDER}/nofakekeyb" ]; then 
-    gptokeyb &
     touch "${CONFIGFOLDER}/nofakekeyb"
 fi
 
@@ -24,10 +27,10 @@ if [ ! -e "${DATAFOLDER}/worlds/Big JM_Mixed River.txt" ]; then
         if [[ $? == 21 ]]; then
             ee_console enable
             wget "${DATA}" -q --show-progress > /dev/tty0 2>&1
-            unzip "master.zip" > /dev/tty0
-            mv supermariowar-data-master/* "${DATAFOLDER}" > /dev/tty0
-            rm -rf "supermariowar-data-master" > /dev/tty0 2>&1
-            rm "master.zip" > /dev/tty0 2>&1
+            unzip "${DATAFILE}" > /dev/tty0
+            mv "${DATAFOLDER}/supermariowar-data-${DATANAME}"/* "${DATAFOLDER}/" > /dev/tty0
+            rm -rf "${DATAFOLDER}/supermariowar-data-${DATANAME}" > /dev/tty0 2>&1
+            rm "${DATAFOLDER}/${DATAFILE}" > /dev/tty0 2>&1
             rm "imgui.ini" > /dev/tty0 2>&1
             ee_console disable
             cd "${DATAFOLDER}/.."

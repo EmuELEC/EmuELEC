@@ -55,11 +55,29 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       eemount \
                       dasbus \
                       diffutils \
-                      fbfix"
+                      fbfix \
+                      munt \
+                      munt_alsadrv \
+                      python-uinput \
+                      python-evdev \
+                      xow \
+                      progressor \
+                      timidity \
+                      sdlterm \
+                      btop"
 
 if [ "${PROJECT}" == "Amlogic-ce" ]; then
                       PKG_DEPENDS_TARGET+=" CoreELEC-Debug-Scripts"
 fi
+
+if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
+	  
+  #we disable some tools that are not working HH
+	for discore in xow; do
+		PKG_DEPENDS_TARGET=$(echo ${PKG_DEPENDS_TARGET} | sed "s|${discore} | |")
+	done
+fi
+
 
 post_install() {
   rm -f ${INSTALL}/usr/bin/{sort,wget,grep}

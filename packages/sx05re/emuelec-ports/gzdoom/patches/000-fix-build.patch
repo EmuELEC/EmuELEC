@@ -1,0 +1,140 @@
+diff --git a/specs/udmf_zdoom.txt b/specs/udmf_zdoom.txt
+index ebc831d57..f2d7974a8 100644
+--- a/specs/udmf_zdoom.txt
++++ b/specs/udmf_zdoom.txt
+@@ -218,6 +218,9 @@ Note: All <bool> fields default to false unless mentioned otherwise.
+ 	  useowncolors_bottom = <bool>; // Set to 1 to use the colors set in the sidedef. Default is using the colors from the owning sector.
+ 	  uppercolor_bottom = <int>;    // Material color of the top of the lower tier.
+ 	  lowercolor_bottom = <int>;    // Material color of the bottom of the lower tier. (Hardware rendering only.)
++	  colorscalefactor_top = <float>  // scales the material color by the given factor.  Default is 1.
++	  colorscalefactor_mid = <float>  // scales the material color by the given factor.  Default is 1.
++	  colorscalefactor_bottom = <float>  // scales the material color by the given factor.  Default is 1.
+ 
+       useowncoloradd_top = <bool>;  // Controls where the advanced colorization properties are taken from.
+       useowncoloradd_mid = <bool>;  // 0: From the containing sector, 1: from the given part of the linedef itself
+diff --git a/src/common/console/keydef.h b/src/common/console/keydef.h
+index 108806774..971ab398f 100644
+--- a/src/common/console/keydef.h
++++ b/src/common/console/keydef.h
+@@ -75,8 +75,13 @@ enum EKeyCodes
+ 	KEY_JOY6,
+ 	KEY_JOY7,
+ 	KEY_JOY8,
+-	KEY_JOY14			= KEY_FIRSTJOYBUTTON+13,
+-	KEY_JOY15			= KEY_FIRSTJOYBUTTON+14,
++	KEY_JOY9,
++	KEY_JOY10,
++	KEY_JOY11,
++	KEY_JOY12,
++	KEY_JOY13,
++	KEY_JOY14,
++	KEY_JOY15,
+ 	KEY_LASTJOYBUTTON		= 0x187,
+ 	KEY_JOYPOV1_UP			= 0x188,
+ 	KEY_JOYPOV1_RIGHT		= 0x189,
+diff --git a/src/common/menu/menu.cpp b/src/common/menu/menu.cpp
+index 448b196a1..62f4819aa 100644
+--- a/src/common/menu/menu.cpp
++++ b/src/common/menu/menu.cpp
+@@ -687,15 +687,12 @@ bool M_Responder (event_t *ev)
+ 			ch = ev->data1;
+ 			switch (ch)
+ 			{
+-			case KEY_JOY1:
+-			case KEY_JOY3:
+-			case KEY_JOY15:
++			case KEY_JOY2:
+ 			case KEY_PAD_A:
+ 				mkey = MKEY_Enter;
+ 				break;
+ 
+-			case KEY_JOY2:
+-			case KEY_JOY14:
++			case KEY_JOY1:
+ 			case KEY_PAD_B:
+ 				mkey = MKEY_Back;
+ 				break;
+@@ -719,6 +716,7 @@ bool M_Responder (event_t *ev)
+ 			case KEY_PAD_LTHUMB_UP:
+ 			case KEY_JOYAXIS2MINUS:
+ 			case KEY_JOYPOV1_UP:
++			case KEY_JOY9:
+ 				mkey = MKEY_Up;
+ 				break;
+ 
+@@ -726,6 +724,7 @@ bool M_Responder (event_t *ev)
+ 			case KEY_PAD_LTHUMB_DOWN:
+ 			case KEY_JOYAXIS2PLUS:
+ 			case KEY_JOYPOV1_DOWN:
++			case KEY_JOY10:
+ 				mkey = MKEY_Down;
+ 				break;
+ 
+@@ -733,6 +732,7 @@ bool M_Responder (event_t *ev)
+ 			case KEY_PAD_LTHUMB_LEFT:
+ 			case KEY_JOYAXIS1MINUS:
+ 			case KEY_JOYPOV1_LEFT:
++			case KEY_JOY11:
+ 				mkey = MKEY_Left;
+ 				break;
+ 
+@@ -740,6 +740,7 @@ bool M_Responder (event_t *ev)
+ 			case KEY_PAD_LTHUMB_RIGHT:
+ 			case KEY_JOYAXIS1PLUS:
+ 			case KEY_JOYPOV1_RIGHT:
++			case KEY_JOY12:
+ 				mkey = MKEY_Right;
+ 				break;
+ 			}
+diff --git a/src/common/platform/posix/sdl/i_gui.cpp b/src/common/platform/posix/sdl/i_gui.cpp
+index 9290f063f..62df74a35 100644
+--- a/src/common/platform/posix/sdl/i_gui.cpp
++++ b/src/common/platform/posix/sdl/i_gui.cpp
+@@ -68,7 +68,7 @@ bool I_SetCursor(FGameTexture *cursorpic)
+ 			SDL_FreeCursor (cursor);
+ 		cursor = SDL_CreateColorCursor (cursorSurface, 0, 0);
+ 		SDL_SetCursor (cursor);
+-		SDL_ShowCursor(SDL_ENABLE);
++		SDL_ShowCursor(SDL_DISABLE);
+ 	}
+ 	else
+ 	{
+diff --git a/src/gamedata/doomfont.h b/src/gamedata/doomfont.h
+index fedeb513c..23b2c0759 100644
+--- a/src/gamedata/doomfont.h
++++ b/src/gamedata/doomfont.h
+@@ -57,6 +57,6 @@ void InitDoomFonts()
+ 	}
+ 	else if (fileSystem.CheckNumForName("STCFN033", FileSys::ns_graphics) >= 0)
+ 	{
+-		OriginalSmallFont = new FFont("OriginalSmallFont", "STCFN%.3d", "defsmallfont", HU_FONTSTART, HU_FONTSIZE, HU_FONTSTART, -1, -1, false, true, true);
++		OriginalSmallFont = new FFont("OriginalSmallFont", "STCFN%.3d", "defsmallfont", HU_FONTSTART, HU_FONTSIZE, HU_FONTSTART, -1, -1, false, true);
+ 	}
+
+diff --git a/wadsrc/static/language.def b/wadsrc/static/language.def
+index da8ddfb4a..a0e3cc60d 100644
+--- a/wadsrc/static/language.def
++++ b/wadsrc/static/language.def
+@@ -99,6 +99,9 @@ STARTUP3 = "";
+ STARTUP4 = "";
+ STARTUP5 = "";
+ 
++// Engine strings
++CNTRLMNU_OPEN_MAIN				= "Open Main Menu";
++
+ // Placeholder definitions for strings that are in the game content table where the labels are needed even when that file is not loaded.
+ 
+ // Level names
+
+diff --git a/src/common/rendering/gles/gles_system.cpp b/src/common/rendering/gles/gles_system.cpp
+index d9bedafdd..2b02dfcd8 100644
+--- a/src/common/rendering/gles/gles_system.cpp
++++ b/src/common/rendering/gles/gles_system.cpp
+@@ -208,6 +208,7 @@ namespace OpenGLESRenderer
+ 			gles.npotAvailable = CheckExtension("GL_OES_texture_npot");
+ 			gles.depthClampAvailable = CheckExtension("GL_EXT_depth_clamp");
+ 			gles.anistropicFilterAvailable = CheckExtension("GL_EXT_texture_filter_anisotropic");
++			gles.useMappedBuffers = true;
+ 		}
+ 		else if (gles.glesMode == GLES_MODE_OGL2)
+ 		{

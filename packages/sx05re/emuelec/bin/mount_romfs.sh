@@ -292,20 +292,21 @@ finish_scan() {
   echo "Finished scanning for roms mounts..."
   echo "Bringing back samba..."
   systemctl start smbd.service
-  echo "Mounting ports_scripts..."
-  if [ -L "/storage/roms" ]; then
-    local LINK=$(readlink /storage/roms)
-  else
-    local LINK="/storage/roms"
-  fi
+  
+  #echo "Mounting ports_scripts..."
+  #if [ -L "/storage/roms" ]; then
+  #  local LINK=$(readlink /storage/roms)
+  #else
+  #  local LINK="/storage/roms"
+  #fi
   # Just in case
-  mkdir -p "${LINK}/ports_scripts"
-  mkdir -p "/emuelec/ports"
-  mkdir -p "/storage/.tmp/ports-workdir"
-  umount "/storage/roms/ports_scripts" &>/dev/null
-  umount "/var/media/EEROMS/roms/ports_scripts" &>/dev/null
+  #mkdir -p "${LINK}/ports_scripts"
+  #mkdir -p "/emuelec/ports"
+  #mkdir -p "/storage/.tmp/ports-workdir"
+  #umount "/storage/roms/ports_scripts" &>/dev/null
+  #umount "/var/media/EEROMS/roms/ports_scripts" &>/dev/null
 
-  mount -t overlay ports -o lowerdir=/usr/bin/ports,upperdir=/emuelec/ports,workdir=/storage/.tmp/ports-workdir "${LINK}/ports_scripts"
+  #mount -t overlay ports -o lowerdir=/usr/bin/ports,upperdir=/emuelec/ports,workdir=/storage/.tmp/ports-workdir "${LINK}/ports_scripts"
 }
 
 if compgen -G /storage/.config/system.d/storage-roms*.mount &>/dev/null; then

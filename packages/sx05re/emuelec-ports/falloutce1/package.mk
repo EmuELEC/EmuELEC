@@ -2,10 +2,11 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="falloutce1"
-PKG_VERSION="f33143d0db9066d4c654464f66aba58871e4c81e"
+PKG_VERSION="bc5a9273304e53f06a7cdac5d12c856cc418e137"
+PKG_GIT_CLONE_BRANCH="patch-1"
 PKG_REV="1"
 PKG_ARCH="any"
-PKG_SITE="https://github.com/alexbatalov/fallout1-ce"
+PKG_SITE="https://github.com/glebm/fallout1-ce"
 PKG_URL="${PKG_SITE}.git"
 PKG_DEPENDS_TARGET="toolchain SDL2"
 PKG_LONGDESC="Game port of Fallout using SDL2"

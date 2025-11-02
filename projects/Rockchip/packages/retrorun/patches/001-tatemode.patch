@@ -1,0 +1,79 @@
+diff --git a/retrorun b/retrorun
+index 5491dd6..a5a26ec 100755
+Binary files a/retrorun and b/retrorun differ
+diff --git a/src/globals.cpp b/src/globals.cpp
+index ff0621b..bc72f01 100755
+--- a/src/globals.cpp
++++ b/src/globals.cpp
+@@ -7,6 +7,7 @@ RETRORUN_CORE_TYPE Retrorun_Core = RETRORUN_CORE_UNKNOWN;
+ Device device = UNKNOWN;
+ bool force_left_analog_stick = true;
+
++bool opt_is_tate = false;
+ bool opt_triggers = false;
+ bool gpio_joypad = false;
+ float opt_aspect = 0.0f;
+diff --git a/src/globals.h b/src/globals.h
+index 23f3bc0..4cbf6de 100755
+--- a/src/globals.h
++++ b/src/globals.h
+@@ -47,6 +47,7 @@ extern bool force_left_analog_stick;
+
+ extern float fps;
+ extern bool opt_triggers;
++extern bool opt_is_tate;
+ extern bool gpio_joypad;
+ extern float opt_aspect;
+ extern float aspect_ratio;
+diff --git a/src/main.cpp b/src/main.cpp
+index 0cbbfe2..2d7a799 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -98,6 +98,7 @@ struct option longopts[] = {
+     {"triggers", no_argument, NULL, 't'},
+     {"analog", no_argument, NULL, 'n'},
+     {"fps", no_argument, NULL, 'f'},
++		{"tatemode", no_argument, NULL, 'z'},
+     {0, 0, 0, 0}};
+
+ static struct
+@@ -883,7 +884,7 @@ int main(int argc, char *argv[])
+     int c;
+     int option_index = 0;
+
+-    while ((c = getopt_long(argc, argv, "s:d:a:b:v:grtnfc:", longopts, &option_index)) != -1)
++    while ((c = getopt_long(argc, argv, "s:d:a:b:v:grtnfcz:", longopts, &option_index)) != -1)
+     {
+         switch (c)
+         {
+@@ -929,7 +930,9 @@ int main(int argc, char *argv[])
+         case 'c':
+             opt_setting_file = optarg;
+             break;
+-
++				case 'z':
++						opt_is_tate = true;
++						break;
+         default:
+             printf("Unknown option. '%s'\n", longopts[option_index].name);
+             exit(EXIT_FAILURE);
+diff --git a/src/video.cpp b/src/video.cpp
+index d168eda..66238ee 100755
+--- a/src/video.cpp
++++ b/src/video.cpp
+@@ -577,6 +577,7 @@ bool cmpf(float A, float B, float epsilon = 0.005f)
+ void prepareScreen(int width, int height)
+ {
+     screen_aspect_ratio = (float)go2_display_height_get(display) / (float)go2_display_width_get(display);
++		isTate = opt_is_tate;
+     if (aspect_ratio >= 1.0f)
+     {
+         if (isWideScreen)
+@@ -641,7 +642,7 @@ void prepareScreen(int width, int height)
+         y = 0;
+         h = go2_display_height_get(display);
+         w = go2_display_width_get(display);
+-        isTate = (Retrorun_Core == RETRORUN_CORE_FLYCAST); // we rotate the screen (Tate) for some arcade games when apsect ratio < 0
++        // isTate = (Retrorun_Core == RETRORUN_CORE_FLYCAST); // we rotate the screen (Tate) for some arcade games when apsect ratio < 0
+     }
+ }

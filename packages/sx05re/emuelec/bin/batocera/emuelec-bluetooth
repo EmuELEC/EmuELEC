@@ -44,7 +44,7 @@ class ShellIO:
         if debug:
             print("> " + " ".join(x for x in cmd))
         out: list[str] = []
-        with Popen(cmd, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
+        with Popen(cmd, stdout=PIPE, bufsize=1, universal_newlines=True, encoding="latin-1") as p:
             for line in p.stdout:
                 out.append(line)
                 if debug:
@@ -61,7 +61,7 @@ class ShellIO:
 
     @staticmethod
     def execute_async(cmd: list[str]):
-        Popen(cmd, stdout=PIPE, bufsize=1, universal_newlines=True)
+        Popen(cmd, stdout=PIPE, bufsize=1, universal_newlines=True, encoding="latin-1")
 
 
 class BluetoothCTL:
@@ -237,8 +237,7 @@ class BluetoothCTL:
 
 # returns true if a game is running via the emuelecRunEmu script
 def is_in_game():
-    return ShellIO.execute_lookup(["ps", "-ef"], "emuelecRunEmu.sh", debug=False)
-
+    return os.path.isfile("/tmp/game.running")
 
 # returns true if another process (not current) is running infinite scan
 def is_bluetooth_running():
@@ -328,24 +327,20 @@ if __name__ == "__main__":
     start_time = time.perf_counter()
     while True:
         diff_time = time.perf_counter() - start_time
-#        if SCAN_TIME >= 0:
-#            if ELAPSED_TIME > SCAN_TIME:
-#        print(diff_time)
         if SCAN_TIME != -1 and diff_time > SCAN_TIME:
                 exit()
 
-        if not BEEN_IN_GAME:
-            BEEN_IN_GAME = is_in_game()
+        IS_IN_GAME = is_in_game()
 
         connected_devs = [dev for dev in bt.devices if dev.connected]
         if not bt.scanning and (
-            not BEEN_IN_GAME or len(connected_devs) == 0 or SCAN_TIME > 0
+            not IS_IN_GAME or len(connected_devs) == 0
         ):
             print("resuming scan")
             BT_THREAD = Process(target=bt.scan_async, args=(SCAN_TIME,))
             BT_THREAD.start()
         elif (
-            bt.scanning and BEEN_IN_GAME and (len(connected_devs) > 0 or SCAN_TIME < 0)
+            bt.scanning and IS_IN_GAME and (len(connected_devs) > 0)
         ):
             print("stopping scan")
             if BT_THREAD is not None:
@@ -353,4 +348,3 @@ if __name__ == "__main__":
             bt.scan_stop()
 
         time.sleep(UPDATE_INTERVAL)
-#        ELAPSED_TIME += UPDATE_INTERVAL

@@ -20,6 +20,7 @@ RACORECONF="/storage/.config/retroarch/retroarch-core-options.cfg"
 PLATFORM=${1,,}
 CORE=${3,,}
 ROM="${2##*/}"
+ROM="$(printf '%s' "${ROM}" | sed 's/\([][]\)/\\\1/g')"
 SETF=0
 SHADERSET=0
 AUTOLOAD="false"
@@ -28,15 +29,76 @@ AUTOLOAD="false"
 ISBEZEL="false"
 IRBEZEL="22"
 
+#Autosave
+AUTOSAVE="$@"
+AUTOSAVE="${AUTOSAVE#*--autosave=*}"
+AUTOSAVE="${AUTOSAVE% --*}"
+
 #Snapshot
 SNAPSHOT="$@"
 SNAPSHOT="${SNAPSHOT#*--snapshot=*}"
+SNAPSHOT="${SNAPSHOT% --*}"
+
+#Self language retroarch
+LANGEMUELEC=$(get_ee_setting system.language)
+
+if [ "$LANGEMUELEC" == "pt_BR" ] || [ "$LANGEMUELEC" == "pt_PT" ]; then
+    LANGEMUELEC="7"
+elif [ "$LANGEMUELEC" == "en_US" ] || [ "$LANGEMUELEC" == "en_GB" ]; then
+    LANGEMUELEC="0"
+elif [ "$LANGEMUELEC" == "fr_FR" ]; then
+    LANGEMUELEC="2"
+elif [ "$LANGEMUELEC" == "es_ES" ] || [ "$LANGEMUELEC" == "es_MX" ]; then
+    LANGEMUELEC="3"
+elif [ "$LANGEMUELEC" == "de_DE" ]; then
+    LANGEMUELEC="4"
+elif [ "$LANGEMUELEC" == "it_IT" ]; then
+    LANGEMUELEC="5"
+elif [ "$LANGEMUELEC" == "eu_ES" ]; then
+    LANGEMUELEC="21"
+elif [ "$LANGEMUELEC" == "tr_TR" ]; then
+    LANGEMUELEC="17"
+elif [ "$LANGEMUELEC" == "zh_CN" ]; then
+    LANGEMUELEC="11"
+elif [ "$LANGEMUELEC" == "zh_TW" ]; then
+    LANGEMUELEC="12"
+elif [ "$LANGEMUELEC" == "ko_KR" ]; then
+    LANGEMUELEC="8"
+elif [ "$LANGEMUELEC" == "ja_JP" ]; then
+    LANGEMUELEC="9"
+elif [ "$LANGEMUELEC" == "ru_RU" ]; then
+    LANGEMUELEC="14"
+elif [ "$LANGEMUELEC" == "nl_NL" ]; then
+    LANGEMUELEC="10"
+elif [ "$LANGEMUELEC" == "pl_PL" ]; then
+    LANGEMUELEC="15"
+elif [ "$LANGEMUELEC" == "sv_SE" ]; then
+    LANGEMUELEC="16"
+elif [ "$LANGEMUELEC" == "hu_HU" ]; then
+    LANGEMUELEC="19"
+elif [ "$LANGEMUELEC" == "cs_CZ" ]; then
+    LANGEMUELEC="20"
+else
+    LANGEMUELEC="0"
+fi
+
+sed -i "s/user_language = \"[^\"]*\"/user_language = \"$LANGEMUELEC\"/" ${RACONF}
 
 # For the new snapshot save state manager we need to set the path to be /storage/roms/savestates/[PLATFORM]
 mkdir -p "/storage/roms/savestates/${PLATFORM}"
 sed -i '/savestates_in_content_dir =/d' ${RACONF}
+sed -i '/sort_savefiles_by_content_enable =/d' ${RACONF}
+sed -i '/sort_savefiles_enable =/d' ${RACONF}
+sed -i '/sort_savestates_by_content_enable =/d' ${RACONF}
+sed -i '/sort_savestates_enable =/d' ${RACONF}
 sed -i '/savestate_directory =/d' ${RACONF}
-echo "savestates_in_content_dir = false" >> ${RACONF}
+echo 'savestates_in_content_dir = "false"' >> ${RACONF}
+echo 'sort_savefiles_by_content_enable = false"' >> ${RACONF}
+echo 'sort_savefiles_enable = "false"' >> ${RACONF}
+echo 'sort_savestates_by_content_enable = "false"' >> ${RACONF}
+echo 'sort_savestates_enable = "false"' >> ${RACONF}
+
+
 echo "savestate_directory = \"/storage/roms/savestates/${PLATFORM}\"" >> ${RACONF}
 
 
@@ -98,9 +160,9 @@ function default_settings() {
     echo 'video_scale_integer_overscale = "false"' >> ${RACONF}
     echo 'video_shader = ""' >> ${RACONF}
     echo 'video_shader_enable = "false"' >> ${RACONF}
-    echo 'video_smooth = "false"' >> ${RACONF} 
+    echo 'video_smooth = "false"' >> ${RACONF}
     echo 'aspect_ratio_index = "22"' >> ${RACONF}
-    echo 'rewind_enable = "false"' >> ${RACONF} 
+    echo 'rewind_enable = "false"' >> ${RACONF}
     echo 'run_ahead_enabled = "false"' >> ${RACONF}
     echo 'run_ahead_frames = "1"' >> ${RACONF}
     echo 'run_ahead_secondary_instance = "false"' >> ${RACONF}
@@ -134,7 +196,7 @@ case ${1} in
     if [[ "${2}" == "false" ]]; then
         # 22 is the "Core Provided" aspect ratio and its set by default if no other is selected
         echo 'aspect_ratio_index = "22"' >> ${RACONF}
-    else    
+    else
     for i in "${!INDEXRATIOS[@]}"; do
         if [[ "${INDEXRATIOS[${i}]}" = "${2}" ]]; then
             break
@@ -145,18 +207,18 @@ case ${1} in
     fi
     ;;
     "smooth")
-        [ "${2}" == "1" ] && echo 'video_smooth = "true"' >> ${RACONF} || echo 'video_smooth = "false"' >> ${RACONF} 
+        [ "${2}" == "1" ] && echo 'video_smooth = "true"' >> ${RACONF} || echo 'video_smooth = "false"' >> ${RACONF}
     ;;
     "rewind")
         (for e in "${NOREWIND[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RE=0 || RE=1
             if [ ${RE} == 1 ] && [ "${2}" == "1" ]; then
                 echo 'rewind_enable = "true"' >> ${RACONF}
             else
-                echo 'rewind_enable = "false"' >> ${RACONF} 
+                echo 'rewind_enable = "false"' >> ${RACONF}
             fi
     ;;
     "autosave")
-        if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
+        if [ "${AUTOSAVE}" == "0" ]; then
             echo 'savestate_auto_save = "false"' >> ${RACONF}
             echo 'savestate_auto_load = "false"' >> ${RACONF}
         else
@@ -166,38 +228,47 @@ case ${1} in
         fi
     ;;
     "snapshot")
-    
-    sed -i "/state_slot =/d" ${RACONF}
 
-if [[ ! -z ${SNAPSHOT} ]]; then    
-        sed -i "/savestate_auto_load =/d" ${RACONF}
-        sed -i "/savestate_auto_save =/d" ${RACONF}
-        echo 'savestate_auto_save = "true"' >> ${RACONF}
-        echo 'savestate_auto_load = "true"' >> ${RACONF}
-        echo "state_slot = \"${SNAPSHOT}\"" >> ${RACONF}
-else
-    if [[ ${AUTOLOAD} == "false" ]]; then
-        sed -i "/savestate_auto_load =/d" ${RACONF}
-        sed -i "/savestate_auto_save =/d" ${RACONF}
-        
-        echo 'savestate_auto_save = "false"' >> ${RACONF}
-        echo 'savestate_auto_load = "false"' >> ${RACONF}
-    fi
-        echo 'state_slot = "0"' >> ${RACONF}
-    fi
+        sed -i "/state_slot =/d" ${RACONF}
+
+        if [[ ! -z ${SNAPSHOT} ]]; then
+            echo "state_slot = \"${SNAPSHOT}\"" >> ${RACONF}
+        else
+            if [[ ${AUTOLOAD} == "false" ]]; then
+                sed -i "/savestate_auto_load =/d" ${RACONF}
+                sed -i "/savestate_auto_save =/d" ${RACONF}
+
+                echo 'savestate_auto_save = "false"' >> ${RACONF}
+                echo 'savestate_auto_load = "false"' >> ${RACONF}
+            fi
+            echo 'state_slot = "0"' >> ${RACONF}
+        fi
     ;;
     "integerscale")
-        [ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF} 
+        [ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF}
         [ "${2}" == "1" ] && ISBEZEL="true" || ISBEZEL="false"
     ;;
     "integerscaleoverscale")
-        [ "${2}" == "1" ] && echo 'video_scale_integer_overscale = "true"' >> ${RACONF} || echo 'video_scale_integer_overscale = "false"' >> ${RACONF} 
+		case "${2}" in
+			"1")
+				echo 'video_scale_integer_scaling = "1"' >> "${RACONF}"
+				echo 'video_scale_integer_axis = "1"' >> "${RACONF}"
+			;;
+			"2")
+				echo 'video_scale_integer_scaling = "2"' >> "${RACONF}"
+				echo 'video_scale_integer_axis = "1"' >> "${RACONF}"
+			;;
+			*)
+				echo 'video_scale_integer_overscale = "0"' >> "${RACONF}"
+				echo 'video_scale_integer_axis = "0"' >> "${RACONF}"
+			;;
+esac
     ;;
     "rgascale")
                 [ "${2}" == "1" ] && echo 'video_ctx_scaling = "true"' >> ${RACONF} || echo 'video_ctx_scaling = "false"' >> ${RACONF}
         ;;
     "shaderset")
-        if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
+        if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
             echo 'video_shader_enable = "false"' >> ${RACONF}
             echo 'video_shader = ""' >> ${RACONF}
         else
@@ -207,9 +278,9 @@ else
         fi
     ;;
     "runahead")
-    (for e in "${NORUNAHEAD[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RA=0 || RA=1    
+    (for e in "${NORUNAHEAD[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RA=0 || RA=1
     if [ ${RA} == 1 ]; then
-        if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
+        if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
             echo 'run_ahead_enabled = "false"' >> ${RACONF}
             echo 'run_ahead_frames = "1"' >> ${RACONF}
         else
@@ -219,9 +290,9 @@ else
     fi
     ;;
     "secondinstance")
-    (for e in "${NORUNAHEAD[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RA=0 || RA=1    
+    (for e in "${NORUNAHEAD[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RA=0 || RA=1
     if [ ${RA} == 1 ]; then
-        [ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"' >> ${RACONF} 
+        [ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"' >> ${RACONF}
     fi
     ;;
     "video_frame_delay_auto")
@@ -258,22 +329,28 @@ else
                     # retroachievements_hardcore_mode
                     get_setting "retroachievements.hardcore"
                     [ "${EES}" == "1" ] && echo 'cheevos_hardcore_mode_enable = "true"' >> ${RACONF} || echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
-                        
+
                     # retroachievements_encore_mode
                     get_setting "retroachievements.encore"
                     [ "${EES}" == "1" ] && echo 'cheevos_start_active = "true"' >> ${RACONF} || echo 'cheevos_start_active = "false"' >> ${RACONF}
-                        
+
                     # retroachievements_leaderboards
                     get_setting "retroachievements.leaderboards"
                     [ "${EES}" == "1" ] && echo 'cheevos_leaderboards_enable = "true"' >> ${RACONF} || echo 'cheevos_leaderboards_enable = "false"' >> ${RACONF}
-           
+
                     # retroachievements_verbose_mode
                     get_setting "retroachievements.verbose"
                     [ "${EES}" == "1" ] && echo 'cheevos_verbose_enable = "true"' >> ${RACONF} || echo 'cheevos_verbose_enable = "false"' >> ${RACONF}
-            
+
                     # retroachievements_automatic_screenshot
                     get_setting "retroachievements.screenshot"
-                    [ "${EES}" == "1" ] && echo 'cheevos_auto_screenshot = "true"' >> ${RACONF} || echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
+                    if [ "${EES}" == "1" ]; then 
+						echo 'cheevos_auto_screenshot = "true"' >> ${RACONF}
+						set_ra_setting screenshot_directory "/roms/screenshots"
+						mkdir -p "/roms/screenshots"
+                    else
+						echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
+                    fi
                 else
                     echo 'cheevos_enable = "false"' >> ${RACONF}
                     echo 'cheevos_username = ""' >> ${RACONF}
@@ -286,45 +363,45 @@ else
                 fi
             fi
         done
-    ;; 
+    ;;
     "netplay")
 
     if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
             echo 'netplay = false' >> ${RACONF}
     else
         echo 'netplay = true' >> ${RACONF}
-        
+
         get_setting "netplay.mode"
         NETPLAY_MODE=${EES}
-        
+
         # Security : hardcore mode disables save states, which would kill netplay
         sed -i '/cheevos_hardcore_mode_enable =/d' ${RACONF}
         echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
-    
+
     if [[ "${NETPLAY_MODE}" == "host" ]]; then
         # Quite strangely, host mode requires netplay_mode to be set to false when launched from command line
         echo 'netplay_mode = false' >> ${RACONF}
         echo 'netplay_client_swap_input = false' >> ${RACONF}
         get_setting "netplay.port"
         echo "netplay_ip_port = ${EES}" >> ${RACONF}
-        
+
     elif [[ "${NETPLAY_MODE}" == "client" || "${NETPLAY_MODE}" == "spectator" ]]; then
         # But client needs netplay_mode = true ... bug ?
         echo 'netplay_mode = true' >> ${RACONF}
-        
+
         get_setting "netplay.server.ip"
         sed -i  "s|netplay_ip_address =.*|netplay_ip_address = ${EES}|" ${RACONF}
-        
+
         get_setting "netplay.server.port"
         sed -i  "s|netplay_ip_port =.*|netplay_ip_port = ${EES}|" ${RACONF}
-        
+
         echo 'netplay_client_swap_input = true' >> ${RACONF}
-    
-    fi # Host or Client 
-        
+
+    fi # Host or Client
+
     if [[ "${NETPLAY_MODE}" == "spectator" ]]; then
         echo 'netplay_start_as_spectator = true' >> ${RACONF}
-    fi 
+    fi
 
         get_setting "netplay.password"
         if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
@@ -339,7 +416,7 @@ else
         else
          sed -i '/netplay_spectate_password =/d' ${RACONF}
         fi
-        
+
         # Netplay hide the gameplay
         get_setting "netplay_public_announce"
         if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
@@ -347,7 +424,7 @@ else
         else
            echo "netplay_public_announce = false" >> ${RACONF}
         fi
-       
+
         # relay
         get_setting "netplay.relay"
         if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
@@ -357,17 +434,17 @@ else
             echo 'netplay_use_mitm_server = false' >> ${RACONF}
             sed -i "/netplay_mitm_server/d" ${RACONF}
         fi
-        
+
         get_setting "netplay.frames"
         echo "netplay_delay_frames = ${EES}" >> ${RACONF}
 
         get_setting "netplay.nickname"
         echo "netplay_nickname = ${EES}" >> ${RACONF}
-        
+
     # mode spectator
        #  get_setting "netplay.spectator"
        #  [ "${EES}" == "1" ] && echo 'netplay_spectator_mode_enable = true' >> ${RACONF} || echo 'netplay_spectator_mode_enable = false' >> ${RACONF}
-       
+
     fi
     ;;
     "fps")
@@ -380,10 +457,10 @@ else
     if [ "${EES}" == "1" ]; then
         echo 'video_oga_vertical_enable = "true"' >> ${RACONF}
         sed -i "/aspect_ratio_index/d" ${RACONF}
-        
+
         get_setting "vert_aspect"
-        
-    if [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] || [ "${EES}" == "1" ]; then        
+
+    if [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] || [ "${EES}" == "1" ]; then
         echo 'aspect_ratio_index = "1"' >> ${RACONF}
         IRBEZEL="1"
     else
@@ -414,7 +491,7 @@ else
     else
         echo 'video_oga_vertical_enable = "false"' >> ${RACONF}
         echo 'video_ogs_vertical_enable = "false"' >> ${RACONF}
-          
+
         case "$(oga_ver)" in
             "OGA")
                 if [ -f "/tmp/joypads/GO-Advance Gamepad_horizontal.cfg" ]; then
@@ -501,11 +578,23 @@ sed -i "/atari800_system =/d" ${ATARI800CONF}
 fi
 
 if [ "${PLATFORM}" == "amstradgx4000" ]; then
-# Make sure cap32_model is set to "6128+"
-GX4000CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
-[[ ! -f "${GX4000CONF}" ]] && touch "${GX4000CONF}"
-    sed -i "/cap32_model =/d" "${GX4000CONF}"
-    echo "cap32_model = \"6128+\"" >> "${GX4000CONF}"
+# Make sure cap32_model is set to "6128+ (experimental)"
+CAP32CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
+[[ ! -f "${CAP32CONF}" ]] && touch "${CAP32CONF}"
+    sed -i "/cap32_model =/d" "${CAP32CONF}"
+    echo "cap32_model = \"6128+ (experimental)\"" >> "${CAP32CONF}"
+    sed -i "/cap32_gfx_colors =/d" "${CAP32CONF}"
+    echo "cap32_gfx_colors = \"24bit\"" >> "${CAP32CONF}"
+fi
+
+if [ "${PLATFORM}" == "amstradcpc" ]; then
+# But amstradcpc wants cap32_model set to "6128"
+CAP32CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
+[[ ! -f "${CAP32CONF}" ]] && touch "${CAP32CONF}"
+    sed -i "/cap32_model =/d" "${CAP32CONF}"
+    echo "cap32_model = \"6128\"" >> "${CAP32CONF}"
+    sed -i "/cap32_gfx_colors =/d" "${CAP32CONF}"
+    echo "cap32_gfx_colors = \"16bit\"" >> "${CAP32CONF}"
 fi
 
 if [ "${CORE}" == "gambatte" ]; then
@@ -549,9 +638,9 @@ sed -i "/gambatte_gb_internal_palette =/d" ${GAMBATTECONF}
 # We set up the controller index
 CONTROLLERS="$@"
 CONTROLLERS="${CONTROLLERS#*--controllers=*}"
-CONTROLLERS="${CONTROLLERS%% -state*}"  # until -state is found
+CONTROLLERS="${CONTROLLERS%% --autosave*}"  # until --autosave is found
 
-for i in 1 2 3 4 5; do 
+for i in 1 2 3 4 5; do
 if [[ "${CONTROLLERS}" == *p${i}* ]]; then
 PINDEX="${CONTROLLERS#*-p${i}index }"
 PINDEX="${PINDEX%% -p${i}guid*}"
@@ -569,7 +658,7 @@ done
 EE_DEVICE=$(cat /ee_arch)
 get_setting "retroarch.menu_driver"
 
-if [ "${EES}" == "false" ] || [ "${EES}" == "auto" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ]; then 
+if [ "${EES}" == "false" ] || [ "${EES}" == "auto" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ]; then
     if [ "${EE_DEVICE}" == "OdroidGoAdvance" ] || [ "${EE_DEVICE}" == "GameForce" ]; then
         EES="xmb"
     else
@@ -583,3 +672,8 @@ echo "menu_driver = ${EES}" >> ${RACONF}
 # Show bezel if enabled
 get_setting "bezel"
 [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} bezels.sh "none" "default" "${ISBEZEL}" "${IRBEZEL}" || ${TBASH} bezels.sh "${PLATFORM}" "${ROM}" "${ISBEZEL}" "${IRBEZEL}"
+
+inverted_ok_cancel=$(get_es_setting bool InvertButtons)
+[[ ${inverted_ok_cancel} == "true" ]] || inverted_ok_cancel="false";
+sed -i "/menu_swap_ok_cancel_buttons =/d" ${RACONF}
+echo "menu_swap_ok_cancel_buttons = ${inverted_ok_cancel}" >> ${RACONF}

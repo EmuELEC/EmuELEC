@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="bstone"
-PKG_VERSION="0ce68bac2eba14154026804b920b25985982a60d"
+PKG_VERSION="ca0c1a02abcf2513b1871a09f786162abb41caec"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/bibendovsky/bstone"
 PKG_URL="${PKG_SITE}.git"
@@ -14,6 +14,6 @@ PKG_CMAKE_OPTS_TARGET=" -DCMAKE_BUILD_TYPE=Release"
 
 makeinstall_target() {
 mkdir -p ${INSTALL}/usr/bin
-cp -rf ${PKG_BUILD}/.${TARGET_NAME}/src/bstone ${INSTALL}/usr/bin/bstone
+cp -rf ${PKG_BUILD}/.${TARGET_NAME}/src/bstone/bstone ${INSTALL}/usr/bin/bstone
 cp -rf ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin/
 } 

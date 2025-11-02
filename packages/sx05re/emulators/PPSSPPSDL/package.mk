@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="PPSSPPSDL"
-PKG_VERSION="f5450e40eb3f4861451fb98bf9239dacc5aef81e"
+PKG_VERSION="f8261ae7ff93baa30f94214965547ed0f124da14"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -13,6 +13,7 @@ PKG_SHORTDESC="PPSSPPDL"
 PKG_LONGDESC="PPSSPP Standalone"
 GET_HANDLER_SUPPORT="git"
 PKG_BUILD_FLAGS="-lto"
+
 
 PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_FBDEV=ON \
@@ -48,7 +49,16 @@ makeinstall_target() {
     ln -sf /storage/.config/ppsspp/assets ${INSTALL}/usr/bin/assets
     mkdir -p ${INSTALL}/usr/config/ppsspp/
     cp -r `find . -name "assets" | xargs echo` ${INSTALL}/usr/config/ppsspp/
+    
     cp -rf ${PKG_DIR}/config/* ${INSTALL}/usr/config/ppsspp/
+    
     rm ${INSTALL}/usr/config/ppsspp/assets/gamecontrollerdb.txt
     ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt ${INSTALL}/usr/config/ppsspp/assets/gamecontrollerdb.txt
+    
+# redirect some of PSP folders to /storage/roms to keep all the saves and custom files
+   mkdir -p "${INSTALL}/usr/config/ppsspp/PSP"    
+   
+for dir in Cheats PPSSPP_STATE SAVEDATA TEXTURES; do
+		ln -sf "/storage/roms/savestates/PPSSPPSDL/PSP/${dir}" "${INSTALL}/usr/config/ppsspp/PSP/${dir}"
+done
 } 

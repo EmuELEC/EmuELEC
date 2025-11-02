@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+remap_keys () {
+  [ ! -f "$1" ] && return
+
+  sed -i 's/ 15[^0-9]*$/ 1/
+          s/ 63[^0-9]*$/ 90/
+          s/ 97[^0-9]*$/ 28/
+          s/ 102[^0-9]*$/ 172/
+          s/ 125[^0-9]*$/ 46/
+          s/ 128[^0-9]*$/ 45/
+          s/ 139[^0-9]*$/ 46/
+          s/ 142[^0-9]*$/ 116/
+          s/ 143[^0-9]*$/ 116/
+          s/ 158[^0-9]*$/ 1/
+          s/ 183[^0-9]*$/ 59/
+          s/ 184[^0-9]*$/ 399/
+          s/ 185[^0-9]*$/ 400/
+          s/ 186[^0-9]*$/ 60/
+          s/ 232[^0-9]*$/ 28/
+          s/ 240[^0-9]*$/ 164/
+          s/ 241[^0-9]*$/ 163/
+          s/ 242[^0-9]*$/ 165/
+          s/ 244[^0-9]*$/ 208/
+          s/ 245[^0-9]*$/ 168/
+          s/ 264[^0-9]*$/ 63/
+          s/ 704[^0-9]*$/ 116/' \
+    "$1"
+}
+
+[ ! -e "/proc/device-tree/meson-ir/compatible" -o ! -e "/proc/device-tree/meson-remote/compatible" ] && exit
+
+if [ -f "/flash/remote.disable" -o -f "/storage/.config/remote.disable" ]; then
+  echo "remote control disabled by user"
+  exit 0
+fi
+
+if [ -f "/flash/remote.force_meson_ir" -o -f "/storage/.config/remote.force_meson_ir" ]; then
+  force_meson_ir="yes"
+else
+  force_meson_ir="no"
+fi
+
+if [ -f "/flash/remote.conf" ]; then
+  REMOTE_CONF_DIR="/flash"
+elif [ -f "/storage/.config/remote.conf" ]; then
+  REMOTE_CONF_DIR="/storage/.config"
+else
+  REMOTE_CONF_DIR=""
+
+  if [ -d "/proc/device-tree/custom_maps" -a "$force_meson_ir" = "no" ]; then
+    MAP_NAME=$(tr -d '\0' 2>/dev/null < /proc/device-tree/custom_maps/map_0/mapname)
+    echo "using meson-remote, with pre-defined map '$MAP_NAME' from dtb"
+    modprobe meson-remote
+    touch /run/use-meson-remote
+    exit 0
+  fi
+fi
+
+if [ -d "$REMOTE_CONF_DIR" ]; then
+  echo "using meson-remote, conf from $REMOTE_CONF_DIR"
+
+  if [ -d "/proc/device-tree/custom_maps" ]; then
+    MAP_NAME=$(tr -d '\0' 2>/dev/null < /proc/device-tree/custom_maps/map_0/mapname)
+    echo "also using pre-defined map '$MAP_NAME' from dtb"
+  fi
+
+  modprobe meson-remote
+  touch /run/use-meson-remote
+
+  for f in $REMOTE_CONF_DIR/remote*.conf; do
+    echo "configuring remote with $f"
+    cp "$f" /tmp/remote.conf
+    remap_keys /tmp/remote.conf
+    remotecfg /tmp/remote.conf
+    rm -f /tmp/remote.conf
+  done
+else
+  echo "using meson-ir"
+  modprobe meson-ir
+  touch /run/use-meson-ir
+fi
+
+exit 0

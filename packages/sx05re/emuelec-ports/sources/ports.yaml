@@ -8,6 +8,60 @@
   commands:
     - /usr/bin/emuelecRunEmu.sh "" -Pports "${2}" -C2048 "-SC${0}"
 
+Abuse:
+  description: Abuse is a dark 2D side-scrolling platform game developed by Crack dot Com in 1995. It features beautiful lighting, realistic animation and nasty alien-like creatures to destroy. It is now maintained by Sam Hocevar in an attempt to prevent it from vanishing from the Internet.
+  rating: 1.0
+  release_date: 1995
+  developer: Crack dot Com
+  publisher: Crack dot Com
+
+  init_port: true
+  port_exe: "abuse"
+  vkb: "abuse"
+  audio: "alsa"
+  commands:
+    - abuse >> $EE_LOG 2>&1
+
+Bermuda Syndrome:
+  description: Bermuda Syndrome is a PC game developed by Century Interactive and published by BMG Interactive in 1995. The game is similar in gameplay and appearance to the classic Flashback from 1992. The player controls the main character from a third person sidescrolling perspective.
+  rating: 1.0
+  release_date: 19950129T000000
+  developer: Century Interactive
+  publisher: BMG Interactive
+
+  init_port: true
+  port_exe: "bs"
+  audio: "alsa"
+  commands:
+    - cd /storage/roms/ports/bermuda/
+    - ${PORT} --datapath=/storage/roms/ports/bermuda/ --fullscreen --widescreen=4:3 >> $EE_LOG 2>&1
+
+Blake Stone:
+  description: "Blake Stone: Aliens of Gold is a first-person shooter for DOS created by JAM Productions and published by Apogee Software in 1993."
+  rating: 1.0
+  release_date: 1993
+  developer: Apogee
+  publisher: Apogee
+
+  init_port: true
+  port_exe: "bstone"
+  audio: "alsa"
+  commands:
+    - bstone.sh >> $EE_LOG 2>&1
+
+Blake Stone Planet Strike:
+  description: "Blake Stone: Planet Strike is a first-person shooter video game, the sequel to Blake Stone: Aliens of Gold, made by JAM Productions and released for DOS on October 28, 1994, by Apogee Software."
+  rating: 1.0
+  release_date: 1994
+  developer: Apogee
+  publisher: Apogee
+
+  init_port: true
+  port_exe: "bstone"
+  audio: "alsa"
+  commands:
+    - bstone.sh ps >> $EE_LOG 2>&1
+
 Cannonball:
   description: "This is an arcade-perfect port of SEGA's seminal arcade racer. Features include: Pixel-perfect 240p video. 60 FPS gameplay. Continuous mode (play all 15 tracks in one go)."
   rating: 0.8
@@ -29,6 +83,46 @@ Cave Story:
   check_bios: CaveStory
   commands:
     - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/CaveStory/Doukutsu.exe" -Pports "${2}" -Cnxengine "-SC${0}"
+
+Cdogs-sdl:
+  description: C-Dogs SDL is a classic overhead run-and-gun game, supporting up to 4 players in co-op and deathmatch modes. Customize your player, choose from many weapons, and blast, slide and slash your way through over 100 user-created campaigns. Have fun!
+  rating: 1.0
+  release_date: 2002
+  developer: Cxong
+  publisher: Cxong
+
+  init_port: true
+  port_exe: "cdogs-sdl"
+  audio: "alsa"
+  commands:
+    - cdogs-sdl.sh >> $EE_LOG 2>&1
+
+Celeste:
+  description: Help Madeline survive her inner demons on her journey to the top of Celeste Mountain, in this super-tight, hand-crafted platformer from the creators of multiplayer classic TowerFall (itch.io version).
+  rating: 1.0
+  release_date: 2018
+  developer: Extremely OK Games, Ltd., Maddy Makes Games
+  publisher: Maddy Makes Games Inc.
+
+  init_port: true
+  port_exe: "mono"
+  audio: "alsa"
+  commands:
+    - celeste.sh >> $EE_LOG 2>&1
+
+Celeste Classic:
+  description: Celeste Classic.
+  rating: 1.0
+  release_date: 2016
+  developer: Extremely OK Games, Ltd., Maddy Makes Games
+  publisher: Maddy Makes Games Inc.
+
+  init_port: true
+  port_exe: "ccleste"
+  audio: "alsa"
+  commands:
+    - cd /emuelec/configs/ccleste
+    - ${PORT} >> $EE_LOG 2>&1
 
 Commander Keen:
   description: Commander Genius is a software piece that interprets the Commander Keen Invasion of the Vorticons and Galaxy series. As fans and developers we try to implement new features, improve the gameplay and give players an experience that feels like playing the original game but a bit more refreshing.
@@ -106,21 +200,23 @@ Doom 2:
   commands:
     - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/doom2/doom2.wad" -Pports "${2}" -Cprboom "-SC${0}"
 
-Heart of Darkness:
-  description: Hode is a reimplementation of the game Heart of Darkness. Heart of Darkness is a cinematic platformer in the vein of Eric Chahi's previous game Another World. The player controls Andy, who faces various dangers in search of his dog, Whisky. The player progresses through the game's linear storyline by navigating various environments and solving puzzles, all whilst attempting to keep Andy from being killed by evil shadows.e engine of the used by the game "Heart of Darkness" developed. 
-  rating: 0.9
-  release_date: 19980704T000000
-  developer: Amazing Studio
-  publisher: Infogrames Interplay
+Duke Nukem:
+  description: Duke Nukem 3D is a first-person shooter video game developed by 3D Realms. It is a sequel to the platform games Duke Nukem and Duke Nukem II, published by 3D Realms. Duke Nukem 3D features the adventures of the titular Duke Nukem, voiced by Jon St. John, who fights against an alien invasion on Earth.
+  rating: 1.0
+  release_date: 19960129T000000
+  developer: 3D Realms
+  publisher: FormGen
 
   init_port: true
-  port_exe: "hode"
+  port_exe: "eduke32"
   audio: "alsa"
+  check_bios: eduke32
   commands:
-    - ${PORT} --datapath=/storage/roms/ports/hode/ --savepath=/storage/roms/ports/hode/ >> $EE_LOG 2>&1
+    - cd /storage/roms/ports/eduke
+    - eduke.sh >> $EE_LOG 2>&1
 
 Fallout:
-  description: Fallout A Post Nuclear Role Playing Game In a mid-22nd century post-apocalyptic and retro-futuristic world, decades after a global nuclear war between the United States and China, the Vault Dweller, inhabits the underground nuclear shelter Vault 13.
+  description: "Fallout: A Post Nuclear Role Playing Game. In a mid-22nd century post-apocalyptic and retro-futuristic world, decades after a global nuclear war between the United States and China, the Vault Dweller, inhabits the underground nuclear shelter Vault 13."
   rating: 0.9
   release_date: 19971007T000000
   developer: Interplay Productions
@@ -149,6 +245,84 @@ Fallout 2:
     - cd /storage/roms/ports/falloutce2
     - falloutce2.sh >> $EE_LOG 2>&1
 
+Flashback:
+  description: REminiscence is a game engine recreation of the 1992/1993 action adventure game Flashback. It is the spiritual successor of Another World/Out Of This World and it distinguishes itself with rotoscoped graphics, and polygonal cutscenes.
+  rating: 0.8
+  release_date: 20180114T000000
+  developer: Gregory Montoir, Stuart Carnie
+  publisher: GPLv3
+
+  check_bios: REminiscence
+  commands:
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/reminiscence" -Pports "${2}" -Creminiscence "-SC${0}"
+
+Half-Life:
+  description: Half-Life is a 1998 first-person shooter (FPS) game developed by Valve and published by Sierra Studios for Windows. It was Valve's debut product and the first game in the Half-Life series. Players assume the role of Gordon Freeman, a scientist who must escape the Black Mesa Research Facility after it is invaded by aliens. The gameplay consists of combat, exploration, and puzzle-solving.
+  rating: 1.0
+  release_date: 1998
+  developer: Valve
+  publisher: Sierra Studios
+
+  init_port: true
+  port_exe: "xash3d"
+  audio: "alsa"
+  commands:
+    - xash3d.sh >> $EE_LOG 2>&1
+
+Heart of Darkness:
+  description: Hode is a reimplementation of the engine used by the game "Heart of Darkness" developed by Amazing Studio. Heart of Darkness is a cinematic platformer in the vein of Eric Chahi's previous game Another World. The player controls Andy, who faces various dangers in search of his dog, Whisky. The player progresses through the game's linear storyline by navigating various environments and solving puzzles, all whilst attempting to keep Andy from being killed by evil shadows.
+  rating: 0.9
+  release_date: 19980704T000000
+  developer: Amazing Studio
+  publisher: Infogrames Interplay
+
+  init_port: true
+  port_exe: "hode"
+  audio: "alsa"
+  commands:
+    - ${PORT} --datapath=/storage/roms/ports/hode/ --savepath=/storage/roms/ports/hode/ >> $EE_LOG 2>&1
+
+Heroes of Might and Magic II:
+  description: "Heroes of Might and Magic II: The Succession Wars is a turn-based strategy video game developed by Jon Van Caneghem through New World Computing and published in 1996 by the 3DO Company."
+  rating: 1.0
+  release_date: 1996
+  developer: New World Computing
+  publisher: The 3DO Company
+
+  init_port: true
+  port_exe: "fheroes2"
+  audio: "alsa"
+  commands:
+    - fheroes2.sh >> $EE_LOG 2>&1
+
+Hurrican:
+  description: Freeware jump and shoot game created by Poke53280, based on the Turrican game series by Manfred Trenz.
+  rating: 1.0
+  release_date: 2001
+  developer: Poke53280
+  publisher: Hurrican Team
+
+  init_port: true
+  port_exe: "hurrican"
+  vkb: "hurrican"
+  audio: "alsa"
+  commands:
+    - hurrican.sh >> $EE_LOG 2>&1
+
+Hydra Castle Labyrinth:
+  description: Hydra Castle Labyrinth (a "metroidvania" kind of game).
+  rating: 1.0
+  release_date: 20110129T000000
+  developer: ptitSeb
+  publisher: Nicalis, Inc.
+
+  init_port: true
+  port_exe: "hcl"
+  audio: "alsa"
+  commands:
+    - cd /emuelec/configs/hcl/
+    - ${PORT} -d >> $EE_LOG 2>&1
+
 Mr. Boom:
   description: Mr. Boom is an up to 8 player Bomberman clone. The goal of the game is to bomb away your enemies and other players.
   rating: 0.8
@@ -158,6 +332,23 @@ Mr. Boom:
 
   commands:
     - /usr/bin/emuelecRunEmu.sh "" -Pports "${2}" -Cmrboom "-SC${0}"
+
+OpenJazz:
+  description: OpenJazz is a free, open-source version of the classic Jazz Jackrabbit game. Jazz Jackrabbit is a PC platform game. Produced by Epic Games (then Epic MegaGames), it was first released in 1994.
+  rating: 1.0
+  release_date: 20210516T000000
+  developer: sana2dang, AlisterT
+  publisher: non-commercial
+
+  requires:
+    - DEVICE: OdroidGoAdvance
+    - DEVICE: GameForce
+
+  init_port: true
+  port_exe: "OpenJazz"
+  audio: "alsa"
+  commands:
+    - ${PORT} --Datadir /storage/roms/ports/openjazz >> $EE_LOG 2>&1
 
 OpenTyrian:
   description: OpenTyrian is an open-source port of the "cult" arcade-style vertical scrolling shooter called "Tyrian". Original game was developed by World Tree Games Productions and published in 1995 by Epic MegaGames.
@@ -177,56 +368,6 @@ OpenTyrian:
   commands_end:
     - '[[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound2.conf /storage/.config/asound.conf'
 
-OpenJazz:
-  description: "Port Of Jazz Jackrabbit."
-  rating: 1.0
-  release_date: 20210516T000000
-  developer: sana2dang, AlisterT
-  publisher: non-commercial
-
-  requires:
-    - DEVICE: OdroidGoAdvance
-    - DEVICE: GameForce
-
-  init_port: true
-  port_exe: "OpenJazz"
-  audio: "alsa"
-  commands:
-    - ${PORT} --Datadir /storage/roms/ports/openjazz >> $EE_LOG 2>&1
-    
-Quake:
-  description: Players must find their way through various maze-like, medieval environments while battling a variety of monsters using an array of weaponry.
-  rating: 0.8
-  release_date: 19960622T000000
-  developer: id Software
-  publisher: GT Interactive
-
-  check_bios: Quake
-  commands:
-    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/quake/id1/pak0.pak" -Pports "${2}" -Ctyrquake "-SC${0}"
-
-Flashback:
-  description: REminiscence is a game engine recreation of the 1992/1993 action adventure game Flashback. It is the spiritual successor of Another World/Out Of This World and it distinguishes itself with rotoscoped graphics, and polygonal cutscenes.
-  rating: 0.8
-  release_date: 20180114T000000
-  developer: Gregory Montoir, Stuart Carnie
-  publisher: GPLv3
-
-  check_bios: REminiscence
-  commands:
-    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/reminiscence" -Pports "${2}" -Creminiscence "-SC${0}"
-
-Rick Dangerous:
-  description: Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles.
-  rating: 0.8
-  release_date: 20170326T000000
-  developer: BigOrno
-  publisher: non-commercial
-
-  check_bios: RickDangerous
-  commands:
-    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/xrick/data.zip" -Pports "${2}" -Cxrick "-SC${0}"
-
 Prince of Persia:
   description: SDLPoP is an open-source port of Prince of Persia that runs natively on Windows and Linux. It is based on a disassembly of the DOS version.
   rating: 1.0
@@ -243,64 +384,27 @@ Prince of Persia:
     - cd /storage/.config/emuelec/configs/SDLPoP
     - ${PORT} >> $EE_LOG 2>&1
 
-VVVVVV:
-  description: VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping? The game is designed not to artificially gate your progress. In VVVVVV there are no locks, no power-ups, no switches, nothing to stop you progressing except the challenges themselves.
-  rating: 1.0
-  release_date: 20100111T000000
-  developer: Terry Cavanagh, Simon Roth, Nicalis
+Quake:
+  description: Players must find their way through various maze-like, medieval environments while battling a variety of monsters using an array of weaponry.
+  rating: 0.8
+  release_date: 19960622T000000
+  developer: id Software
+  publisher: GT Interactive
+
+  check_bios: Quake
+  commands:
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/quake/id1/pak0.pak" -Pports "${2}" -Ctyrquake "-SC${0}"
+
+Rick Dangerous:
+  description: Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles.
+  rating: 0.8
+  release_date: 20170326T000000
+  developer: BigOrno
   publisher: non-commercial
 
-  init_port: true
-  port_exe: "VVVVVV"
-  audio: "alsa"
-  check_bios: VVVVVV
+  check_bios: RickDangerous
   commands:
-    - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
-    - cd /storage/.config/SDL-GameControllerDB/
-    - ${PORT} >> $EE_LOG 2>&1
-
-Duke Nukem:
-  description: Duke Nukem 3D is a first-person shooter video game developed by 3D Realms. It is a sequel to the platform games Duke Nukem and Duke Nukem II, published by 3D Realms. Duke Nukem 3D features the adventures of the titular Duke Nukem, voiced by Jon St. John, who fights against an alien invasion on Earth.
-  rating: 1.0
-  release_date: 19960129T000000
-  developer: 3D Realms
-  publisher: FormGen
-
-  init_port: true
-  port_exe: "eduke32"
-  audio: "alsa"
-  check_bios: eduke32
-  commands:
-    - cd /storage/roms/ports/eduke
-    - eduke.sh >> $EE_LOG 2>&1
-
-Hydra Castle Labyrinth:
-  description: Hydra Castle Labyrinth (a "metroidvania" kind of game).
-  rating: 1.0
-  release_date: 20110129T000000
-  developer: ptitSeb
-  publisher: Nicalis, Inc.
-
-  init_port: true
-  port_exe: "hcl"
-  audio: "alsa"
-  commands:
-    - cd /emuelec/configs/hcl/
-    - ${PORT} -d >> $EE_LOG 2>&1
-
-Bermuda Syndrome:
-  description: Bermuda Syndrome is a PC game developed by Century Interactive and published by BMG Interactive in 1995. The game is similar in gameplay and appearance to the classic Flashback from 1992. The player controls the main character from a third person sidescrolling perspective..
-  rating: 1.0
-  release_date: 19950129T000000
-  developer: Century Interactive
-  publisher: BMG Interactive
-
-  init_port: true
-  port_exe: "bs"
-  audio: "alsa"
-  commands:
-    - cd /storage/roms/ports/bermuda/
-    - ${PORT} --datapath=/storage/roms/ports/bermuda/ --fullscreen --widescreen=4:3 >> $EE_LOG 2>&1
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/xrick/data.zip" -Pports "${2}" -Cxrick "-SC${0}"
 
 RigelEngine:
   description: RigelEngine is an open-source recreation of the 2D side-scroller Duke Nukem II, originally released by Apogee in 1993.
@@ -315,6 +419,19 @@ RigelEngine:
   check_bios: RigelEngine
   commands:
     - ${PORT} /storage/roms/ports/rigelengine >> $EE_LOG 2>&1
+
+Shovel Knight:
+  description: Shovel Knight is a 2D side-scrolling platform game developed and published by Yacht Club Games.
+  rating: 1.0
+  release_date: 2014
+  developer: Yacht Club Games
+  publisher: Yacht Club Games
+
+  init_port: true
+  port_exe: "ShovelKnight"
+  audio: "alsa"
+  commands:
+    - shovelknight.sh >> $EE_LOG 2>&1
 
 Sonic 1:
   description: Sonic the Hedgehog is a platform game developed by Sonic Team and published by Sega for the Sega Genesis home video game console. It was released in North America in June 1991 and in PAL regions and Japan the following month.
@@ -381,86 +498,6 @@ Sonic Mania:
     - cd /storage/roms/ports/sonicmania/
     - ${PORT} >> $EE_LOG 2>&1
 
-SuperTux:
-  description: SuperTux is a free and open-source two-dimensional platform video game published under the GNU General Public License. The game was inspired by Nintendo's Super Mario Bros. series; instead of Mario, the hero in the game is Tux, the official mascot of the Linux kernel.
-  rating: 1.0
-  release_date: 2004
-  developer: SuperTux Development Team
-  publisher: Pelya, SuperTux Development Team
-  
-  init_port: true
-  port_exe: "supertux2"
-  audio: "alsa"
-  commands:
-    - run_supertux.sh >> $EE_LOG 2>&1
-
-SuperTuxKart:
-  description: SuperTuxKart is a free and open-source kart racing game, distributed under the terms of the GNU General Public License, version 3. It features mascots of various open-source projects. 
-  rating: 1.0
-  release_date: 2007
-  developer: SuperTuxKart Team
-  publisher: SuperTuxKart Team
-
-  init_port: true
-  port_exe: "supertuxkart"
-  audio: "alsa"
-  commands:
-    - run_supertuxkart.sh >> $EE_LOG 2>&1
-
-Supermariowar:
-  description: A fan-made multiplayer Super Mario Bros. style deathmatch game
-  rating: 0.8
-  release_date: 2006
-  developer: Michael Schaffer, Florian Hufsky, Supermariowar Team
-  publisher: Supermariowar Team
-
-  init_port: true
-  port_exe: "smw"
-  audio: "alsa"
-  commands:
-    - run_smw.sh >> $EE_LOG 2>&1
-
-Hurrican:
-  description: Freeware jump and shoot game created by Poke53280 
-  rating: 1.0
-  release_date: 2001
-  developer: Poke53280
-  publisher: Hurrican Team
-
-  init_port: true
-  port_exe: "hurrican"
-  vkb: "hurrican"
-  audio: "alsa"
-  commands:
-    - hurrican.sh >> $EE_LOG 2>&1
-
-Cdogs-sdl:
-  description: C-Dogs SDL is a classic overhead run-and-gun game, supporting up to 4 players in co-op and deathmatch modes. Customize your player, choose from many weapons, and blast, slide and slash your way through over 100 user-created campaigns. Have fun!
-  rating: 1.0
-  release_date: 2002
-  developer: Cxong
-  publisher: Cxong
-
-  init_port: true
-  port_exe: "cdogs-sdl"
-  audio: "alsa"
-  commands:
-    - cdogs-sdl.sh >> $EE_LOG 2>&1
-
-Abuse:
-  description: Abuse is a dark 2D side-scrolling platform game developed by Crack dot Com in 1995. It features beautiful lighting, realistic animation and nasty alien-like creatures to destroy. It is now maintained by Sam Hocevar in an attempt to prevent it from vanishing from the Internet. 
-  rating: 1.0
-  release_date: 1995
-  developer: Crack dot Com
-  publisher: Crack dot Com
-
-  init_port: true
-  port_exe: "abuse"
-  vkb: "abuse"
-  audio: "alsa"
-  commands:
-    - abuse >> $EE_LOG 2>&1
-
 Sorr:
   description: Streets of Rage Remake is a remastered version of the MegaDrive classic. There are more than 60 different enemies, you can choose among 16 characters, choose your favourite one and kick asses out there. It's even better than the original one. More characters, more levels, more actions, more finals,... Amazing.
   rating: 1.0
@@ -477,70 +514,44 @@ Sorr:
     - '[[ ! -e "/storage/roms/ports/sorr/SorR.dat" ]] && end_port && exit 21'
     - bgdi "/storage/roms/ports/sorr/SorR.dat" >> $EE_LOG 2>&1
 
-Heroes of Might and Magic II:
-  description: 'Heroes of Might and Magic II: The Succession Wars is a turn-based strategy video game developed by Jon Van Caneghem through New World Computing and published in 1996 by the 3DO Company.'
-  rating: 1.0
-  release_date: 1996
-  developer: New World Computing
-  publisher: The 3DO Company
+Supermariowar:
+  description: A fan-made multiplayer Super Mario Bros. style deathmatch game.
+  rating: 0.8
+  release_date: 2006
+  developer: Michael Schaffer, Florian Hufsky, Supermariowar Team
+  publisher: Supermariowar Team
 
   init_port: true
-  port_exe: "fheroes2"
+  port_exe: "smw"
   audio: "alsa"
   commands:
-    - fheroes2.sh >> $EE_LOG 2>&1
+    - run_smw.sh >> $EE_LOG 2>&1
 
-Blake Stone:
-  description: 'Blake Stone: Aliens of Gold is a first-person shooter for DOS created by JAM Productions and published by Apogee Software in 1993.'
+SuperTux:
+  description: SuperTux is a free and open-source two-dimensional platform video game published under the GNU General Public License. The game was inspired by Nintendo's Super Mario Bros. series; instead of Mario, the hero in the game is Tux, the official mascot of the Linux kernel.
   rating: 1.0
-  release_date: 1993
-  developer: Apogee
-  publisher: Apogee
+  release_date: 2004
+  developer: SuperTux Development Team
+  publisher: Pelya, SuperTux Development Team
+  
+  init_port: true
+  port_exe: "supertux2"
+  audio: "alsa"
+  commands:
+    - run_supertux.sh >> $EE_LOG 2>&1
+
+SuperTuxKart:
+  description: SuperTuxKart is a free and open-source kart racing game, distributed under the terms of the GNU General Public License, version 3. It features mascots of various open-source projects.
+  rating: 1.0
+  release_date: 2007
+  developer: SuperTuxKart Team
+  publisher: SuperTuxKart Team
 
   init_port: true
-  port_exe: "bstone"
+  port_exe: "supertuxkart"
   audio: "alsa"
   commands:
-    - bstone.sh >> $EE_LOG 2>&1
-
-Blake Stone Planet Strike:
-  description: 'Blake Stone: Planet Strike is a first-person shooter video game, the sequel to Blake Stone: Aliens of Gold, made by JAM Productions and released for DOS on October 28, 1994, by Apogee Software.'
-  rating: 1.0
-  release_date: 1994
-  developer: Apogee
-  publisher: Apogee
-
-  init_port: true
-  port_exe: "bstone"
-  audio: "alsa"
-  commands:
-    - bstone.sh ps >> $EE_LOG 2>&1
-
-Shovel Knight:
-  description: 'Shovel Knight is a 2D side-scrolling platform game developed and published by Yacht Club Games. '
-  rating: 1.0
-  release_date: 2014
-  developer: Yacht Club Games
-  publisher: Yacht Club Games
-
-  init_port: true
-  port_exe: "ShovelKnight"
-  audio: "alsa"
-  commands:
-    - shovelknight.sh >> $EE_LOG 2>&1
-
-Half-Life:
-  description: "Half-Life is a 1998 first-person shooter (FPS) game developed by Valve and published by Sierra Studios for Windows. It was Valve's debut product and the first game in the Half-Life series. Players assume the role of Gordon Freeman, a scientist who must escape the Black Mesa Research Facility after it is invaded by aliens. The gameplay consists of combat, exploration, and puzzle-solving. "
-  rating: 1.0
-  release_date: 1998
-  developer: Valve
-  publisher: Sierra Studios
-
-  init_port: true
-  port_exe: "xash3d"
-  audio: "alsa"
-  commands:
-    - xash3d.sh >> $EE_LOG 2>&1
+    - run_supertuxkart.sh >> $EE_LOG 2>&1
 
 TMNTSR:
   description: "Teenage Mutant Ninja Turtles: Shredder's Revenge is a beat'em up game developed by Tribute Games and published by Dotemu."
@@ -555,29 +566,18 @@ TMNTSR:
   commands:
     - tmntsr.sh >> $EE_LOG 2>&1
 
-Celeste Classic:
-  description: "Celeste Classic"
+VVVVVV:
+  description: VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping? The game is designed not to artificially gate your progress. In VVVVVV there are no locks, no power-ups, no switches, nothing to stop you progressing except the challenges themselves.
   rating: 1.0
-  release_date: 2016
-  developer: Extremely OK Games, Ltd., Maddy Makes Games
-  publisher: Maddy Makes Games Inc.
+  release_date: 20100111T000000
+  developer: Terry Cavanagh, Simon Roth, Nicalis
+  publisher: non-commercial
 
   init_port: true
-  port_exe: "ccleste"
+  port_exe: "VVVVVV"
   audio: "alsa"
+  check_bios: VVVVVV
   commands:
-    - cd /emuelec/configs/ccleste
+    - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
+    - cd /storage/.config/SDL-GameControllerDB/
     - ${PORT} >> $EE_LOG 2>&1
-
-Celeste:
-  description: "Celeste Itch.io"
-  rating: 1.0
-  release_date: 2018
-  developer: Extremely OK Games, Ltd., Maddy Makes Games
-  publisher: Maddy Makes Games Inc.
-
-  init_port: true
-  port_exe: "mono"
-  audio: "alsa"
-  commands:
-    - celeste.sh >> $EE_LOG 2>&1

@@ -1,0 +1,11 @@
+--- a/Makefile	2024-12-20 21:55:50.723084900 +0100
++++ b/Makefile	2024-12-20 22:17:50.342798300 +0100
+@@ -446,7 +446,7 @@
+ all: $(TARGET)
+ 
+ ifeq ($(DEBUG),0)
+-   FLAGS += -O2 $(EXTRA_GCC_FLAGS)
++   FLAGS += -O3 $(EXTRA_GCC_FLAGS)
+ else
+    FLAGS += -O0 -g
+ endif

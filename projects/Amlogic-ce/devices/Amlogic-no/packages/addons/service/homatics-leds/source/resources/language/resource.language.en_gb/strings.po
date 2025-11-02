@@ -1,0 +1,74 @@
+# Kodi Media Center language file
+# Addon Name: Homatics LED setup
+# Addon id: service.homatics-leds
+# Addon Provider: Team CoreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#32000"
+msgid "LED"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Effect color"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Effect or solid"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Color by name or hex"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Solid color On"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Solid color Off"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Solid color Suspend"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Number of LEDs On"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Set red Knight Rider effect"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Set blue Knight Rider effect"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Set green Knight Rider effect"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Set purple Knight Rider effect"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Set yellow Knight Rider effect"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Set deepblue Knight Rider effect"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Set magenta Knight Rider effect"
+msgstr ""
+
+msgctxt "#32016"
+msgid "Set orange Knight Rider effect"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Set straight purple color"
+msgstr ""

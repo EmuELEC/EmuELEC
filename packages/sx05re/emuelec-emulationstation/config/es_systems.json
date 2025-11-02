@@ -1,0 +1,4058 @@
+{
+  "systems": [
+    {
+      "name": "imageviewer",
+      "fullname": "Screenshots",
+      "manufacturer": "EmuELEC",
+      "path": "/storage/roms/screenshots",
+      "platform": "ignore",
+      "theme": "imageviewer",
+      "command": "ignore",
+      "extensions": [
+        ".jpg",
+        ".pbm",
+        ".png"
+      ]
+    },
+    {
+      "name": "amstradgx4000",
+      "fullname": "Amstrad GX4000",
+      "manufacturer": "Amstrad",
+      "release": "1990",
+      "hardware": "computer",
+      "path": "/storage/roms/amstradgx4000",
+      "platform": "gx4000",
+      "theme": "gx4000",
+      "command": "default",
+      "extensions": [
+        ".cdt",
+        ".cpr",
+        ".dsk",
+        ".m3u",
+        ".sna",
+        ".tap",
+        ".voc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "cap32",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amstradcpc",
+      "fullname": "Amstrad CPC",
+      "manufacturer": "Amstrad",
+      "release": "1984",
+      "hardware": "computer",
+      "path": "/storage/roms/amstradcpc",
+      "platform": "amstradcpc",
+      "theme": "amstradcpc",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cdt",
+        ".dsk",
+        ".m3u",
+        ".sna",
+        ".tap",
+        ".voc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "cap32",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "arcade",
+      "fullname": "Arcade",
+      "manufacturer": "Arcade",
+      "hardware": "arcade",
+      "path": "/storage/roms/arcade",
+      "platform": "arcade",
+      "theme": "arcade",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cmd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AdvanceMame",
+          "cores": [
+            {
+              "name": "AdvanceMame"
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame2003_plus",
+              "default": true
+            },
+            {
+              "name": "mame2010"
+            },
+            {
+              "name": "fbneo"
+            },
+            {
+              "name": "fbalpha2012"
+            },
+            {
+              "name": "mame"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mame",
+      "fullname": "Arcade MAME",
+      "manufacturer": "Arcade",
+      "hardware": "arcade",
+      "path": "/storage/roms/mame",
+      "platform": "arcade",
+      "theme": "mame",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cmd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AdvanceMame",
+          "cores": [
+            {
+              "name": "AdvanceMame",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame2003_plus"
+            },
+            {
+              "name": "mame2010"
+            },
+            {
+              "name": "fbneo"
+            },
+            {
+              "name": "fbalpha2012"
+            },
+            {
+              "name": "mame"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fmtowns",
+      "fullname": "FM Towns",
+      "manufacturer": "Fujitsu",
+      "release": "1989",
+      "hardware": "computer",
+      "path": "/storage/roms/fmtownsux",
+      "platform": "fmtowns",
+      "theme": "fmtowns",
+      "command": "default",
+      "extensions": [
+        ".cmd"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "apple2",
+      "fullname": "Apple 2",
+      "manufacturer": "Apple",
+      "release": "1977",
+      "hardware": "computer",
+      "path": "/storage/roms/apple",
+      "platform": "apple2",
+      "theme": "apple2",
+      "command": "default",
+      "extensions": [
+        ".cmd"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pgm2",
+      "fullname": "PolyGame Master",
+      "manufacturer": "IGS",
+      "release": "2007",
+      "hardware": "arcade",
+      "path": "/storage/roms/pgm2",
+      "platform": "pgm2",
+      "theme": "pgm2",
+      "command": "default",
+      "extensions": [
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atari2600",
+      "fullname": "Atari 2600",
+      "manufacturer": "Atari",
+      "release": "1977",
+      "hardware": "console",
+      "path": "/storage/roms/atari2600",
+      "platform": "atari2600",
+      "theme": "atari2600",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".a26",
+        ".bin",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "STELLASA",
+          "cores": [
+            {
+              "name": "STELLASA",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "stella"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atari5200",
+      "fullname": "Atari 5200",
+      "manufacturer": "Atari",
+      "release": "1982",
+      "hardware": "console",
+      "path": "/storage/roms/atari5200",
+      "platform": "atari5200",
+      "theme": "atari5200",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".a52",
+        ".atr",
+        ".atx",
+        ".bin",
+        ".cas",
+        ".cdm",
+        ".rom",
+        ".xex",
+        ".xfd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "a5200",
+              "default": true
+            },
+            {
+              "name": "atari800"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atari7800",
+      "fullname": "Atari 7800",
+      "manufacturer": "Atari",
+      "release": "1986",
+      "hardware": "console",
+      "path": "/storage/roms/atari7800",
+      "platform": "atari7800",
+      "theme": "atari7800",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".a78",
+        ".bin",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "prosystem",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atari800",
+      "fullname": "Atari 800",
+      "manufacturer": "Atari",
+      "release": "1979",
+      "hardware": "console",
+      "path": "/storage/roms/atari800",
+      "platform": "atari800",
+      "theme": "atari800",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".a52",
+        ".atr",
+        ".atx",
+        ".bas",
+        ".bin",
+        ".car",
+        ".cas",
+        ".cdm",
+        ".rom",
+        ".xex",
+        ".xfd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "atari800",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atarilynx",
+      "fullname": "Atari Lynx",
+      "manufacturer": "Atari",
+      "release": "1989",
+      "hardware": "portable",
+      "path": "/storage/roms/atarilynx",
+      "platform": "atarilynx",
+      "theme": "atarilynx",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".lnx",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "handy",
+              "default": true
+            },
+            {
+              "name": "mednafen_lynx"
+            },
+            {
+              "name": "gearlynx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atarist",
+      "fullname": "Atari ST",
+      "manufacturer": "Atari",
+      "release": "1985",
+      "hardware": "computer",
+      "path": "/storage/roms/atarist",
+      "platform": "atarist",
+      "theme": "atarist",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".dim",
+        ".ipf",
+        ".m3u",
+        ".msa",
+        ".st",
+        ".stx",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "HATARISA",
+          "cores": [
+            {
+              "name": "HATARISA"
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "hatari",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atarijaguar",
+      "fullname": "Atari Jaguar",
+      "manufacturer": "Atari",
+      "release": "1993",
+      "hardware": "console",
+      "path": "/storage/roms/atarijaguar",
+      "platform": "atarijaguar",
+      "theme": "atarijaguar",
+      "command": "default",
+      "extensions": [
+        ".j64",
+        ".jag",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "virtualjaguar",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wonderswan",
+      "fullname": "Bandai Wonderswan",
+      "manufacturer": "Bandai",
+      "release": "1999",
+      "hardware": "portable",
+      "path": "/storage/roms/wonderswan",
+      "platform": "wonderswan",
+      "theme": "wonderswan",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".ws",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_wswan",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wonderswancolor",
+      "fullname": "Bandai Wonderswan Color",
+      "manufacturer": "Bandai",
+      "release": "2000",
+      "hardware": "portable",
+      "path": "/storage/roms/wonderswancolor",
+      "platform": "wonderswancolor",
+      "theme": "wonderswancolor",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".wsc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_wswan",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cps1",
+      "fullname": "Capcom PlaySystem 1",
+      "manufacturer": "Capcom",
+      "release": "1988",
+      "hardware": "arcade",
+      "path": "/storage/roms/cps1",
+      "platform": "arcade",
+      "theme": "cps1",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AdvanceMame",
+          "cores": [
+            {
+              "name": "AdvanceMame"
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame2003_plus"
+            },
+            {
+              "name": "mame2010"
+            },
+            {
+              "name": "fbneo",
+              "default": true
+            },
+            {
+              "name": "fbalpha2012"
+            },
+            {
+              "name": "mame"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cps2",
+      "fullname": "Capcom PlaySystem 2",
+      "manufacturer": "Capcom",
+      "release": "1993",
+      "hardware": "arcade",
+      "path": "/storage/roms/cps2",
+      "platform": "arcade",
+      "theme": "cps2",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AdvanceMame",
+          "cores": [
+            {
+              "name": "AdvanceMame"
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame2003_plus"
+            },
+            {
+              "name": "mame2010"
+            },
+            {
+              "name": "fbneo",
+              "default": true
+            },
+            {
+              "name": "fbalpha2012"
+            },
+            {
+              "name": "mame"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cps3",
+      "fullname": "Capcom PlaySystem 3",
+      "manufacturer": "Capcom",
+      "release": "1996",
+      "hardware": "arcade",
+      "path": "/storage/roms/cps3",
+      "platform": "arcade",
+      "theme": "cps3",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AdvanceMame",
+          "cores": [
+            {
+              "name": "AdvanceMame"
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame2003_plus"
+            },
+            {
+              "name": "mame2010"
+            },
+            {
+              "name": "fbneo",
+              "default": true
+            },
+            {
+              "name": "fbalpha2012"
+            },
+            {
+              "name": "mame"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "colecovision",
+      "fullname": "ColecoVision",
+      "manufacturer": "Coleco",
+      "release": "1982",
+      "hardware": "console",
+      "path": "/storage/roms/coleco",
+      "platform": "colecovision",
+      "theme": "colecovision",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".col",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bluemsx",
+              "default": true
+            },
+            {
+              "name": "gearcoleco"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "c128",
+      "fullname": "Commodore 128",
+      "manufacturer": "Commodore",
+      "release": "1985",
+      "hardware": "computer",
+      "path": "/storage/roms/c128",
+      "platform": "c128",
+      "theme": "c128",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".crt",
+        ".d64",
+        ".g64",
+        ".m3u",
+        ".prg",
+        ".t64",
+        ".x64",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "vice_x128",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "c64",
+      "fullname": "Commodore 64",
+      "manufacturer": "Commodore",
+      "release": "1982",
+      "hardware": "computer",
+      "path": "/storage/roms/c64",
+      "platform": "c64",
+      "theme": "c64",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".crt",
+        ".d64",
+        ".m3u",
+        ".prg",
+        ".t64",
+        ".tap",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "vice_x64",
+              "default": true
+            },
+            {
+              "name": "vice_x64sc"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amiga",
+      "fullname": "Commodore Amiga",
+      "manufacturer": "Commodore",
+      "release": "1985",
+      "hardware": "computer",
+      "path": "/storage/roms/amiga",
+      "platform": "amiga",
+      "theme": "amiga",
+      "command": "default",
+      "extensions": [
+        ".adf",
+        ".adz",
+        ".dms",
+        ".hdf",
+        ".ipf",
+        ".lha",
+        ".m3u",
+        ".uae",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AMIBERRY",
+          "cores": [
+            {
+              "name": "AMIBERRY-LITE",
+              "incompatible": [".m3u"]
+            },
+            {
+              "name": "AMIBERRY",              
+              "incompatible": [".m3u"]
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "puae",
+              "default": true
+            },
+            {
+              "name": "puae2021"
+            },
+            {
+              "name": "uae4arm_32b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amigacd32",
+      "fullname": "Commodore Amiga CD 32",
+      "manufacturer": "Commodore",
+      "release": "1994",
+      "hardware": "console",
+      "path": "/storage/roms/amigacd32",
+      "platform": "amigacd32",
+      "theme": "amigacd32",
+      "command": "default",
+      "extensions": [
+        ".chd",
+        ".cue",
+        ".hdf",
+        ".iso",
+        ".lha",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "AMIBERRY",
+          "cores": [
+            {
+              "name": "AMIBERRY-LITE",
+              "incompatible": [".m3u"]
+            },
+            {
+              "name": "AMIBERRY",              
+              "incompatible": [".m3u"]
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "puae",
+              "default": true
+            },
+            {
+              "name": "puae2021"
+            },
+            {
+              "name": "uae4arm_32b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "c16",
+      "fullname": "Commodore Plus4",
+      "manufacturer": "Commodore",
+      "release": "1984",
+      "hardware": "computer",
+      "path": "/storage/roms/c16",
+      "platform": "c16",
+      "theme": "c16",
+      "command": "default",
+      "extensions": [
+        ".d64",
+        ".g64",
+        ".prg",
+        ".t64",
+        ".x64",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "vice_xplus4",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vic20",
+      "fullname": "Commodore Vic 20",
+      "manufacturer": "Commodore",
+      "release": "1980",
+      "hardware": "computer",
+      "path": "/storage/roms/vic20",
+      "platform": "vic20",
+      "theme": "vic20",
+      "command": "default",
+      "extensions": [
+        ".d64",
+        ".g64",
+        ".t64",
+        ".x64",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "vice_xvic",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pc",
+      "fullname": "DOS x86",
+      "manufacturer": "Microsoft",
+      "release": "1981",
+      "hardware": "computer",
+      "path": "/storage/roms/pc",
+      "platform": "pc",
+      "theme": "pc",
+      "command": "default",
+      "extensions": [
+        ".bat",
+        ".com",
+        ".exe",
+        ".sh",
+        ".zip",
+        ".iso",
+        ".cue"
+      ],
+      "emulators": [
+        {
+          "name": "DOSBOXSDL2",
+          "cores": [
+            {
+              "name": "DOSBOXSDL2"
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "dosbox_pure",
+              "default": true
+            },
+            {
+              "name": "dosbox_svn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pc-9800",
+      "fullname": "NEC PC-9800",
+      "manufacturer": "NEC",
+      "release": "1983",
+      "hardware": "computer",
+      "path": "/storage/roms/pc98",
+      "platform": "pc98",
+      "theme": "pc98",
+      "command": "default",
+      "extensions": [
+        ".2hd",
+        ".88d",
+        ".98d",
+        ".d88",
+        ".d98",
+        ".dup",
+        ".fdd",
+        ".fdi",
+        ".hdd",
+        ".hdi",
+        ".hdm",
+        ".hdn",
+        ".nhd",
+        ".tfd",
+        ".thd",
+        ".xdf",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "np2kai",
+              "default": true
+            },
+            {
+              "name": "nekop2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "daphne",
+      "fullname": "Daphne",
+      "manufacturer": "Arcade",
+      "release": "1982",
+      "hardware": "arcade",
+      "path": "/storage/roms/daphne",
+      "platform": "daphne",
+      "theme": "daphne",
+      "command": "default",
+      "extensions": [
+        ".daphne"
+      ],
+      "emulators": [
+        {
+          "name": "HYPSEUS",
+          "cores": [
+            {
+              "name": "HYPSEUS",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "daphne"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wii",
+      "fullname": "Nintendo Wii",
+      "manufacturer": "Nintendo",
+      "release": "2006",
+      "hardware": "console",
+      "path": "/storage/roms/wii",
+      "platform": "wii",
+      "theme": "wii",
+      "command": "default",
+      "extensions": [
+        ".ciso",
+        ".gcm",
+        ".gcz",
+        ".iso",
+        ".rvz",
+        ".wad",
+        ".wbfs"
+      ],
+      "emulators": [
+        {
+          "name": "dolphin",
+          "cores": [
+            {
+              "name": "dolphin",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gamecube",
+      "fullname": "Nintendo GameCube",
+      "manufacturer": "Nintendo",
+      "release": "2001",
+      "hardware": "console",
+      "path": "/storage/roms/gamecube",
+      "platform": "gc",
+      "theme": "gc",
+      "command": "default",
+      "extensions": [
+        ".ciso",
+        ".gcm",
+        ".gcz",
+        ".iso",
+        ".rvz",
+        ".wbfs"
+      ],
+      "emulators": [
+        {
+          "name": "dolphin",
+          "cores": [
+            {
+              "name": "dolphin",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fbn",
+      "fullname": "Final Burn Neo",
+      "manufacturer": "Arcade",
+      "hardware": "arcade",
+      "path": "/storage/roms/fbneo",
+      "platform": "arcade",
+      "theme": "fbn",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "fbneo",
+              "default": true
+            },
+            {
+              "name": "mame2003_plus"
+            },
+            {
+              "name": "fbalpha2012"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "msx",
+      "fullname": "MSX",
+      "manufacturer": "Microsoft",
+      "release": "1983",
+      "hardware": "computer",
+      "path": "/storage/roms/msx",
+      "platform": "msx",
+      "theme": "msx",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cas",
+        ".dsk",
+        ".m3u",
+        ".mx1",
+        ".mx2",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bluemsx",
+              "default": true
+            },
+            {
+              "name": "fmsx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "msx2",
+      "fullname": "MSX2",
+      "manufacturer": "Microsoft",
+      "release": "1985",
+      "hardware": "computer",
+      "path": "/storage/roms/msx2",
+      "platform": "msx",
+      "theme": "msx2",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cas",
+        ".dsk",
+        ".m3u",
+        ".mx1",
+        ".mx2",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bluemsx",
+              "default": true
+            },
+            {
+              "name": "fmsx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "odyssey2",
+      "fullname": "Magnavox Odyssey 2",
+      "manufacturer": "Magnavox - Philips",
+      "release": "1979",
+      "hardware": "console",
+      "path": "/storage/roms/odyssey2",
+      "platform": "odyssey2",
+      "theme": "odyssey2",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "o2em",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "intellivision",
+      "fullname": "Mattel Intellivision",
+      "manufacturer": "Mattel",
+      "release": "1979",
+      "hardware": "console",
+      "path": "/storage/roms/intellivision",
+      "platform": "intellivision",
+      "theme": "intellivision",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".int",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "freeintv",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "jzintv",
+          "cores": [
+            {
+              "name": "jzintv"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mplayer",
+      "fullname": "Media Player",
+      "manufacturer": "EmuELEC",
+      "release": "2020",
+      "path": "/storage/roms/mplayer",
+      "platform": "mplayer",
+      "theme": "mplayer",
+      "command": "default",
+      "extensions": [
+        ".3g2",
+        ".3gp",
+        ".aac",
+        ".ac3",
+        ".aiff",
+        ".asf",
+        ".avi",
+        ".divx",
+        ".dts",
+        ".f4f",
+        ".f4v",
+        ".flac",
+        ".flv",
+        ".hevc",
+        ".m2p",
+        ".m2ts",
+        ".m3u",
+        ".m4a",
+        ".mkv",
+        ".mov",
+        ".mp3",
+        ".mp4",
+        ".mpeg",
+        ".mpg",
+        ".mxf",
+        ".ogg",
+        ".ogm",
+        ".ogv",
+        ".opus",
+        ".pcm",
+        ".pls",
+        ".ps",
+        ".rm",
+        ".sh",
+        ".swf",
+        ".ts",
+        ".twi",
+        ".vob",
+        ".wav",
+        ".webm",
+        ".wma",
+        ".wmv",
+        ".ytb"
+      ],
+      "emulators": [
+        {
+          "name": "mpv",
+          "cores": [
+            {
+              "name": "mpv"
+            }
+          ]
+        },
+        {
+          "name": "ffplay",
+          "cores": [
+            {
+              "name": "ffplay"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vectrex",
+      "fullname": "Milton Bradley Vectrex",
+      "manufacturer": "Milton Bradley",
+      "release": "1982",
+      "hardware": "console",
+      "path": "/storage/roms/vectrex",
+      "platform": "vectrex",
+      "theme": "vectrex",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".gam",
+        ".vec",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "vecx",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pcengine",
+      "fullname": "NEC PC-Engine",
+      "manufacturer": "NEC",
+      "release": "1987",
+      "hardware": "console",
+      "path": "/storage/roms/pcengine",
+      "platform": "pcengine",
+      "theme": "pcengine",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".pce",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_pce_fast",
+              "default": true
+            },
+            {
+              "name": "mednafen_supergrafx"
+            },
+            {
+              "name": "geargrafx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pcenginecd",
+      "fullname": "NEC PC-Engine CD",
+      "manufacturer": "NEC",
+      "release": "1988",
+      "hardware": "console",
+      "path": "/storage/roms/pcenginecd",
+      "platform": "pcenginecd",
+      "theme": "pce-cd",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".ccd",
+        ".chd",
+        ".cue",
+        ".img",
+        ".iso",
+        ".pce",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_pce_fast",
+              "default": true
+            },
+            {
+              "name": "mednafen_supergrafx"
+            },
+            {
+              "name": "geargrafx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pcfx",
+      "fullname": "NEC PC-FX",
+      "manufacturer": "NEC",
+      "release": "1994",
+      "hardware": "console",
+      "path": "/storage/roms/pcfx",
+      "platform": "pcfx",
+      "theme": "pcfx",
+      "command": "default",
+      "extensions": [
+        ".ccd",
+        ".chd",
+        ".cue",
+        ".toc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_pcfx",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "supergrafx",
+      "fullname": "NEC Super Grafx",
+      "manufacturer": "NEC",
+      "release": "1989",
+      "hardware": "console",
+      "path": "/storage/roms/supergrafx",
+      "platform": "supergrafx",
+      "theme": "supergrafx",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".ccd",
+        ".chd",
+        ".cue",
+        ".pce",
+        ".sgx",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_supergrafx",
+              "default": true
+            },
+            {
+              "name": "mednafen_pce_fast"
+            },
+            {
+              "name": "geargrafx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tg16",
+      "fullname": "NEC TurboGrafx 16",
+      "manufacturer": "NEC",
+      "release": "1989",
+      "hardware": "console",
+      "path": "/storage/roms/tg16",
+      "platform": "pcengine",
+      "theme": "tg16",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".pce",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_pce_fast",
+              "default": true
+            },
+            {
+              "name": "mednafen_supergrafx"
+            },
+            {
+              "name": "geargrafx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tg16cd",
+      "fullname": "NEC TurboGrafx 16-CD",
+      "manufacturer": "NEC",
+      "release": "1989",
+      "hardware": "console",
+      "path": "/storage/roms/tg16cd",
+      "platform": "pcenginecd",
+      "theme": "tg16cd",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".ccd",
+        ".chd",
+        ".cue",
+        ".img",
+        ".iso",
+        ".pce",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_pce_fast",
+              "default": true
+            },
+            {
+              "name": "mednafen_supergrafx"
+            },
+            {
+              "name": "geargrafx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "n64",
+      "fullname": "Nintendo 64",
+      "manufacturer": "Nintendo",
+      "release": "1996",
+      "hardware": "console",
+      "path": "/storage/roms/n64",
+      "platform": "n64",
+      "theme": "n64",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".n64",
+        ".v64",
+        ".z64",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mupen64plus_next",
+              "default": true
+            },
+            {
+              "name": "mupen64plus_next_alt"
+            },
+            {
+              "name": "mupen64plus_32b"
+            },
+            {
+              "name": "parallel_n64_32b"
+            }
+          ]
+        },
+        {
+          "name": "mupen64plussa",
+          "cores": [
+            {
+              "name": "rice"
+            },
+            {
+              "name": "glide64mk2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nes",
+      "fullname": "Nintendo Entertainment System",
+      "manufacturer": "Nintendo",
+      "release": "1985",
+      "hardware": "console",
+      "path": "/storage/roms/nes",
+      "platform": "nes",
+      "theme": "nes",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".nes",
+        ".nesm",
+        ".unf",
+        ".unif",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "nestopia",
+              "default": true
+            },
+            {
+              "name": "fceumm"
+            },
+            {
+              "name": "fceumm_mod"
+            },
+            {
+              "name": "mesen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nesh",
+      "fullname": "Nintendo Entertainment System Hacks",
+      "manufacturer": "Nintendo",
+      "release": "1985",
+      "hardware": "console",
+      "path": "/storage/roms/nesh",
+      "platform": "nes",
+      "theme": "nesh",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".nes",
+        ".nesm",
+        ".unf",
+        ".unif",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "nestopia",
+              "default": true
+            },
+            {
+              "name": "fceumm"
+            },
+            {
+              "name": "fceumm_mod"
+            },
+            {
+              "name": "mesen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "famicom",
+      "fullname": "Nintendo Famicom",
+      "manufacturer": "Nintendo",
+      "release": "1983",
+      "hardware": "console",
+      "path": "/storage/roms/famicom",
+      "platform": "nes",
+      "theme": "famicom",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".nes",
+        ".nesm",
+        ".unf",
+        ".unif",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "nestopia",
+              "default": true
+            },
+            {
+              "name": "fceumm"
+            },
+            {
+              "name": "fceumm_mod"
+            },
+            {
+              "name": "mesen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fds",
+      "fullname": "Nintendo Famicom Disk System",
+      "manufacturer": "Nintendo",
+      "release": "1986",
+      "hardware": "console",
+      "path": "/storage/roms/fds",
+      "platform": "fds",
+      "theme": "fds",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".fds",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "nestopia",
+              "default": true
+            },
+            {
+              "name": "fceumm"
+            },
+            {
+              "name": "fceumm_mod"
+            },
+            {
+              "name": "mesen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gb",
+      "fullname": "Nintendo Game Boy",
+      "manufacturer": "Nintendo",
+      "release": "1989",
+      "hardware": "portable",
+      "path": "/storage/roms/gb",
+      "platform": "gb",
+      "theme": "gb",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".gb",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gambatte",
+              "default": true
+            },
+            {
+              "name": "gearboy"
+            },
+            {
+              "name": "sameboy"
+            },
+            {
+              "name": "tgbdual"
+            },
+            {
+              "name": "mgba"
+            },
+            {
+              "name": "vbam"
+            },
+            {
+              "name": "vba_next"
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gba",
+      "fullname": "Nintendo Game Boy Advance",
+      "manufacturer": "Nintendo",
+      "release": "2001",
+      "hardware": "portable",
+      "path": "/storage/roms/gba",
+      "platform": "gba",
+      "theme": "gba",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".gba",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mgba",
+              "default": true
+            },
+            {
+              "name": "gpsp"
+            },
+            {
+              "name": "vbam"
+            },
+            {
+              "name": "vba_next"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gbah",
+      "fullname": "Nintendo Game Boy Advance hacks",
+      "manufacturer": "Nintendo",
+      "release": "2001",
+      "hardware": "portable",
+      "path": "/storage/roms/gbah",
+      "platform": "gba",
+      "theme": "gbah",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".gba",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mgba",
+              "default": true
+            },
+            {
+              "name": "gpsp"
+            },
+            {
+              "name": "vbam"
+            },
+            {
+              "name": "vba_next"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gbc",
+      "fullname": "Nintendo Game Boy Color",
+      "manufacturer": "Nintendo",
+      "release": "1998",
+      "hardware": "portable",
+      "path": "/storage/roms/gbc",
+      "platform": "gbc",
+      "theme": "gbc",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".gb",
+        ".gbc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gambatte",
+              "default": true
+            },
+            {
+              "name": "gearboy"
+            },
+            {
+              "name": "sameboy"
+            },
+            {
+              "name": "tgbdual"
+            },
+            {
+              "name": "mgba"
+            },
+            {
+              "name": "vbam"
+            },
+            {
+              "name": "vba_next"
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gbch",
+      "fullname": "Nintendo Game Boy Color Hacks",
+      "manufacturer": "Nintendo",
+      "release": "1998",
+      "hardware": "portable",
+      "path": "/storage/roms/gbch",
+      "platform": "gbc",
+      "theme": "gbch",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".gb",
+        ".gbc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gambatte",
+              "default": true
+            },
+            {
+              "name": "gearboy"
+            },
+            {
+              "name": "sameboy"
+            },
+            {
+              "name": "tgbdual"
+            },
+            {
+              "name": "mgba"
+            },
+            {
+              "name": "vbam"
+            },
+            {
+              "name": "vba_next"
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gbh",
+      "fullname": "Nintendo Game Boy Hacks",
+      "manufacturer": "Nintendo",
+      "release": "1989",
+      "hardware": "portable",
+      "path": "/storage/roms/gbh",
+      "platform": "gb",
+      "theme": "gbh",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".gb",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gambatte",
+              "default": true
+            },
+            {
+              "name": "gearboy"
+            },
+            {
+              "name": "sameboy"
+            },
+            {
+              "name": "tgbdual"
+            },
+            {
+              "name": "mgba"
+            },
+            {
+              "name": "vbam"
+            },
+            {
+              "name": "vba_next"
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gameandwatch",
+      "fullname": "Nintendo Game and Watch",
+      "manufacturer": "Nintendo",
+      "release": "1980",
+      "hardware": "portable",
+      "path": "/storage/roms/gameandwatch",
+      "platform": "gameandwatch",
+      "theme": "gameandwatch",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".mgw",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gw",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sfc",
+      "fullname": "Nintendo Super Famicom",
+      "manufacturer": "Nintendo",
+      "release": "1990",
+      "hardware": "console",
+      "path": "/storage/roms/sfc",
+      "platform": "snes",
+      "theme": "sfc",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bs",
+        ".bsx",
+        ".dx2",
+        ".fig",
+        ".gd3",
+        ".gd7",
+        ".sfc",
+        ".smc",
+        ".st",
+        ".swc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "snes9x",
+              "default": true
+            },
+            {
+              "name": "snes9x2010"
+            },
+            {
+              "name": "snes9x2002"
+            },
+            {
+              "name": "snes9x2005_plus"
+            },
+            {
+              "name": "mesen-s"
+            },
+            {
+              "name": "mednafen_supafaust"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "snes",
+      "fullname": "Nintendo Super Nintendo",
+      "manufacturer": "Nintendo",
+      "release": "1991",
+      "hardware": "console",
+      "path": "/storage/roms/snes",
+      "platform": "snes",
+      "theme": "snes",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bs",
+        ".bsx",
+        ".dx2",
+        ".fig",
+        ".gd3",
+        ".gd7",
+        ".sfc",
+        ".smc",
+        ".st",
+        ".swc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "snes9x",
+              "default": true
+            },
+            {
+              "name": "snes9x2010"
+            },
+            {
+              "name": "snes9x2002"
+            },
+            {
+              "name": "snes9x2005_plus"
+            },
+            {
+              "name": "mesen-s"
+            },
+            {
+              "name": "mednafen_supafaust"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "snesh",
+      "fullname": "Nintendo Super Nintendo Hacks",
+      "manufacturer": "Nintendo",
+      "release": "1991",
+      "hardware": "console",
+      "path": "/storage/roms/snesh",
+      "platform": "snes",
+      "theme": "snesh",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bs",
+        ".bsx",
+        ".dx2",
+        ".fig",
+        ".gd3",
+        ".gd7",
+        ".sfc",
+        ".smc",
+        ".st",
+        ".swc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "snes9x",
+              "default": true
+            },
+            {
+              "name": "snes9x2010"
+            },
+            {
+              "name": "snes9x2002"
+            },
+            {
+              "name": "snes9x2005_plus"
+            },
+            {
+              "name": "mesen-s"
+            },
+            {
+              "name": "mednafen_supafaust"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "snesmsu1",
+      "fullname": "Near's Super Nintendo MSU1",
+      "manufacturer": "Nintendo - Near",
+      "release": "2012",
+      "hardware": "console",
+      "path": "/storage/roms/snesmsu1",
+      "platform": "snes",
+      "theme": "snesmsu1",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bs",
+        ".bsx",
+        ".dx2",
+        ".fig",
+        ".gd3",
+        ".gd7",
+        ".sfc",
+        ".smc",
+        ".st",
+        ".swc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "snes9x",
+              "default": true
+            },
+            {
+              "name": "mednafen_supafaust"
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sufami",
+      "fullname": "SuFami Turbo",
+      "manufacturer": "Bandai",
+      "release": "1996",
+      "hardware": "console",
+      "path": "/storage/roms/sufami",
+      "platform": "snes",
+      "theme": "sufami",
+      "command": "default",
+      "extensions": [
+        ".st",
+        ".fig",
+        ".bs",
+        ".smc",
+        ".sfc",
+        ".zip",
+        ".7z"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "snes9x",
+              "default": true
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "satellaview",
+      "fullname": "Satellaview",
+      "manufacturer": "Nintendo",
+      "release": "1995",
+      "hardware": "console",
+      "path": "/storage/roms/satellaview",
+      "platform": "snes",
+      "theme": "satellaview",
+      "command": "default",
+      "extensions": [
+        ".st",
+        ".fig",
+        ".bs",
+        ".smc",
+        ".sfc",
+        ".zip",
+        ".7z"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "snes9x",
+              "default": true
+            },
+            {
+              "name": "mesen-s"
+            }
+          ]
+        }
+      ]
+     },
+    {
+      "name": "virtualboy",
+      "fullname": "Nintendo Virtual Boy",
+      "manufacturer": "Nintendo",
+      "release": "1995",
+      "hardware": "console",
+      "path": "/storage/roms/virtualboy",
+      "platform": "virtualboy",
+      "theme": "virtualboy",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".vb",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_vb",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "phillips-cdi",
+      "fullname": "Phillips CDI",
+      "manufacturer": "Phillips",
+      "release": "1990",
+      "hardware": "console",
+      "path": "/storage/roms/cdi",
+      "platform": "cdi",
+      "theme": "cdi",
+      "command": "default",
+      "extensions": [
+        ".chd",
+        ".iso",
+        ".cue"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "same_cdi",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pokemini",
+      "fullname": "Pokemon Mini",
+      "manufacturer": "Nintendo",
+      "release": "2001",
+      "hardware": "portable",
+      "path": "/storage/roms/pokemini",
+      "platform": "pokemini",
+      "theme": "pokemini",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".min",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "pokemini",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "openbor",
+      "fullname": "OpenBOR",
+      "manufacturer": "Ports",
+      "release": "2008",
+      "hardware": "port",
+      "path": "/storage/roms/openbor",
+      "platform": "openbor",
+      "theme": "openbor",
+      "command": "default",
+      "extensions": [
+        ".pak"
+      ],
+      "emulators": [
+        {
+          "name": "OPENBOR",
+          "cores": [
+            {
+              "name": "OpenBOR",
+              "default": true
+            },
+            {
+              "name": "OpenBORff"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "videopac",
+      "fullname": "Philips VideoPac",
+      "manufacturer": "Magnavox - Philips",
+      "release": "1978",
+      "hardware": "console",
+      "path": "/storage/roms/videopac",
+      "platform": "videopac",
+      "theme": "videopac",
+      "command": "default",
+      "extensions": [
+        ".bin",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "o2em",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3do",
+      "fullname": "Panasonic 3DO",
+      "manufacturer": "Panasonic",
+      "release": "1993",
+      "hardware": "console",
+      "path": "/storage/roms/3do",
+      "platform": "3do",
+      "theme": "3do",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".chd",
+        ".cue",
+        ".iso",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "opera",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ports",
+      "fullname": "Ports",
+      "manufacturer": "Ports",
+      "release": "Varies",
+      "hardware": "port",
+      "path": "/storage/roms/ports_scripts",
+      "platform": "ports",
+      "theme": "ports",
+      "command": "emuelecRunApp.sh %ROM% -P%SYSTEM% --core=%CORE% --emulator=%EMULATOR% --controllers=\"%CONTROLLERSCONFIG%\"",
+      "extensions": [
+        ".sh"
+      ],
+      "emulators": [
+        {
+          "name": "ports",
+          "cores": [
+            {
+              "name": "ports",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "neogeo",
+      "fullname": "SNK Neo-Geo",
+      "manufacturer": "SNK",
+      "release": "1990",
+      "hardware": "console",
+      "path": "/storage/roms/neogeo",
+      "platform": "neogeo",
+      "theme": "neogeo",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".neo",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "fbneo",
+              "default": true
+            },
+            {
+              "name": "mame2003_plus"
+            },
+            {
+              "name": "fbalpha2012"
+            },
+            {
+              "name": "geolith"
+            }
+          ]
+        },
+        {
+          "name": "FBNEOSA",
+          "cores": [
+            {
+              "name": "FbneoSA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "neocd",
+      "fullname": "SNK Neo-Geo CD",
+      "manufacturer": "SNK",
+      "release": "1990",
+      "hardware": "console",
+      "path": "/storage/roms/neocd",
+      "platform": "neogeocd",
+      "theme": "neogeocd",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".chd",
+        ".cue",
+        ".iso",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "neocd",
+              "default": true
+            },
+            {
+              "name": "fbneo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ngp",
+      "fullname": "SNK Neo-Geo Pocket",
+      "manufacturer": "SNK",
+      "release": "1998",
+      "hardware": "portable",
+      "path": "/storage/roms/ngp",
+      "platform": "ngp",
+      "theme": "ngp",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".ngp",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_ngp",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ngpc",
+      "fullname": "SNK Neo-Geo Pocket Color",
+      "manufacturer": "SNK",
+      "release": "1999",
+      "hardware": "portable",
+      "path": "/storage/roms/ngpc",
+      "platform": "ngpc",
+      "theme": "ngpc",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".ngc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mednafen_ngp",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "scummvm",
+      "fullname": "ScummVM",
+      "manufacturer": "LucasArts",
+      "release": "1987",
+      "hardware": "computer",
+      "path": "/storage/roms/scummvm",
+      "platform": "pc",
+      "theme": "scummvm",
+      "command": "default",
+      "extensions": [
+        ".scummvm"
+      ],
+      "emulators": [
+        {
+          "name": "SCUMMVMSA",
+          "cores": [
+            {
+              "name": "SCUMMVMSA",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "scummvm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sega32x",
+      "fullname": "Sega 32X",
+      "manufacturer": "Sega",
+      "release": "1991",
+      "hardware": "console",
+      "path": "/storage/roms/sega32x",
+      "platform": "sega32x",
+      "theme": "sega32x",
+      "command": "default",
+      "extensions": [
+        ".32x",
+        ".7z",
+        ".bin",
+        ".md",
+        ".smd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "segacd",
+      "fullname": "Sega CD",
+      "manufacturer": "Sega",
+      "release": "1991",
+      "hardware": "console",
+      "path": "/storage/roms/segacd",
+      "platform": "segacd",
+      "theme": "segacd",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".chd",
+        ".cue",
+        ".iso",
+        ".m3u",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "genesis_plus_gx",
+              "default": true
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dreamcast",
+      "fullname": "Sega Dreamcast",
+      "manufacturer": "Sega",
+      "release": "1998",
+      "hardware": "console",
+      "path": "/storage/roms/dreamcast",
+      "platform": "dreamcast",
+      "theme": "dreamcast",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cdi",
+        ".chd",
+        ".gdi",
+        ".m3u",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "flycast",
+              "default": true
+            },
+            {
+              "name": "flycast_32b"
+            }
+          ]
+        },
+        {
+          "name": "flycastsa",
+          "cores": [
+            {
+              "name": "flycastsa"
+            }
+          ]
+        },
+        {
+          "name": "flycast_dojo",
+          "cores": [
+            {
+              "name": "flycast_dojo"
+            }
+          ]
+        },
+        {
+          "name": "retrorun",
+          "cores": [
+            {
+              "name": "flycast"
+            },
+            {
+              "name": "flycast_32b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "atomiswave",
+      "fullname": "Atomiswave",
+      "manufacturer": "Sammy",
+      "release": "2003",
+      "hardware": "arcade",
+      "path": "/storage/roms/atomiswave",
+      "platform": "atomiswave",
+      "theme": "atomiswave",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".dat",
+        ".lst",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "flycast",
+              "default": true
+            },
+            {
+              "name": "flycast_32b"
+            }
+          ]
+        },
+        {
+          "name": "flycastsa",
+          "cores": [
+            {
+              "name": "flycastsa"
+            }
+          ]
+        },
+        {
+          "name": "flycast_dojo",
+          "cores": [
+            {
+              "name": "flycast_dojo"
+            }
+          ]
+        },
+        {
+          "name": "retrorun",
+          "cores": [
+            {
+              "name": "flycast"
+            },
+            {
+              "name": "flycast_32b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gamegear",
+      "fullname": "Sega Game Gear",
+      "manufacturer": "Sega",
+      "release": "1990",
+      "hardware": "portable",
+      "path": "/storage/roms/gamegear",
+      "platform": "gamegear",
+      "theme": "gamegear",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".gg",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gearsystem",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ggh",
+      "fullname": "Sega Game Gear Hacks",
+      "manufacturer": "Sega",
+      "release": "1990",
+      "hardware": "portable",
+      "path": "/storage/roms/gamegearh",
+      "platform": "gamegear",
+      "theme": "ggh",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".gg",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gearsystem",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "genesis",
+      "fullname": "Sega Genesis",
+      "manufacturer": "Sega",
+      "release": "1989",
+      "hardware": "console",
+      "path": "/storage/roms/genesis",
+      "platform": "genesis",
+      "theme": "genesis",
+      "command": "default",
+      "extensions": [
+        ".68k",
+        ".7z",
+        ".bin",
+        ".gen",
+        ".md",
+        ".sg",
+        ".sgd",
+        ".smd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "genesis_plus_gx",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx_cart_special"
+            },
+            {
+              "name": "genesis_plus_gx_wide"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "genh",
+      "fullname": "Sega Genesis Hacks",
+      "manufacturer": "Sega",
+      "release": "1989",
+      "hardware": "console",
+      "path": "/storage/roms/genh",
+      "platform": "genesis",
+      "theme": "genh",
+      "command": "default",
+      "extensions": [
+        ".68k",
+        ".7z",
+        ".bin",
+        ".gen",
+        ".md",
+        ".sg",
+        ".sgd",
+        ".smd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "genesis_plus_gx",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx_wide"
+            },
+            {
+              "name": "genesis_plus_gx_cart_special"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mastersystem",
+      "fullname": "Sega Master System",
+      "manufacturer": "Sega",
+      "release": "1985",
+      "hardware": "console",
+      "path": "/storage/roms/mastersystem",
+      "platform": "mastersystem",
+      "theme": "mastersystem",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".sms",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gearsystem",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "megadrive",
+      "fullname": "Sega Mega Drive",
+      "manufacturer": "Sega",
+      "release": "1990",
+      "hardware": "console",
+      "path": "/storage/roms/megadrive",
+      "platform": "megadrive",
+      "theme": "megadrive",
+      "command": "default",
+      "extensions": [
+        ".68k",
+        ".7z",
+        ".bin",
+        ".gen",
+        ".md",
+        ".sg",
+        ".sgd",
+        ".smd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "genesis_plus_gx",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx_cart_special"
+            },
+            {
+              "name": "genesis_plus_gx_wide"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "megadrivemsu",
+      "fullname": "Sega Mega Drive MSU",
+      "manufacturer": "Sega",
+      "release": "1990",
+      "hardware": "console",
+      "path": "/storage/roms/megadrivemsu",
+      "platform": "megadrive",
+      "theme": "megadrivemsu",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".gen",
+        ".md",
+        ".sg",
+        ".smd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "genesis_plus_gx_wide",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "megadrive-japan",
+      "fullname": "Sega Mega Drive Japan",
+      "manufacturer": "Sega",
+      "release": "1988",
+      "hardware": "console",
+      "path": "/storage/roms/megadrive-japan",
+      "platform": "megadrive",
+      "theme": "megadrive-japan",
+      "command": "default",
+      "extensions": [
+        ".68k",
+        ".7z",
+        ".bin",
+        ".gen",
+        ".md",
+        ".sg",
+        ".sgd",
+        ".smd",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "genesis_plus_gx",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx_wide"
+            },
+            {
+              "name": "genesis_plus_gx_cart_special"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "megaduck",
+      "fullname": "MegaDuck",
+      "manufacturer": "Welback Holdings",
+      "release": "1993",
+      "hardware": "console",
+      "path": "/storage/roms/megaduck",
+      "platform": "megaduck",
+      "theme": "megaduck",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "sameduck",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "naomi",
+      "fullname": "Sega Naomi",
+      "manufacturer": "Sega",
+      "release": "1998",
+      "hardware": "arcade",
+      "path": "/storage/roms/naomi",
+      "platform": "naomi",
+      "theme": "naomi",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".dat",
+        ".lst",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "flycast",
+              "default": true
+            },
+            {
+              "name": "flycast_32b"
+            }
+          ]
+        },
+        {
+          "name": "flycastsa",
+          "cores": [
+            {
+              "name": "flycastsa"
+            }
+          ]
+        },
+        {
+          "name": "flycast_dojo",
+          "cores": [
+            {
+              "name": "flycast_dojo"
+            }
+          ]
+        },
+        {
+          "name": "retrorun",
+          "cores": [
+            {
+              "name": "flycast"
+            },
+            {
+              "name": "flycast_32b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sc-3000",
+      "fullname": "Sega SC-3000",
+      "manufacturer": "Sega",
+      "release": "1983",
+      "hardware": "computer",
+      "path": "/storage/roms/sc-3000",
+      "platform": "sc-3000",
+      "theme": "sc-3000",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".sg",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bluemsx",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sg-1000",
+      "fullname": "Sega SG-1000",
+      "manufacturer": "Sega",
+      "release": "1983",
+      "hardware": "console",
+      "path": "/storage/roms/sg-1000",
+      "platform": "sg-1000",
+      "theme": "sg-1000",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".sg",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "gearsystem",
+              "default": true
+            },
+            {
+              "name": "genesis_plus_gx"
+            },
+            {
+              "name": "picodrive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "saturn",
+      "fullname": "Sega Saturn",
+      "manufacturer": "Sega",
+      "release": "1994",
+      "hardware": "console",
+      "path": "/storage/roms/saturn",
+      "platform": "saturn",
+      "theme": "saturn",
+      "command": "default",
+      "extensions": [
+        ".bin",
+        ".chd",
+        ".cue",
+        ".iso",
+        ".mds",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "yabasanshiro"
+            },
+            {
+              "name": "mednafen_saturn"
+            }
+          ]
+        },
+        {
+          "name": "yabasanshiro",
+          "cores": [
+            {
+              "name": "yabasanshiroSA"
+            },
+            {
+              "name": "yabasanshiroSA1_5",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "setup",
+      "fullname": "Setup",
+      "manufacturer": "EmuELEC",
+      "release": "2017",
+      "hardware": "Amlogic",
+      "path": "/usr/bin/scripts/setup",
+      "platform": "setup",
+      "theme": "setup",
+      "command": "default",
+      "extensions": [
+        ".sh"
+      ]
+    },
+    {
+      "name": "ikemen",
+      "fullname": "ikemen",
+      "manufacturer": "Ports",
+      "release": "2021",
+      "hardware": "port",
+      "path": "/storage/roms/ikemen",
+      "platform": "ikemen",
+      "theme": "ikemen",
+      "command": "default",
+      "extensions": [
+        ".exe",
+        ".ikemen",
+        ".pc"
+      ],
+      "emulators": [
+        {
+          "name": "ikemen",
+          "cores": [
+            {
+              "name": "ikemen",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "x68000",
+      "fullname": "Sharp X68000",
+      "manufacturer": "Sharp",
+      "release": "1987",
+      "hardware": "computer",
+      "path": "/storage/roms/x68000",
+      "platform": "x68000",
+      "theme": "x68000",
+      "command": "default",
+      "extensions": [
+        ".2hd",
+        ".7z",
+        ".88d",
+        ".cmd",
+        ".d88",
+        ".dim",
+        ".dup",
+        ".hdf",
+        ".hdm",
+        ".img",
+        ".m3u",
+        ".xdf",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "px68k",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "x1",
+      "fullname": "Sharp X1",
+      "manufacturer": "Sharp",
+      "release": "1982",
+      "hardware": "computer",
+      "path": "/storage/roms/x1",
+      "platform": "x1",
+      "theme": "sharpx1",
+      "command": "default",
+      "extensions": [
+        ".2d",
+        ".2hd",
+        ".7z",
+        ".88d",
+        ".cmd",
+        ".d88",
+        ".dup",
+        ".dx1",
+        ".hdm",
+        ".tap",
+        ".tfd",
+        ".xdf",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "x1",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "zxspectrum",
+      "fullname": "Sinclair ZX Spectrum",
+      "manufacturer": "Sinclair",
+      "release": "1982",
+      "hardware": "computer",
+      "path": "/storage/roms/zxspectrum",
+      "platform": "zxspectrum",
+      "theme": "zxspectrum",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".rzx",
+        ".scl",
+        ".tap",
+        ".trd",
+        ".tzx",
+        ".z80",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "fuse",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "zx81",
+      "fullname": "Sinclair ZX81",
+      "manufacturer": "Sinclair",
+      "release": "1981",
+      "hardware": "computer",
+      "path": "/storage/roms/zx81",
+      "platform": "zx81",
+      "theme": "zx81",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".p",
+        ".tzx",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "81",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "psx",
+      "fullname": "Sony Playstation",
+      "manufacturer": "Sony",
+      "release": "1994",
+      "hardware": "console",
+      "path": "/storage/roms/psx",
+      "platform": "psx",
+      "theme": "psx",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".cbn",
+        ".ccd",
+        ".chd",
+        ".cue",
+        ".img",
+        ".iso",
+        ".m3u",
+        ".mdf",
+        ".pbp",
+        ".toc",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "pcsx_rearmed_32b",
+              "default": true
+            },
+            {
+              "name": "pcsx_rearmed"
+            },
+            {
+              "name": "swanstation"
+            }
+          ]
+        },
+        {
+          "name": "Duckstation",
+          "cores": [
+            {
+              "name": "duckstation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "psp",
+      "fullname": "Sony Playstation Portable",
+      "manufacturer": "Sony",
+      "release": "2004",
+      "hardware": "portable",
+      "path": "/storage/roms/psp",
+      "platform": "psp",
+      "theme": "psp",
+      "command": "default",
+      "extensions": [
+        ".cso",
+        ".iso",
+        ".pbp"
+      ],
+      "emulators": [
+        {
+          "name": "PPSSPPSDL",
+          "cores": [
+            {
+              "name": "PPSSPPSDL",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pspminis",
+      "fullname": "Sony Playstation Portable Minis",
+      "manufacturer": "Sony",
+      "release": "2004",
+      "hardware": "portable",
+      "path": "/storage/roms/pspminis",
+      "platform": "psp",
+      "theme": "pspminis",
+      "command": "default",
+      "extensions": [
+        ".cso",
+        ".iso",
+        ".pbp"
+      ],
+      "emulators": [
+        {
+          "name": "PPSSPPSDL",
+          "cores": [
+            {
+              "name": "PPSSPPSDL",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "uzebox",
+      "fullname": "uzebox",
+      "manufacturer": "belogic",
+      "release": "2008",
+      "hardware": "console",
+      "path": "/storage/roms/uzebox",
+      "platform": "uzebox",
+      "theme": "uzebox",
+      "command": "default",
+      "extensions": [
+        ".hex",
+        ".uze"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "uzem"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "solarus",
+      "fullname": "Solarus",
+      "manufacturer": "Solarus",
+      "release": "2006",
+      "hardware": "console",
+      "path": "/storage/roms/solarus",
+      "platform": "solarus",
+      "theme": "solarus",
+      "command": "default",
+      "extensions": [
+        ".solarus"
+      ],
+      "emulators": [
+        {
+          "name": "Solarus",
+          "cores": [
+            {
+              "name": "solarus",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pico8",
+      "fullname": "PICO-8 fantasy console",
+      "manufacturer": "Lexaloffle",
+      "release": "2015",
+      "hardware": "console",
+      "path": "/storage/roms/pico-8",
+      "platform": "pico8",
+      "theme": "pico8",
+      "command": "default",
+      "extensions": [
+        ".p8",
+        ".png"
+      ],
+      "emulators": [
+        {
+          "name": "Pico-8",
+          "cores": [
+            {
+              "name": "Pico-8",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "fake08"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "prboom",
+      "fullname": "Doom",
+      "manufacturer": "id",
+      "release": "1993",
+      "hardware": "computer",
+      "path": "/storage/roms/ports/doom",
+      "platform": "pc",
+      "theme": "prboom",
+      "command": "default",
+      "extensions": [
+        ".doom",
+        ".iwad",
+        ".pwad",
+        ".wad"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "prboom"
+            }
+          ]
+        },
+        {
+          "name": "Chocolate-Doom",
+          "cores": [
+            {
+              "name": "Chocolate-Doom",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "LZDoom",
+          "cores": [
+            {
+              "name": "LZDoom"
+            }
+          ]
+        },
+        {
+          "name": "GZDoom",
+          "cores": [
+            {
+              "name": "GZDoom"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tic-80",
+      "fullname": "TIC-80",
+      "manufacturer": "Nesbox",
+      "release": "2017",
+      "hardware": "console",
+      "path": "/storage/roms/tic-80",
+      "platform": "tic80",
+      "theme": "tic-80",
+      "command": "default",
+      "extensions": [
+        ".tic"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "tic80",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "easyrpg",
+      "fullname": "EasyRPG",
+      "manufacturer": "EasyRPG",
+      "release": "2003",
+      "hardware": "ports",
+      "path": "/storage/roms/easyrpg",
+      "platform": "easyrpg",
+      "theme": "easyrpg",
+      "command": "default",
+      "extensions": [
+        ".ldb"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "easyrpg",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ecwolf",
+      "fullname": "Wolfenstein 3D",
+      "manufacturer": "id",
+      "release": "1992",
+      "hardware": "computer",
+      "path": "/storage/roms/ports/ecwolf/games",
+      "platform": "pc",
+      "theme": "ecwolf",
+      "command": "default",
+      "extensions": [
+        ".ecwolf",
+        ".n3d",
+        ".sd2",
+        ".sd3",
+        ".sod",
+        ".wl6"
+      ],
+      "emulators": [
+        {
+          "name": "ECWolf",
+          "cores": [
+            {
+              "name": "ecwolf",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "supervision",
+      "fullname": "Supervision",
+      "manufacturer": "watara",
+      "release": "1992",
+      "hardware": "portable",
+      "path": "/storage/roms/supervision",
+      "platform": "supervision",
+      "theme": "supervision",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".bin",
+        ".sv",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "potator",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "freej2me",
+      "fullname": "Java Games",
+      "manufacturer": "freej2me",
+      "release": "2017",
+      "hardware": "portable",
+      "path": "/storage/roms/freej2me",
+      "platform": "freej2me",
+      "theme": "freej2me",
+      "command": "default",
+      "extensions": [
+        ".jar"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "freej2me",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gmloader",
+      "fullname": "Gamemaker Loader",
+      "manufacturer": "gmloader",
+      "release": "2021",
+      "hardware": "port",
+      "path": "/storage/roms/ports/gmloader",
+      "platform": "gmloader",
+      "theme": "gmloader",
+      "command": "default",
+      "extensions": [
+        ".apk",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "gmloader",
+          "cores": [
+            {
+              "name": "gmloader",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "karaoke",
+      "fullname": "Karaoke",
+      "manufacturer": "Karaoke",
+      "release": "2000",
+      "hardware": "console",
+      "path": "/storage/roms/karaoke",
+      "platform": "karaoke",
+      "theme": "karaoke",
+      "command": "default",
+      "extensions": [
+        ".cdg"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "pocketcdg",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bk",
+      "fullname": "Electronika",
+      "path": "/storage/roms/bk",
+      "platform": "bk",
+      "theme": "bk",
+      "command": "default",
+      "extensions": [
+        ".bin",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bk",
+              "default": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -10,13 +10,14 @@ PKG_SECTION="emuelec"
 PKG_LONGDESC="EmuELEC Meta Package"
 PKG_TOOLCHAIN="manual"
 
-PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus-singe yabasanshiroSA fbneoSA same_cdi"
-PKG_EMUS="${LIBRETRO_CORES} advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-staging mupen64plus-nx mupen64plus-nx-alt scummvmsa stellasa solarus dosbox-pure pcsx_rearmed ecwolf potator freej2me duckstation flycastsa fmsx-libretro jzintv mupen64plussa"
-PKG_DEPENDS_TARGET+=" emuelec-tools ${PKG_EMUS} ${PKG_EXPERIMENTAL} emuelec-ports"
+PKG_EXPERIMENTAL="nestopiaCV quasi88 xmil np2kai hypseus-singe yabasanshiroSA_1_11 yabasanshiroSA_1_5 fbneoSA same_cdi ikemen-go" 
+PKG_EMUS="${LIBRETRO_CORES} advancemame PPSSPPSDL amiberry amiberry-lite hatarisa openbor dosbox-staging mupen64plus-nx mupen64plus-nx-alt scummvmsa stellasa solarus dosbox-pure pcsx_rearmed ecwolf potator freej2me duckstation flycastsa fmsx-libretro jzintv mupen64plussa"
+PKG_DEPENDS_TARGET+=" emuelec-tools ${PKG_EMUS} ${PKG_EXPERIMENTAL}"
+
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
-if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
-	PKG_DEPENDS_TARGET+=" ${LIBRETRO_S922X_CORES} mame2016 xow"
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+	PKG_DEPENDS_TARGET+=" ${LIBRETRO_S922X_CORES}"
 fi
 
 if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
@@ -51,16 +52,28 @@ if [ "${ARCH}" == "aarch64" ]; then
                         lib32-box86
                         lib32-libusb"
 
-  if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+  if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
     PKG_DEPENDS_TARGET+=" dolphinSA"
   fi
 
   if [ "${DEVICE}" == "Amlogic-old" ]; then
     #we disable some cores that are not working or work poorly on Amlogic-old
-    for discore in yabasanshiroSA yabasanshiro same_cdi duckstation; do
+    for discore in yabasanshiroSA_1_11 yabasanshiroSA_1_5 yabasanshiro same_cdi duckstation; do
       PKG_DEPENDS_TARGET=$(echo ${PKG_DEPENDS_TARGET} | sed "s|${discore} | |")
     done
   fi
+fi
+
+# We make sure MAME is the last package from EE to be built.
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+	PKG_DEPENDS_TARGET+=" mame"
+fi
+
+# These packages do not yet compile for OdroidM1
+if [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+ for discore in flycast-dojo; do
+		PKG_DEPENDS_TARGET=$(echo ${PKG_DEPENDS_TARGET} | sed "s|${discore}| |")
+	done
 fi
 
 makeinstall_target() {
@@ -74,7 +87,9 @@ makeinstall_target() {
 
   # Added for compatibility with portmaster
   ln -sf /storage/roms ${INSTALL}/roms
-  ln -sf /storage/roms/ports/portmaster ${INSTALL}/portmaster
+  ln -sf /storage/roms/ports/PortMaster ${INSTALL}/PortMaster
+  mkdir -p ${INSTALL}/usr/bin/ports
+  touch ${INSTALL}/usr/bin/ports/.ports_here
 
   find ${INSTALL}/usr/config/emuelec/ -type f -exec chmod o+x {} \;
 

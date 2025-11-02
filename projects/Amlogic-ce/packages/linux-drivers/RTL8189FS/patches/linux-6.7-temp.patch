@@ -1,0 +1,30 @@
+From 221a84d92ec04505fa1aee0a8531b7df0b8be6eb Mon Sep 17 00:00:00 2001
+From: Jookia <contact@jookia.org>
+Date: Mon, 30 Oct 2023 16:46:06 +1100
+Subject: [PATCH] Fix cfg80211_rtw_change_beacon on kernel 6.5
+
+---
+ os_dep/linux/ioctl_cfg80211.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
+index d63c89b0..4820315a 100644
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -5148,9 +5148,16 @@ static int cfg80211_rtw_start_ap(struct wiphy *wiphy, struct net_device *ndev,
+ 	return ret;
+ }
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
++static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *ndev,
++		struct cfg80211_ap_update *params)
++{
++		struct cfg80211_beacon_data *info = &params->beacon;
++#else
+ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *ndev,
+ 		struct cfg80211_beacon_data *info)
+ {
++#endif
+ 	int ret = 0;
+ 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
+ 

@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="2048"
-PKG_VERSION="331c1de588ed8f8c370dcbc488e5434a3c09f0f2"
-PKG_SHA256="9b30278e61b8dfe067d8f7cc9cb0d467e16a3d2de995e950b712570d7e4aa195"
+PKG_VERSION="86e02d3c2dd76858db7370f5df1ccfc33b3abee1"
+PKG_SHA256="1288de5aa6c88b1bf710f62b7bdd9908c72781890bf6c34e8864a5bbeb67bb1d"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"

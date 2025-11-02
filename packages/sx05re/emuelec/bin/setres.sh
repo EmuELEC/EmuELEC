@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 # Copyright (C) 2022-present Joshua L (https://github.com/Langerz82)
+# 2025-present DiegroSan (https://github.com/Diegrosan)
 
 # Read the video output mode and set it for emuelec to avoid video flicking.
 
@@ -17,20 +18,40 @@
 FILE_MODE="/sys/class/display/mode"
 PLATFORM=""
 
+#here we look for the best framebuffer; the default is fb0, but on some devices it is fb1. Here we choose the best available,
+#thus achieving the best video performance. 
+max_area=0
+max_fb=""
+
+for fb in /sys/class/graphics/fb*/virtual_size; do
+    if [ -f "$fb" ]; then
+        fb_num=$(echo "$fb" | grep -o 'fb[0-9]*' | sed 's/fb//')
+        size=$(cat "$fb")
+        width=$(echo "$size" | cut -d',' -f1)
+        height=$(echo "$size" | cut -d',' -f2)
+        area=$((width * height))
+              
+        if [ $area -gt $max_area ]; then
+            max_area=$area
+            max_fb=$fb_num
+        fi
+    fi
+done
+
 switch_resolution()
 {
   local MODE=${1}
 
   # Here we first clear the primary display buffer of leftover artifacts then set
   # the secondary small buffers flag to stop copying across.
-  blank_buffer >> /dev/null
-
+	echo 1 > /sys/class/graphics/fb${max_fb}/blank
   case ${MODE} in
     480cvbs|576cvbs|480p*|480i*|576p*|720p*|1080p*|1440p*|2160p*|576i*|720i*|1080i*|1440i*|2160i*|*x*)
       echo null > "${FILE_MODE}"
       sleep 1
       echo ${MODE} > "${FILE_MODE}"
   esac
+	echo 0 > /sys/class/graphics/fb${max_fb}/blank
 	NEW_MODE=$( cat ${FILE_MODE} )
 	[[ "${NEW_MODE}" != "${MODE}" ]] && exit 1
 }
@@ -51,7 +72,7 @@ get_resolution_size()
 
   case ${MODE} in
     480cvbs)
-      PSW=640
+      PSW=720
       PSH=480
       [[ -z "${FBW}" ]] && FBW=1024
       [[ -z "${FBH}" ]] && FBH=768
@@ -92,10 +113,10 @@ set_main_framebuffer() {
 
   if [[ -n "${FBW}" && "${FBW}" > 0 && -n "${FBH}" && "${FBH}" > 0 ]]; then
     MFBH=$(( FBH*2 ))
-    fbset -fb /dev/fb0 -g ${FBW} ${FBH} ${FBW} ${MFBH} ${BPP}
-    echo 0 0 $(( FBW-1 )) $(( FBH-1 )) > /sys/class/graphics/fb0/free_scale_axis
-    echo 0 > /sys/class/graphics/fb0/free_scale
-    echo 0 > /sys/class/graphics/fb0/freescale_mode
+    fbset -fb /dev/fb$max_fb -g ${FBW} ${FBH} ${FBW} ${MFBH} ${BPP}
+    [[ -f "/sys/class/graphics/fb$max_fb/free_scale_axis" ]] && echo 0 0 $(( FBW-1 )) $(( FBH-1 )) > /sys/class/graphics/fb$max_fb/free_scale_axis
+    [[ -f "/sys/class/graphics/fb$max_fb/free_scale" ]] && echo 0 > /sys/class/graphics/fb$max_fb/free_scale
+    [[ -f "/sys/class/graphics/fb$max_fb/freescale_mode" ]] && echo 0 > /sys/class/graphics/fb$max_fb/freescale_mode
   fi
 }
 
@@ -103,9 +124,9 @@ set_fb_borders() {
 	local CUSTOM_OFFSETS=( ${1} ${2} ${3} ${4} )
 	local COUNT_ARGS=${#CUSTOM_OFFSETS[@]}
 	if [[ "${COUNT_ARGS}" == "4" ]]; then
-	  echo ${CUSTOM_OFFSETS[@]} > /sys/class/graphics/fb0/window_axis
-	  echo 1 > /sys/class/graphics/fb0/freescale_mode
-	  echo 0x10001 > /sys/class/graphics/fb0/free_scale
+	  echo ${CUSTOM_OFFSETS[@]} > /sys/class/graphics/fb$max_fb/window_axis
+	  echo 1 > /sys/class/graphics/fb$max_fb/freescale_mode
+	  echo 0x10001 > /sys/class/graphics/fb$max_fb/free_scale
 	fi
 }
 
@@ -129,12 +150,14 @@ if [[ $# == 2 ]]; then
 	PLATFORM=${2}
 fi
 
+if [[ $# == 3 ]]; then
+	MODE=${1}
+	PLATFORM=${2}
+	ROMNAME=${3}
+fi
+
 FBW=0
 FBH=0
-
-# Here we first clear the primary display buffer of leftover artifacts then set
-# the secondary small buffers flag to stop copying across.
-blank_buffer >> /dev/null
 
 # The current display mode before it may get changed below.
 OLD_MODE=$( cat ${FILE_MODE} )
@@ -147,11 +170,12 @@ BUFF=$(get_ee_setting ee_video_fb1_size)
 [[ -z "${BUFF}" ]] && BUFF=32
 
 if [[ -n "${BUFF}" ]] && [[ ${BUFF} > 0 ]]; then
-  fbset -fb /dev/fb1 -g ${BUFF} ${BUFF} ${BUFF} ${BUFF} ${BPP}
+	[[ "${max_fb}" == 0 ]] && fbset -fb /dev/fb1 -g ${BUFF} ${BUFF} ${BUFF} ${BUFF} ${BPP}
+	[[ "${max_fb}" == 1 ]] && fbset -fb /dev/fb0 -g ${BUFF} ${BUFF} ${BUFF} ${BUFF} ${BPP}
 fi
 
 # This is needed to reset scaling.
-echo 0 > /sys/class/ppmgr/ppscaler
+[[ -f "/sys/class/ppmgr/ppscaler" ]] && echo 0 > /sys/class/ppmgr/ppscaler
 
 # Option too Custom set the CVBS Resolution by creating a cvbs_resolution.txt file.
 # File contents must just 2 different integers seperated by a space. e.g. 800 600.
@@ -166,7 +190,7 @@ if [[ "${MODE}" == *"cvbs" ]]; then
   fi
 fi
 
-CUSTOM_RES=$(get_ee_setting ${ES_MODE}framebuffer.${MODE} ${PLATFORM})
+CUSTOM_RES=$(get_ee_setting ${ES_MODE}framebuffer "${PLATFORM}" "${ROMNAME}")
 #[[ -z "${CUSTOM_RES}" ]] && CUSTOM_RES=$(get_ee_setting ee_framebuffer.${MODE})
 if [[ ! -z "${CUSTOM_RES}" ]]; then
   declare -a RES=($(echo "${CUSTOM_RES}"))
@@ -176,10 +200,10 @@ if [[ ! -z "${CUSTOM_RES}" ]]; then
   fi
 fi
 
-
-[[ ${OLD_MODE} != ${MODE} ]] && switch_resolution ${MODE}
+if [[ ${OLD_MODE} != ${MODE} ]]; then
+	switch_resolution ${MODE}
+fi
 MODE=$( cat ${FILE_MODE} )
-
 
 declare -a SIZE=($( get_resolution_size ${MODE} ${FBW} ${FBH}))
 
@@ -196,11 +220,12 @@ fi
 # Once we know the Width and Height is valid numbers we set the primary display
 # buffer, and we multiply the 2nd height by a factor of 2 I assume for interlaced 
 # support.
-CURRENT_MODE=$( cat ${FILE_MODE} )
-if [[ "${CURRENT_MODE}" == "${MODE}" ]]; then
+CURRENT_SIZE="$( fbset -fb /dev/fb${max_fb} | grep geometry | cut -d' ' -f2-3 )"
+NEW_SIZE="${FBW} ${FBH}"
+if [[ "${CURRENT_SIZE}" != "${NEW_SIZE}" ]]; then
+	emuelec-utils blank_buffer
   echo "SET MAIN FRAME BUFFER"
-  set_main_framebuffer ${FBW} ${FBH}
-  blank_buffer
+  set_main_framebuffer ${FBW} ${FBH} 
 fi
 
 # Now that the primary buffer has been acquired we blank it again because the new
@@ -214,10 +239,12 @@ if [[ -f "/storage/.config/${MODE}_offsets" ]]; then
   CUSTOM_OFFSETS=( $( cat "/storage/.config/${MODE}_offsets" ) )
 fi
 
-OFFSET_SETTING="$(get_ee_setting ${ES_MODE}framebuffer_border.${MODE} ${PLATFORM})"
+OFFSET_SETTING=$(get_ee_setting ${ES_MODE}framebuffer_border "${PLATFORM}" "${ROMNAME}")
 #[[ -z "${OFFSET_SETTING}" ]] && OFFSET_SETTING="$(get_ee_setting ${MODE}.ee_offsets)"
 if [[ ! -z "${OFFSET_SETTING}" ]]; then
   CUSTOM_OFFSETS=( ${OFFSET_SETTING} )
+	CUSTOM_OFFSETS[2]=$(( ${PSW} - CUSTOM_OFFSETS[2] - 1 ))
+	CUSTOM_OFFSETS[3]=$(( ${PSH} - CUSTOM_OFFSETS[3] - 1 ))
 fi
 
 # Now that the primary buffer has been acquired we blank it again because the new
@@ -271,3 +298,4 @@ if [[ ! -z "${BORDER_VALS}" ]]; then
 	set_fb_borders ${A1} ${A2} ${A3} ${A4}
 fi
 # End Legacy code
+

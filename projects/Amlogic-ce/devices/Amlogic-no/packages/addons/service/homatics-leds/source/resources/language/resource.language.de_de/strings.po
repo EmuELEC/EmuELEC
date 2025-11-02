@@ -1,0 +1,74 @@
+# Kodi Media Center language file
+# Addon Name: Homatics LED setup
+# Addon id: service.homatics-leds
+# Addon Provider: Team CoreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#32000"
+msgid "LED"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Effect color"
+msgstr "Farbe des Effekts"
+
+msgctxt "#32002"
+msgid "Effect or solid"
+msgstr "Effekt oder Einfarbig"
+
+msgctxt "#32003"
+msgid "Color by name or hex"
+msgstr "Farbe nach Name oder HEX"
+
+msgctxt "#32004"
+msgid "Solid color On"
+msgstr "LED-Farbe: Eingeschaltet"
+
+msgctxt "#32005"
+msgid "Solid color Off"
+msgstr "LED-Farbe: Ausgeschaltet"
+
+msgctxt "#32006"
+msgid "Solid color Suspend"
+msgstr "LED-Farbe: Schlafmodus"
+
+msgctxt "#32007"
+msgid "Number of LEDs On"
+msgstr "Anzahl der eingeschalteten LEDs"
+
+msgctxt "#32009"
+msgid "Set red Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Rot"
+
+msgctxt "#32010"
+msgid "Set blue Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Blau"
+
+msgctxt "#32011"
+msgid "Set green Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Grün"
+
+msgctxt "#32012"
+msgid "Set purple Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Lila"
+
+msgctxt "#32013"
+msgid "Set yellow Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Gelb"
+
+msgctxt "#32014"
+msgid "Set deepblue Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Tiefblau"
+
+msgctxt "#32015"
+msgid "Set magenta Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Magenta"
+
+msgctxt "#32016"
+msgid "Set orange Knight Rider effect"
+msgstr "Knight-Rider-Effekt: Orange"
+
+msgctxt "#32017"
+msgid "Set straight purple color"
+msgstr "Einfarbige Farbe: Lila"

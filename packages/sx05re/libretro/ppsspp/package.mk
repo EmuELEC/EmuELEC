@@ -32,6 +32,10 @@ PKG_PATCH_DIRS+=" $(get_pkg_directory PPSSPPSDL)/patches"
 PKG_LIBNAME="ppsspp_libretro.so"
 PKG_LIBPATH="lib/${PKG_LIBNAME}"
 
+post_unpack() {
+  ( cd "${PKG_BUILD}" && git submodule update --init --recursive )
+}
+
 pre_configure_target() {
   PKG_CMAKE_OPTS_TARGET="-DLIBRETRO=ON \
                          -DUSE_SYSTEM_FFMPEG=ON \

@@ -19,12 +19,12 @@
 ################################################################################
 
 PKG_NAME="gearcoleco"
-PKG_VERSION="bb89079d3469cac81a1ce683d19ed396317ae99e"
-PKG_SHA256="f3f4b1fb7d32030a4c11e335e7e6b224234dfe62e9d7747ab6dc6ce84710175f"
+PKG_VERSION="d76579dba9daad6e0898997c2bec47cdba9aecf9"
+PKG_SHA256="7bfd060601ebc48cc4cabc5419552477424b1f029888e84ce48702ef7555d270"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
-PKG_SITE="https://github.com/drhelius/Gearcoleco/"
+PKG_SITE="https://github.com/drhelius/Gearcoleco"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="libretro"

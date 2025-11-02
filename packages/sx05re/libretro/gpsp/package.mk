@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="gpsp"
-PKG_VERSION="092c5144827ee3ac07a6af9276244221c303ca41"
+PKG_VERSION="74db5e5c73020626a1118b97d3735b5636d65d9d"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/gpsp"
 PKG_URL="${PKG_SITE}.git"

@@ -25,7 +25,7 @@ fi
 
 # Double check if required fmod files are installed, because why not. 
 if [[ ! -f "${gamedir}/libs/libfmod.so.13" ]] || [[ ! -f "${gamedir}/libs/libfmodstudio.so.13" ]]; then
-    text_viewer -e -w -t "ERROR!" -f 24 -m "Fmod does not exist on ${gamedir}/libs\n\nYou need to provide the fmodengine files from https://www.fmod.com/ then copy the file fmodstudioapi20206linux.tar.gz to ${gamedir}"
+    text_viewer -e -w -t "ERROR!" -f 24 -m "Fmod does not exist on ${gamedir}/libs\n\nYou need to provide the fmodengine files from https://www.fmod.com/ then copy the file fmodstudioapi20216linux.tar.gz to ${gamedir}"
     exit 0
 fi
 

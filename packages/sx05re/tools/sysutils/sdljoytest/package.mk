@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="sdljoytest"
-PKG_VERSION="5db1610df52ccdaf10c20dad1b7fa9e339429bb0"
-PKG_SHA256="1923152054ab61f7ebc329c78af25fd49e4f53391c7068f40256ac3d01831f7d"
+PKG_VERSION="2daaf52122303197bfb6502a73280cfa65fe0524"
+PKG_SHA256="ff45b1677361e4fd361c1372c4804f1a8eca1dade048b4f9f32126d2cdc9dfd9"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/EmuELEC/sdljoytest"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
