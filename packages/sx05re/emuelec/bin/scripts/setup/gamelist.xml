@@ -44,7 +44,7 @@
 	</game>
 	<game>
 		<path>./macrorun.sh</path>
-		<name>Macro Runner</name>
+		<name>Macro Enabler</name>
 		<desc>Runs the pre-defined macro when the trigger button is pressed. To stop and remove the macro from memory, press the trigger button for 3-5 seconds.</desc>
 		<developer>worstcase_scenario </developer>
 		<genre>script</genre>

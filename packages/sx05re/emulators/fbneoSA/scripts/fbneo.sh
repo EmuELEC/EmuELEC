@@ -56,6 +56,5 @@ sed -i "s|szAppRomPaths\[0\].*|szAppRomPaths\[0\] ${DIR}/|" /emuelec/configs/fbn
 export LIBGL_NOBANNER=1
 export LIBGL_SILENTSTUB=1
 
-fbneo -joy -fullscreen "${ROM}" ${EXTRAOPTS} >> /emuelec/logs/emuelec.log 2>&1 &
-fbfix
-wait
+fbfix $( emuelec-utils getmainfb )
+fbneo -joy -fullscreen "${ROM}" ${EXTRAOPTS} >> /emuelec/logs/emuelec.log 2>&1

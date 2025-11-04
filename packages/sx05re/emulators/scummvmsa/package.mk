@@ -2,13 +2,13 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="scummvmsa"
-PKG_VERSION="ae848a551e9a0a68621bc4c3786468f836299f79"
-PKG_SHA256="a265341667dac08696067f7735a3e9f9874948b46b0c04000bfd9bf170afed42"
+PKG_VERSION="0d62e946497ec9fc432750734e94a7333db0963c"
+PKG_SHA256="475c50fc5af385db6a0f42db9b051abb871f2c3c6d36822f036803facd5b75a3"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/scummvm/scummvm"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_net freetype fluidsynth-git libmad"
+PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_net freetype fluidsynth-git libmad timidity"
 PKG_SHORTDESC="Script Creation Utility for Maniac Mansion Virtual Machine"
 PKG_LONGDESC="ScummVM is a program which allows you to run certain classic graphical point-and-click adventure games, provided you already have their data files."
 
@@ -28,6 +28,7 @@ pre_configure_target() {
                          --enable-release \
                          --enable-engine=xeen \
                          --enable-engine=mm \
+                         --enable-engine=adl,testbed,scumm,scumm_7_8,grim,monkey4,mohawk,myst,riven,sci32,agos2,sword2,drascula,sky,lure,queen,testbed,director,stark \
                          --prefix=/usr/local"
 }
 

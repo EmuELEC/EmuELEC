@@ -13,11 +13,11 @@ index 87d693e8d..891d588c4 100644
          /* Save the SDL error set by SDL_EGL_MakeCurrent */
 --- a/src/video/kmsdrm/SDL_kmsdrmopengles.c
 +++ b/src/video/kmsdrm/SDL_kmsdrmopengles.c
-@@ -41,11 +41,17 @@ KMSDRM_GLES_DefaultProfileConfig(_THIS, int *mask, int *major, int *minor)
+@@ -41,11 +41,17 @@
  {
      /* if SDL was _also_ built with the Raspberry Pi driver (so we're
         definitely a Pi device), default to GLES2. */
--#if SDL_VIDEO_DRIVER_RPI
+-#ifdef SDL_VIDEO_DRIVER_RPI
 -    *mask = SDL_GL_CONTEXT_PROFILE_ES;
 -    *major = 2;
 -    *minor = 0;
@@ -34,10 +34,10 @@ index 87d693e8d..891d588c4 100644
 +    }
  }
  
- int
-@@ -72,6 +78,7 @@ SDL_EGL_CreateContext_impl(KMSDRM)
- 
- int KMSDRM_GLES_SetSwapInterval(_THIS, int interval) {
+ int KMSDRM_GLES_LoadLibrary(_THIS, const char *path)
+@@ -73,6 +79,7 @@
+     int KMSDRM_GLES_SetSwapInterval(_THIS, int interval)
+ {
  
 +  interval = 1;
      if (!_this->egl_data) {

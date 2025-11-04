@@ -3,7 +3,6 @@
 
 PKG_NAME="PPSSPPSDL"
 PKG_VERSION="f8261ae7ff93baa30f94214965547ed0f124da14"
-CHEAT_DB_VERSION="06d4d6148b66109005f7d51c37e8344f0bc042cc"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -50,8 +49,16 @@ makeinstall_target() {
     ln -sf /storage/.config/ppsspp/assets ${INSTALL}/usr/bin/assets
     mkdir -p ${INSTALL}/usr/config/ppsspp/
     cp -r `find . -name "assets" | xargs echo` ${INSTALL}/usr/config/ppsspp/
+    
     cp -rf ${PKG_DIR}/config/* ${INSTALL}/usr/config/ppsspp/
+    
     rm ${INSTALL}/usr/config/ppsspp/assets/gamecontrollerdb.txt
     ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt ${INSTALL}/usr/config/ppsspp/assets/gamecontrollerdb.txt
-    curl -Lo ${INSTALL}/usr/config/ppsspp/PSP/Cheats/cheat.db https://raw.githubusercontent.com/Saramagrean/CWCheat-Database-Plus-/${CHEAT_DB_VERSION}/cheat.db
+    
+# redirect some of PSP folders to /storage/roms to keep all the saves and custom files
+   mkdir -p "${INSTALL}/usr/config/ppsspp/PSP"    
+   
+for dir in Cheats PPSSPP_STATE SAVEDATA TEXTURES; do
+		ln -sf "/storage/roms/savestates/PPSSPPSDL/PSP/${dir}" "${INSTALL}/usr/config/ppsspp/PSP/${dir}"
+done
 } 

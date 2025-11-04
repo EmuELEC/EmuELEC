@@ -44,14 +44,14 @@ switch_resolution()
 
   # Here we first clear the primary display buffer of leftover artifacts then set
   # the secondary small buffers flag to stop copying across.
-  blank_buffer >> /dev/null
-
+	echo 1 > /sys/class/graphics/fb${max_fb}/blank
   case ${MODE} in
     480cvbs|576cvbs|480p*|480i*|576p*|720p*|1080p*|1440p*|2160p*|576i*|720i*|1080i*|1440i*|2160i*|*x*)
       echo null > "${FILE_MODE}"
       sleep 1
       echo ${MODE} > "${FILE_MODE}"
   esac
+	echo 0 > /sys/class/graphics/fb${max_fb}/blank
 	NEW_MODE=$( cat ${FILE_MODE} )
 	[[ "${NEW_MODE}" != "${MODE}" ]] && exit 1
 }
@@ -159,10 +159,6 @@ fi
 FBW=0
 FBH=0
 
-# Here we first clear the primary display buffer of leftover artifacts then set
-# the secondary small buffers flag to stop copying across.
-blank_buffer >> /dev/null
-
 # The current display mode before it may get changed below.
 OLD_MODE=$( cat ${FILE_MODE} )
 
@@ -174,7 +170,8 @@ BUFF=$(get_ee_setting ee_video_fb1_size)
 [[ -z "${BUFF}" ]] && BUFF=32
 
 if [[ -n "${BUFF}" ]] && [[ ${BUFF} > 0 ]]; then
-  fbset -fb /dev/fb1 -g ${BUFF} ${BUFF} ${BUFF} ${BUFF} ${BPP}
+	[[ "${max_fb}" == 0 ]] && fbset -fb /dev/fb1 -g ${BUFF} ${BUFF} ${BUFF} ${BUFF} ${BPP}
+	[[ "${max_fb}" == 1 ]] && fbset -fb /dev/fb0 -g ${BUFF} ${BUFF} ${BUFF} ${BUFF} ${BPP}
 fi
 
 # This is needed to reset scaling.
@@ -203,10 +200,10 @@ if [[ ! -z "${CUSTOM_RES}" ]]; then
   fi
 fi
 
-
-[[ ${OLD_MODE} != ${MODE} ]] && switch_resolution ${MODE}
+if [[ ${OLD_MODE} != ${MODE} ]]; then
+	switch_resolution ${MODE}
+fi
 MODE=$( cat ${FILE_MODE} )
-
 
 declare -a SIZE=($( get_resolution_size ${MODE} ${FBW} ${FBH}))
 
@@ -223,11 +220,12 @@ fi
 # Once we know the Width and Height is valid numbers we set the primary display
 # buffer, and we multiply the 2nd height by a factor of 2 I assume for interlaced 
 # support.
-CURRENT_MODE=$( cat ${FILE_MODE} )
-if [[ "${CURRENT_MODE}" == "${MODE}" ]]; then
+CURRENT_SIZE="$( fbset -fb /dev/fb${max_fb} | grep geometry | cut -d' ' -f2-3 )"
+NEW_SIZE="${FBW} ${FBH}"
+if [[ "${CURRENT_SIZE}" != "${NEW_SIZE}" ]]; then
+	emuelec-utils blank_buffer
   echo "SET MAIN FRAME BUFFER"
   set_main_framebuffer ${FBW} ${FBH} 
-  blank_buffer
 fi
 
 # Now that the primary buffer has been acquired we blank it again because the new

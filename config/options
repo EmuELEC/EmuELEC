@@ -27,7 +27,7 @@ DISTRO="${DISTRO:-EmuELEC}"
 export PROJECT="${PROJECT:-Amlogic-ce}"
 
 # determines DEVICE, if not forced by user
-export DEVICE="${DEVICE:-Amlogic-no}"
+export DEVICE="${DEVICE:-Amlogic-ng}"
 
 # default to Generic device if building Generic project without device set
 if [ "${PROJECT}" = "Generic" -a -z "${DEVICE}" ]; then

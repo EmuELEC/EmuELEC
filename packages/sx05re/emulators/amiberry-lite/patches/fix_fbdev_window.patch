@@ -1,0 +1,700 @@
+From 4a2a96134121d857099461ac27de15a848baaece Mon Sep 17 00:00:00 2001
+From: Adventurous Programmer <47227694+Diegrosan@users.noreply.github.com>
+Date: Mon, 13 Oct 2025 22:25:33 -0300
+Subject: [PATCH] Update main_window.cpp
+
+---
+ src/osdep/gui/main_window.cpp | 369 +++++++++++++++++++++++++++-------
+ 1 file changed, 291 insertions(+), 78 deletions(-)
+
+diff --git a/src/osdep/gui/main_window.cpp b/src/osdep/gui/main_window.cpp
+index b464a011..ae0ea703 100644
+--- a/src/osdep/gui/main_window.cpp
++++ b/src/osdep/gui/main_window.cpp
+@@ -26,6 +26,15 @@
+ #include "inputdevice.h"
+ #include "xwin.h"
+ 
++static bool fbdev_detected = false;
++static bool reusing_amiga_resources = false;
++
++static gcn::Widget* widget_before_modal = nullptr;
++static int gui_top_children_count = -1;
++static int frames_after_modal = 0;
++static bool waiting_for_modal_close = false;
++static int frames_waiting_for_close = 0;
++
+ bool ctrl_state = false, shift_state = false, alt_state = false, win_state = false;
+ int last_x = 0;
+ int last_y = 0;
+@@ -246,6 +255,12 @@ void update_gui_screen()
+ {
+ 	const AmigaMonitor* mon = &AMonitors[0];
+ 
++	if (!gui_texture || !gui_screen || !mon->gui_renderer)
++	{
++		write_log("WARNING: update_gui_screen called with null pointers!\n");
++		return;
++	}
++
+ 	SDL_UpdateTexture(gui_texture, nullptr, gui_screen->pixels, gui_screen->pitch);
+ 	if (amiberry_options.rotation_angle == 0 || amiberry_options.rotation_angle == 180)
+ 		gui_renderQuad = { 0, 0, gui_screen->w, gui_screen->h };
+@@ -259,23 +274,70 @@ void update_gui_screen()
+ 		show_screen(0, 0);
+ }
+ 
++
+ void amiberry_gui_init()
+ {
+ 	AmigaMonitor* mon = &AMonitors[0];
+ 	sdl_video_driver = SDL_GetCurrentVideoDriver();
+ 
+-	if (sdl_video_driver != nullptr && strcmpi(sdl_video_driver, "KMSDRM") == 0)
++	write_log("=== GUI INIT START ===\n");
++	write_log("SDL Video Driver: %s\n", sdl_video_driver ? sdl_video_driver : "NULL");
++	write_log("amiga_window exists: %s\n", mon->amiga_window ? "YES" : "NO");
++	write_log("amiga_renderer exists: %s\n", mon->amiga_renderer ? "YES" : "NO");
++	write_log("gui_window exists: %s\n", mon->gui_window ? "YES" : "NO");
++	write_log("gui_renderer exists: %s\n", mon->gui_renderer ? "YES" : "NO");
++
++	reusing_amiga_resources = false;  // Reset
++
++	if (sdl_video_driver != nullptr)
+ 	{
+-		kmsdrm_detected = true;
+-		if (!mon->gui_window && mon->amiga_window)
++		if (strcmpi(sdl_video_driver, "KMSDRM") == 0)
+ 		{
+-			mon->gui_window = mon->amiga_window;
++			write_log("KMSDRM detected\n");
++			kmsdrm_detected = true;
++			fbdev_detected = false;
++			
++			if (!mon->gui_window && mon->amiga_window)
++			{
++				mon->gui_window = mon->amiga_window;
++				reusing_amiga_resources = true;
++				write_log("Reusing amiga_window for GUI (KMSDRM)\n");
++			}
++			if (!mon->gui_renderer && mon->amiga_renderer)
++			{
++				mon->gui_renderer = mon->amiga_renderer;
++				reusing_amiga_resources = true;
++				write_log("Reusing amiga_renderer for GUI (KMSDRM)\n");
++			}
+ 		}
+-		if (!mon->gui_renderer && mon->amiga_renderer)
++		else if (strcmpi(sdl_video_driver, "fbdev") == 0 || 
++		         strstr(sdl_video_driver, "mali") != nullptr)
+ 		{
+-			mon->gui_renderer = mon->amiga_renderer;
++			write_log("fbdev/mali detected\n");
++			fbdev_detected = true;
++			kmsdrm_detected = true;  // Para compatibilidade
++			
++			if (!mon->gui_window && mon->amiga_window)
++			{
++				mon->gui_window = mon->amiga_window;
++				reusing_amiga_resources = true;
++				write_log("Reusing amiga_window for GUI (fbdev)\n");
++			}
++			if (!mon->gui_renderer && mon->amiga_renderer)
++			{
++				mon->gui_renderer = mon->amiga_renderer;
++				reusing_amiga_resources = true;
++				write_log("Reusing amiga_renderer for GUI (fbdev)\n");
++			}
++		}
++		else
++		{
++			write_log("Standard video driver: %s\n", sdl_video_driver);
++			kmsdrm_detected = false;
++			fbdev_detected = false;
+ 		}
+ 	}
++	
+ 	SDL_GetCurrentDisplayMode(0, &sdl_mode);
+ 
+ 	//-------------------------------------------------
+@@ -285,23 +347,22 @@ void amiberry_gui_init()
+ 	{
+ 		gui_screen = SDL_CreateRGBSurface(0, GUI_WIDTH, GUI_HEIGHT, 16, 0, 0, 0, 0);
+ 		check_error_sdl(gui_screen == nullptr, "Unable to create GUI surface:");
++		write_log("GUI surface created\n");
+ 	}
+ 
+ 	if (!mon->gui_window)
+ 	{
+-		write_log("Creating Amiberry GUI window...\n");
++		write_log("Creating new Amiberry GUI window...\n");
+ 		regqueryint(nullptr, _T("GUIPosX"), &gui_window_rect.x);
+ 		regqueryint(nullptr, _T("GUIPosY"), &gui_window_rect.y);
+ 
+         Uint32 mode;
+ 		if (!kmsdrm_detected)
+ 		{
+-			// Only enable Windowed mode if we're running under x11
+ 			mode = SDL_WINDOW_RESIZABLE;
+ 		}
+ 		else
+ 		{
+-			// otherwise go for Full-window
+ 			mode = SDL_WINDOW_FULLSCREEN_DESKTOP;
+ 		}
+ 
+@@ -311,14 +372,13 @@ void amiberry_gui_init()
+             mode |= SDL_WINDOW_HIDDEN;
+         else
+             mode |= SDL_WINDOW_SHOWN;
+-		// Set Window allow high DPI by default
+ 		mode |= SDL_WINDOW_ALLOW_HIGHDPI;
+ 
+         if (amiberry_options.rotation_angle == 0 || amiberry_options.rotation_angle == 180)
+         {
+ 			mon->gui_window = SDL_CreateWindow("Amiberry GUI",
+-				gui_window_rect.x != 0 ? gui_window_rect.x : SDL_WINDOWPOS_CENTERED,
+-				gui_window_rect.y != 0 ? gui_window_rect.y : SDL_WINDOWPOS_CENTERED,
++				gui_window_rect.x,
++				gui_window_rect.y,
+ 				gui_window_rect.w,
+ 				gui_window_rect.h,
+ 				mode);
+@@ -326,13 +386,14 @@ void amiberry_gui_init()
+         else
+         {
+ 			mon->gui_window = SDL_CreateWindow("Amiberry GUI",
+-				gui_window_rect.y != 0 ? gui_window_rect.y : SDL_WINDOWPOS_CENTERED,
+-				gui_window_rect.x != 0 ? gui_window_rect.x : SDL_WINDOWPOS_CENTERED,
++				gui_window_rect.y,
++				gui_window_rect.x,
+ 				gui_window_rect.h,
+ 				gui_window_rect.w,
+ 				mode);
+         }
+         check_error_sdl(mon->gui_window == nullptr, "Unable to create window:");
++		write_log("New GUI window created\n");
+ 
+ 		auto* const icon_surface = IMG_Load(prefix_with_data_path("amiberry.png").c_str());
+ 		if (icon_surface != nullptr)
+@@ -341,16 +402,23 @@ void amiberry_gui_init()
+ 			SDL_FreeSurface(icon_surface);
+ 		}
+ 	}
+-	else if (kmsdrm_detected)
++	else
+ 	{
+-		SDL_SetWindowSize(mon->gui_window, GUI_WIDTH, GUI_HEIGHT);
++		write_log("Using existing window for GUI\n");
+ 	}
+ 
+ 	if (mon->gui_renderer == nullptr)
+ 	{
++		write_log("Creating new GUI renderer...\n");
+ 		mon->gui_renderer = SDL_CreateRenderer(mon->gui_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+ 		check_error_sdl(mon->gui_renderer == nullptr, "Unable to create a renderer:");
++		write_log("New GUI renderer created\n");
++	}
++	else
++	{
++		write_log("Using existing renderer for GUI\n");
+ 	}
++	
+ 	DPIHandler::set_render_scale(mon->gui_renderer);
+ 
+ 	gui_texture = SDL_CreateTexture(mon->gui_renderer, gui_screen->format->format, SDL_TEXTUREACCESS_STREAMING, gui_screen->w,
+@@ -364,31 +432,34 @@ void amiberry_gui_init()
+ 
+ 	SDL_SetRelativeMouseMode(SDL_FALSE);
+ 	SDL_ShowCursor(SDL_ENABLE);
+-
+ 	SDL_RaiseWindow(mon->gui_window);
+ 
+ 	//-------------------------------------------------
+ 	// Create helpers for GUI framework
+ 	//-------------------------------------------------
+-
+ 	gui_imageLoader = new gcn::SDLImageLoader();
+ 	gui_imageLoader->setRenderer(mon->gui_renderer);
+-
+-	// The ImageLoader in use is static and must be set to be
+-	// able to load images
+ 	gcn::Image::setImageLoader(gui_imageLoader);
++	
+ 	gui_graphics = new gcn::SDLGraphics();
+-	// Set the target for the graphics object to be the screen.
+-	// In other words, we will draw to the screen.
+-	// Note, any surface will do, it doesn't have to be the screen.
+ 	gui_graphics->setTarget(gui_screen);
++	
+ 	gui_input = new gcn::SDLInput();
++	
++	write_log("=== GUI INIT COMPLETE ===\n");
++	write_log("Reusing amiga resources: %s\n", reusing_amiga_resources ? "YES" : "NO");
+ }
+ 
+ void amiberry_gui_halt()
+ {
+ 	AmigaMonitor* mon = &AMonitors[0];
+ 
++	write_log("=== GUI HALT START ===\n");
++	write_log("Reusing amiga resources: %s\n", reusing_amiga_resources ? "YES" : "NO");
++	write_log("fbdev_detected: %s\n", fbdev_detected ? "YES" : "NO");
++	write_log("kmsdrm_detected: %s\n", kmsdrm_detected ? "YES" : "NO");
++
++	// Clear GUI helpers
+ 	delete gui_imageLoader;
+ 	gui_imageLoader = nullptr;
+ 	delete gui_input;
+@@ -396,30 +467,135 @@ void amiberry_gui_halt()
+ 	delete gui_graphics;
+ 	gui_graphics = nullptr;
+ 
++	// Clear GUI surface
+ 	if (gui_screen != nullptr)
+ 	{
+ 		SDL_FreeSurface(gui_screen);
+ 		gui_screen = nullptr;
++		write_log("GUI screen freed\n");
+ 	}
++	
++	// Clear GUI texture
+ 	if (gui_texture != nullptr)
+ 	{
+ 		SDL_DestroyTexture(gui_texture);
+ 		gui_texture = nullptr;
++		write_log("GUI texture destroyed\n");
+ 	}
+-	if (mon->gui_renderer && !kmsdrm_detected)
++	
++	// CRITICAL: Deciding what to do with renderer and window
++	if (reusing_amiga_resources)
+ 	{
+-		SDL_DestroyRenderer(mon->gui_renderer);
++		
++		write_log("Releasing (not destroying) renderer and window - they belong to emulation\n");
++		
++		// IMPORTANT: Reset logical size for the game
++		if (mon->gui_renderer)
++		{
++			SDL_RenderClear(mon->gui_renderer);
++			SDL_RenderPresent(mon->gui_renderer);
++		}
++		
++		// DO NOT destroy, just "release" the pointers
+ 		mon->gui_renderer = nullptr;
++		mon->gui_window = nullptr;
+ 	}
++	else
++	{
++		// created own resources, we destroy normally
++		write_log("Destroying GUI-owned renderer and window\n");
++		
++		if (mon->gui_renderer)
++		{
++			SDL_DestroyRenderer(mon->gui_renderer);
++			mon->gui_renderer = nullptr;
++			write_log("GUI renderer destroyed\n");
++		}
+ 
+-	if (mon->gui_window && !kmsdrm_detected) {
+-		regsetint(nullptr, _T("GUIPosX"), gui_window_rect.x);
+-		regsetint(nullptr, _T("GUIPosY"), gui_window_rect.y);
+-		SDL_DestroyWindow(mon->gui_window);
+-		mon->gui_window = nullptr;
++		if (mon->gui_window)
++		{
++			regsetint(nullptr, _T("GUIPosX"), gui_window_rect.x);
++			regsetint(nullptr, _T("GUIPosY"), gui_window_rect.y);
++			SDL_DestroyWindow(mon->gui_window);
++			mon->gui_window = nullptr;
++			write_log("GUI window destroyed\n");
++		}
+ 	}
++	
++	write_log("=== GUI HALT COMPLETE ===\n");
+ }
+ 
++
++
++// ============================================================
++// ADICIONE ESTAS FUNÇÕES AUXILIARES 
++// (antes da função check_input)
++// ============================================================
++
++void restore_input_after_modal()
++{
++	const AmigaMonitor* mon = &AMonitors[0];
++	
++	write_log("=== MODAL CLOSED - Restoring input ===\n");
++	
++	// Limpar TODOS os eventos pendentes da fila
++	SDL_Event event;
++	int cleared = 0;
++	while (SDL_PollEvent(&event))
++	{
++		cleared++;
++	}
++	write_log("Cleared %d pending events\n", cleared);
++	
++	// Resetar todos os estados
++	ctrl_state = false;
++	shift_state = false;
++	alt_state = false;
++	win_state = false;
++	last_x = 0;
++	last_y = 0;
++	
++	// Garantir que mouse está visível e configurado
++	SDL_SetRelativeMouseMode(SDL_FALSE);
++	SDL_ShowCursor(SDL_ENABLE);
++	
++	// Elevar e focar a janela GUI
++	if (mon->gui_window)
++	{
++		SDL_RaiseWindow(mon->gui_window);
++		SDL_SetWindowInputFocus(mon->gui_window);
++		write_log("Window raised and focused\n");
++	}
++	
++	// Pequeno delay para estabilizar
++	SDL_Delay(50);
++	
++	// Limpar eventos novamente após o delay
++	while (SDL_PollEvent(&event)) { }
++	
++	// Restaurar foco no widget ou no painel ativo
++	if (widget_before_modal && widget_before_modal->isVisible())
++	{
++		widget_before_modal->requestFocus();
++		write_log("Focus restored to saved widget\n");
++	}
++	else if (categories[last_active_panel].selector)
++	{
++		categories[last_active_panel].selector->requestFocus();
++		write_log("Focus restored to panel selector\n");
++	}
++	
++	widget_before_modal = nullptr;
++	frames_after_modal = 5; // Aguardar alguns frames
++	
++	write_log("=== Input restoration complete ===\n");
++}
++
++
++// ============================================================
++// SUBSTITUA A FUNÇÃO check_input() COMPLETA POR ESTA VERSÃO
++// ============================================================
++
+ void check_input()
+ {
+ 	const AmigaMonitor* mon = &AMonitors[0];
+@@ -428,8 +604,67 @@ void check_input()
+ 	didata* did = &di_joystick[0];
+ 	didata* existing_did;
+ 	
++	// Detectar mudanças no número de widgets filhos (indica modal abrindo/fechando)
++	if (uae_gui && gui_top)
++	{
++		const auto& children = gui_top->getChildren();
++		int current_count = children.size();
++		
++		// Primeira vez - apenas inicializar
++		if (gui_top_children_count == -1)
++		{
++			gui_top_children_count = current_count;
++			write_log("GUI initialized with %d children\n", current_count);
++		}
++		// Se número de filhos aumentou significativamente, modal abriu
++		else if (current_count > gui_top_children_count + 1)
++		{
++			write_log("Child count increased from %d to %d - MODAL OPENED\n", 
++			          gui_top_children_count, current_count);
++			
++			// Salvar widget com foco
++			focusHdl = gui_top->_getFocusHandler();
++			if (focusHdl)
++			{
++				widget_before_modal = focusHdl->getFocused();
++				write_log("Saved focus widget before modal\n");
++			}
++			waiting_for_modal_close = true;
++		}
++		// Se estava esperando modal fechar E o número diminuiu
++		else if (waiting_for_modal_close && current_count < gui_top_children_count)
++		{
++			write_log("Child count decreased from %d to %d - MODAL CLOSED\n", 
++			          gui_top_children_count, current_count);
++			restore_input_after_modal();
++			waiting_for_modal_close = false;
++		}
++		
++		gui_top_children_count = current_count;
++	}
++	
++	// Se estamos em período de estabilização após modal, decrementar
++	if (frames_after_modal > 0)
++	{
++		frames_after_modal--;
++		if (frames_after_modal == 0)
++		{
++			write_log("Stabilization period finished\n");
++		}
++	}
++	
+ 	while (SDL_PollEvent(&gui_event))
+ 	{
++		// Durante estabilização, descartar eventos de entrada do joystick/teclado
++		if (frames_after_modal > 0 && 
++		    (gui_event.type == SDL_KEYDOWN || 
++		     gui_event.type == SDL_JOYBUTTONDOWN ||
++		     gui_event.type == SDL_JOYHATMOTION))
++		{
++			write_log("Discarding input during stabilization\n");
++			continue;
++		}
++		
+ 		switch (gui_event.type)
+ 		{
+ 		case SDL_WINDOWEVENT:
+@@ -445,6 +680,16 @@ void check_input()
+ 					gui_window_rect.w = gui_event.window.data1;
+ 					gui_window_rect.h = gui_event.window.data2;
+ 					break;
++				case SDL_WINDOWEVENT_FOCUS_GAINED:
++					write_log("Window focus gained\n");
++					if (mon->gui_window)
++					{
++						SDL_SetWindowInputFocus(mon->gui_window);
++					}
++					break;
++				case SDL_WINDOWEVENT_FOCUS_LOST:
++					write_log("Window focus lost\n");
++					break;
+ 				default: 
+ 					break;
+ 				}
+@@ -454,15 +699,11 @@ void check_input()
+ 		
+ 		case SDL_QUIT:
+ 			got_event = 1;
+-			//-------------------------------------------------
+-			// Quit entire program
+-			//-------------------------------------------------
+ 			uae_quit();
+ 			gui_running = false;
+ 			break;
+ 
+ 		case SDL_JOYDEVICEADDED:
+-			// Check if we need to re-import joysticks
+ 			existing_did = &di_joystick[gui_event.jdevice.which];
+ 			if (existing_did->guid.empty())
+ 			{
+@@ -472,6 +713,7 @@ void check_input()
+ 				RefreshPanelInput();
+ 			}
+ 			return;
++			
+ 		case SDL_JOYDEVICEREMOVED:
+ 			write_log("GUI: SDL2 Controller/Joystick removed, re-running import joysticks...\n");
+ 			if (inputdevice_devicechange(&currprefs))
+@@ -495,16 +737,10 @@ void check_input()
+ 				{
+ 					if (emulating && cmdStart->isEnabled())
+ 					{
+-						//------------------------------------------------
+-						// Continue emulation
+-						//------------------------------------------------
+ 						gui_running = false;
+ 					}
+ 					else
+ 					{
+-						//------------------------------------------------
+-						// First start of emulator -> reset Amiga
+-						//------------------------------------------------
+ 						uae_reset(0, 1);
+ 						gui_running = false;
+ 					}
+@@ -512,18 +748,17 @@ void check_input()
+ 				else if (SDL_JoystickGetButton(gui_joystick, did->mapping.button[SDL_CONTROLLER_BUTTON_DPAD_UP]) || hat & SDL_HAT_UP)
+ 				{
+ 					if (handle_navigation(DIRECTION_UP))
+-						continue; // Don't change value when enter Slider -> don't send event to control
++						continue;
+ 					PushFakeKey(SDLK_UP);
+ 					break;
+ 				}
+ 				else if (SDL_JoystickGetButton(gui_joystick, did->mapping.button[SDL_CONTROLLER_BUTTON_DPAD_DOWN]) || hat & SDL_HAT_DOWN)
+ 				{
+ 					if (handle_navigation(DIRECTION_DOWN))
+-						continue; // Don't change value when enter Slider -> don't send event to control
++						continue;
+ 					PushFakeKey(SDLK_DOWN);
+ 					break;
+ 				}
+-
+ 				else if ((did->mapping.is_retroarch || !did->is_controller)
+ 					&& SDL_JoystickGetButton(gui_joystick, did->mapping.button[SDL_CONTROLLER_BUTTON_LEFTSHOULDER])
+ 					|| SDL_GameControllerGetButton(did->controller,
+@@ -544,18 +779,17 @@ void check_input()
+ 						PushFakeKey(SDLK_DOWN);
+ 					}
+ 				}
+-
+ 				else if (SDL_JoystickGetButton(gui_joystick, did->mapping.button[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]) || hat & SDL_HAT_RIGHT)
+ 				{
+ 					if (handle_navigation(DIRECTION_RIGHT))
+-						continue; // Don't change value when enter Slider -> don't send event to control
++						continue;
+ 					PushFakeKey(SDLK_RIGHT);
+ 					break;
+ 				}
+ 				else if (SDL_JoystickGetButton(gui_joystick, did->mapping.button[SDL_CONTROLLER_BUTTON_DPAD_LEFT]) || hat & SDL_HAT_LEFT)
+ 				{
+ 					if (handle_navigation(DIRECTION_LEFT))
+-						continue; // Don't change value when enter Slider -> don't send event to control
++						continue;
+ 					PushFakeKey(SDLK_LEFT);
+ 					break;
+ 				}
+@@ -570,22 +804,18 @@ void check_input()
+ 					PushFakeKey(SDLK_RETURN);
+ 					continue;
+ 				}
+-
+ 				else if (SDL_JoystickGetButton(gui_joystick, did->mapping.quit_button) &&
+ 					SDL_JoystickGetButton(gui_joystick, did->mapping.hotkey_button))
+ 				{
+-					// use the HOTKEY button
+ 					uae_quit();
+ 					gui_running = false;
+ 					break;
+ 				}
+-
+ 				else if ((did->mapping.is_retroarch || !did->is_controller)
+ 					&& SDL_JoystickGetButton(gui_joystick, did->mapping.button[SDL_CONTROLLER_BUTTON_GUIDE])
+ 					|| SDL_GameControllerGetButton(did->controller,
+ 						static_cast<SDL_GameControllerButton>(did->mapping.button[SDL_CONTROLLER_BUTTON_GUIDE])))
+ 				{
+-					// use the HOTKEY button
+ 					gui_running = false;
+ 				}
+ 			}
+@@ -601,14 +831,14 @@ void check_input()
+ 					{
+ 						last_x = 1;
+ 						if (handle_navigation(DIRECTION_RIGHT))
+-							continue; // Don't change value when enter Slider -> don't send event to control
++							continue;
+ 						PushFakeKey(SDLK_RIGHT);
+ 					}
+ 					else if (gui_event.jaxis.value < -joystick_dead_zone && last_x != -1)
+ 					{
+ 						last_x = -1;
+ 						if (handle_navigation(DIRECTION_LEFT))
+-							continue; // Don't change value when enter Slider -> don't send event to control
++							continue;
+ 						PushFakeKey(SDLK_LEFT);
+ 					}
+ 					else if (gui_event.jaxis.value > -joystick_dead_zone && gui_event.jaxis.value < joystick_dead_zone)
+@@ -622,14 +852,14 @@ void check_input()
+ 					{
+ 						last_y = -1;
+ 						if (handle_navigation(DIRECTION_UP))
+-							continue; // Don't change value when enter Slider -> don't send event to control
++							continue;
+ 						PushFakeKey(SDLK_UP);
+ 					}
+ 					else if (gui_event.jaxis.value > joystick_dead_zone && last_y != 1)
+ 					{
+ 						last_y = 1;
+ 						if (handle_navigation(DIRECTION_DOWN))
+-							continue; // Don't change value when enter Slider -> don't send event to control
++							continue;
+ 						PushFakeKey(SDLK_DOWN);
+ 					}
+ 					else if (gui_event.jaxis.value > -joystick_dead_zone && gui_event.jaxis.value < joystick_dead_zone)
+@@ -673,16 +903,10 @@ void check_input()
+ 				{
+ 					if (emulating && cmdStart->isEnabled())
+ 					{
+-						//------------------------------------------------
+-						// Continue emulation
+-						//------------------------------------------------
+ 						gui_running = false;
+ 					}
+ 					else
+ 					{
+-						//------------------------------------------------
+-						// First start of emulator -> reset Amiga
+-						//------------------------------------------------
+ 						uae_reset(0, 1);
+ 						gui_running = false;
+ 					}
+@@ -693,14 +917,10 @@ void check_input()
+ 				switch (gui_event.key.keysym.sym)
+ 				{
+ 				case SDLK_q:
+-					//-------------------------------------------------
+-					// Quit entire program via Q on keyboard
+-					//-------------------------------------------------
+ 					focusHdl = gui_top->_getFocusHandler();
+ 					activeWidget = focusHdl->getFocused();
+ 					if (dynamic_cast<gcn::TextField*>(activeWidget) == nullptr)
+ 					{
+-						// ...but only if we are not in a Textfield...
+ 						uae_quit();
+ 						gui_running = false;
+ 					}
+@@ -713,32 +933,29 @@ void check_input()
+ 
+ 				case VK_Green:
+ 				case VK_Blue:
+-					//------------------------------------------------
+-					// Simulate press of enter when 'X' pressed
+-					//------------------------------------------------
+ 					gui_event.key.keysym.sym = SDLK_RETURN;
+-					gui_input->pushInput(gui_event); // Fire key down
+-					gui_event.type = SDL_KEYUP; // and the key up
++					gui_input->pushInput(gui_event);
++					gui_event.type = SDL_KEYUP;
+ 					break;
+ 
+ 				case VK_UP:
+ 					if (handle_navigation(DIRECTION_UP))
+-						continue; // Don't change value when enter ComboBox -> don't send event to control
++						continue;
+ 					break;
+ 
+ 				case VK_DOWN:
+ 					if (handle_navigation(DIRECTION_DOWN))
+-						continue; // Don't change value when enter ComboBox -> don't send event to control
++						continue;
+ 					break;
+ 
+ 				case VK_LEFT:
+ 					if (handle_navigation(DIRECTION_LEFT))
+-						continue; // Don't change value when enter Slider -> don't send event to control
++						continue;
+ 					break;
+ 
+ 				case VK_RIGHT:
+ 					if (handle_navigation(DIRECTION_RIGHT))
+-						continue; // Don't change value when enter Slider -> don't send event to control
++						continue;
+ 					break;
+ 
+ 				case SDLK_F1:
+@@ -822,12 +1039,8 @@ void check_input()
+ 	
+ 	if (got_event)
+ 	{
+-		// Now we let the Gui object perform its logic.
+ 		uae_gui->logic();
+-
+ 		SDL_RenderClear(mon->gui_renderer);
+-
+-		// Now we let the Gui object draw itself.
+ 		uae_gui->draw();
+ 		update_gui_screen();
+ 	}

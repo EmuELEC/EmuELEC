@@ -55,6 +55,7 @@ PKG_CONFIGURE_OPTS_TARGET="${UTILLINUX_CONFIG_DEFAULT} \
                            --enable-fstrim \
                            --enable-blkid \
                            --enable-lsfd \
+                           --enable-lsblk \
                            --disable-setterm \
                            --with-ncursesw"
 

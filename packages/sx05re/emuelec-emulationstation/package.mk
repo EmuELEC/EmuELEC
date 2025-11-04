@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="ac84c41ab654b16c9189193512ebdbdb3e9398ee"
+PKG_VERSION="09356d0dae6291008a074d8ac4f8c20678d822d2"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -29,8 +29,9 @@ PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} Crystal"
 
 pre_configure_target() {
 
-# adding audio port for s905w2 and derivatives
-sed -i '/Audiodevices\.push_back("0,1");/a\\t\tAudiodevices.push_back("0,2");\n\t\tAudiodevices.push_back("1,2");' ${PKG_BUILD}/es-app/src/guis/GuiMenu.cpp
+# build directly in ${PKG_BUILD} to avoid Python3 errors
+  cd ${PKG_BUILD}
+  rm -rf .${TARGET_NAME}
 
 PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1 -DGLES2=1 -DENABLE_TTS=1"
 
@@ -81,6 +82,9 @@ makeinstall_target() {
 	mkdir -p ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/scripts ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/*.cfg ${INSTALL}/usr/config/emulationstation
+
+	# Generate es_systems.cfg from json
+	python3 ${PKG_DIR}/generate_es_systems.py -i ${PKG_DIR}/config/es_systems.json -o ${INSTALL}/usr/config/emulationstation/es_systems.cfg -b manufacturer
 
 	chmod +x ${INSTALL}/usr/config/emulationstation/scripts/*
 	chmod +x ${INSTALL}/usr/config/emulationstation/scripts/configscripts/*

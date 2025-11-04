@@ -157,8 +157,7 @@ else
 		STORED_VOLUME=$(get_ee_setting audio.volume)
 		[[ ! -z "$STORED_VOLUME" ]] && VOLUME=$STORED_VOLUME
 
-    amixer set 'DAC Extra Digital Gain' 0dB
-    amixer set 'DAC Digital' "$VOLUME%"
+    amixer set Master "$VOLUME%"
 fi
 
 # We need to always use the newest es_systems.cfg if there was a recent update, we also need to update the ports gamelist.xml and es_features.cfg
@@ -171,8 +170,8 @@ OLDCFG="${ESDIR}/es_systems.cfg.${BUILDATE}.bak"
 CFG="${ESDIR}/es_systems.cfg"
 
 if [[ "${CVER}" != "${NVER}" ]]; then
-    mv "/storage/.config/emuelec/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml.${BUILDATE}.bak"
-    cp -rf "/usr/bin/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml"
+    #mv "/storage/.config/emuelec/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml.${BUILDATE}.bak"
+    #cp -rf "/usr/bin/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml"
     
     mv "${ESDIR}/es_features.cfg" "${ESDIR}/es_features.cfg.${BUILDATE}.bak"
     cp -rf "/usr/config/emulationstation/es_features.cfg" "${ESDIR}/es_features.cfg"

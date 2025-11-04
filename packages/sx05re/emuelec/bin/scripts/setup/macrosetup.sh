@@ -6,7 +6,7 @@ function macrosetup_confirm() {
     text_viewer -y -w -t "SETUP MACRO" -f 24 -m "This will start the macro setup configuration.\n\nThe setup will guide you through configuring your macro settings.\n\nContinue?"
     if [[ $? == 21 ]]; then
         if macrosetup_start; then
-            text_viewer -w -t "MACRO SETUP COMPLETED!" -f 24 -m "Macro setup has been completed successfully!\n\nYour macro configuration has been saved and is ready to use.\n\nYou can now activate macros using the macro activation script."
+            text_viewer -w -t "MACRO SETUP COMPLETED!" -f 24 -m "Macro setup has been completed successfully!\n\nYour macro configuration has been saved and is ready to use.\n\nYou can now select and activate macros using the macro activation script."
         else
             text_viewer -e -w -t "MACRO SETUP FAILED!" -f 24 -m "Failed to complete macro setup! Check /tmp/macrosetup.log for details."
         fi

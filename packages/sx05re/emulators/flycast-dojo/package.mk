@@ -1,13 +1,9 @@
-#
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2025-present DiegroSan (https://github.com/Diegrosan)
-#
-#NOTE: IT WILL ONLY BE COMPILED IN THE SECOND DENTATIVE, BUT IT IS IMPORTANT THAT IT WILL BE COMPILED, UNTIL THE NEXT PACKAGE UPDATES.
-#
-#
+>>>>>>> 5a3e0877546318dd70cd001563e57bfb78328a6b:packages/sx05re/emulators/flycast-dojo/package.mk
 
-PKG_NAME="flycastsadojo"
-PKG_VERSION="f5dea9e" #6.53+
+PKG_NAME="flycast-dojo"
+PKG_VERSION="d0e47e572b1e7b355e88bda8308c89d0c5156cbf" #6.53+
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/blueminder/flycast-dojo"
 PKG_URL="${PKG_SITE}.git"

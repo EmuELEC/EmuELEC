@@ -1,9 +1,15 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2024-present DiegroSan
+# Copyright (C) 2025-present DiegroSan (https://github.com/Diegrosan)
 #
 
 . /etc/profile
+
+IKEMEN_ALSA_CONF=/storage/.config/asound-ikemen.conf
+ALSA_CONF=/storage/.config/asound.conf
+    
+    mv ${ALSA_CONF} ${ALSA_CONF}.tmp
+    cp ${IKEMEN_ALSA_CONF} ${ALSA_CONF}
 
 LOGSDIR="/emuelec/logs"
 LOGFILE="$LOGSDIR/ikemen.log"
@@ -24,8 +30,8 @@ if [ "$language_value" = "pt_BR" ]; then
     MESSAGE_006="Links simbólicos criados com sucesso."
     MESSAGE_007="Erro ao criar links simbólicos."
     MESSAGE_008="Verificação dos arquivos do Ikemen_Go"
-    MESSAGE_009="Usando Ikemen_Go de B"
-    MESSAGE_010="Usando Ikemen_Go de A"
+    MESSAGE_009="error gamecontrollerdb"
+    MESSAGE_010="error saving gamepadmap configuration"
     MESSAGE_011="Falha ao copiar $file"
     MESSAGE_012="Falha ao copiar diretório external"
     MESSAGE_013="Falha ao copiar arquivos de fonte"
@@ -41,8 +47,8 @@ elif [ "$language_value" = "es_ES" ]; then
     MESSAGE_006="Enlaces simbólicos creados con éxito."
     MESSAGE_007="Error al crear enlaces simbólicos."
     MESSAGE_008="Verificación de los archivos de Ikemen_Go"
-    MESSAGE_009="Usando Ikemen_Go de B"
-    MESSAGE_010="Usando Ikemen_Go de A"
+    MESSAGE_009="error gamecontrollerdb"
+    MESSAGE_010="error saving gamepadmap configuration"
     MESSAGE_011="Error al copiar $file"
     MESSAGE_012="Error al copiar el directorio external"
     MESSAGE_013="Error al copiar archivos de fuente"
@@ -58,8 +64,8 @@ elif [ "$language_value" = "zh_CN" ]; then
     MESSAGE_006="符号链接创建成功。"
     MESSAGE_007="创建符号链接时出错。"
     MESSAGE_008="验证Ikemen_Go文件"
-    MESSAGE_009="使用 B 中的 Ikemen_Go"
-    MESSAGE_010="使用 A 中的 Ikemen_Go"
+    MESSAGE_009="error gamecontrollerdb"
+    MESSAGE_010="error saving gamepadmap configuration"
     MESSAGE_011="复制失败 $file"
     MESSAGE_012="复制external目录失败"
     MESSAGE_013="复制字体文件失败"
@@ -75,8 +81,8 @@ else
     MESSAGE_006="Symbolic links created successfully."
     MESSAGE_007="Error creating symbolic links."
     MESSAGE_008="Verifying Ikemen_Go files"
-    MESSAGE_009="Using Ikemen_Go from B"
-    MESSAGE_010="Using Ikemen_Go from A"
+    MESSAGE_009="error gamecontrollerdb"
+    MESSAGE_010="error saving gamepadmap configuration"
     MESSAGE_011="Failed to copy $file"
     MESSAGE_012="Failed to copy external directory"
     MESSAGE_013="Failed to copy font files"
@@ -98,7 +104,7 @@ mkdir -p "$CONFIGDIRHOME"
 mkdir -p "$LOGSDIR"
 rm -f "$LOGFILE"
 
-killall gptokeyb 2>/dev/null
+#killall gptokeyb 2>/dev/null
 
 [ -z "$1" ] && { log "$MESSAGE_001"; exit 1; }
 
@@ -162,13 +168,9 @@ log "$MESSAGE_005 $IKEMEN"
 # Create symbolic links
 ln -sf "$IKEMEN"/* "$CONFIGDIR/"
 
-# Link appropriate Ikemen_Go binary
-if [ -f "/emuelec/bin/Ikemen_Go" ]; then
-    ln -sf "/emuelec/bin/Ikemen_Go" "$CONFIGDIR/Ikemen_Go"
-    log "$MESSAGE_009"
-else
-    ln -sf "/usr/bin/Ikemen_Go" "$CONFIGDIR/Ikemen_Go"
-    log "$MESSAGE_010"
+GAMEMAP=$(get_ee_setting ee_ikemen.enabled)
+if [[ ${GAMEMAP} != 0 ]]; then
+gamepadmap "${IKEMEN}/save/config.json"  2>/dev/null || log "$MESSAGE_010"
 fi
 
 if [ $? -eq 0 ]; then
@@ -178,17 +180,13 @@ else
     exit 1
 fi
 
-if [ ! -x "$CONFIGDIR/Ikemen_Go" ]; then
-    log "$MESSAGE_016"
-    exit 1
-fi
-
 cd "$CONFIGDIR" || exit 1
 
 # Verifying included the game assets
 log "$MESSAGE_008"
-./Ikemen_Go -audit >> "$LOGFILE" 2>&1
+Ikemen_Go -audit >> "$LOGFILE" 2>&1
+exec nice -n -20 Ikemen_Go
 
-exec nice -n -20 ./Ikemen_Go
-
-
+# restore asound.conf
+    rm ${ALSA_CONF}
+    mv ${ALSA_CONF}.tmp ${ALSA_CONF}

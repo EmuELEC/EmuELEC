@@ -15,10 +15,12 @@ PLATFORM="${PLATFORM%% *}"  # until a space is found
 
 ROMNAME="${1}"
 
+RUNEMU=$(echo "${1}" | grep "^emuelecRunEmu.sh")
+
 init_game
-emuelec-utils init_app_video "${PLATFORM}" "${ROMNAME}"
+[[ -z "${RUNEMU}" ]] && emuelec-utils init_app_video "${PLATFORM}" "${ROMNAME}"
 
 "$@"
 
-emuelec-utils end_app_video
+[[ -z "${RUNEMU}" ]] && emuelec-utils end_app_video "${PLATFORM}" "${ROMNAME}"
 end_game

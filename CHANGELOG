@@ -1,6 +1,53 @@
 EmuELEC CHANGELOG
 ==================
 
+# v4.8
+
+Finally It's here!
+
+## Changes
+
+* Removed preinstalled ports:
+Ports were taking a lof of space on the system partition and added a lot to the main build time, with PortMaster now fully mature and working extremly well, we decide to use it instead, all the ports we had preinstalled
+are available in PortMaster. 
+However one thing keep in mind is that all ports from PortMaster are intended for handheld devices, so EmuELEC on SBC's is not officially supported, worstcase_scenario has tested a lot of games running on a s905x2 SBC 
+and installed directly from PortMaster: https://github.com/EmuELEC/EmuELEC/wiki/List-of-Ports-running-on-EmuElec-(work-in-progress)
+Just remember to follow their instructions. https://portmaster.games/ as some games require special steps. 
+To install PortMaster Scroll to the Setup Scripts, select "Install PortMaster" and follow the instructions, after restarting ES, you should now see "Launch Portmaster" in the Ports section.
+
+* A new and improved Splash system:
+Thanks to Langerz82 and worstcase_scenario it has never been as easy to customize how EmuELEC looks while loading a game! there are many splash options to display in game launching and exit available, including:
+
+	* Default - Legacy option, will load the default splash.
+	* Enable Platform/Rom loading: Legacy option, will look for a file in /storage/splash/{platform}/{rom_name}.png if not found it will look for /storage/splash/{platform}/launching.png
+	* Custom - Select your own image/video!
+	* Random - automatically selects video/image from the defined path!
+	* Scraped media - This option will read your platform gamelist.xml for a predefined tag and use any media you have scraped, options: random, image, thumbnail, video, marquee, fanart
+
+* Many other improvements:
+We removed mame2016 and added MAME 0.282 (with full MESS support), while not everything has ben setup automatically, you can load any system that MAME supports from Retroarch directly.
+Added Fmtowns using MESS. 
+Added Satellaview and Sufami Turbo thanks to Qbertaddict for the suggestion
+Wii Remotes are now easy to setup directly from ES
+Volume is now controlled globally from ES
+Updated Amiberry to v8, added Amiberry-lite
+Added Ikemen-GO, a M.U.G.E.N alternative.
+Full midi/mt32/fluidsynth support(core dependent)
+The ability to use a normal IR sensor bar (or candles) with a wiimote inside retroarch
+Automatic shutdown timer after user inactivity
+script for saving and enabling multiple macros for controllers
+Audio connection via Bluetooth devices
+customizable scroll sound for ES menu
+enabled cheat function for Mame2010
+new and updated emulators: gearlynx bk electronika, supafaust, amiberry-lite, dosbox-pure, stella2023 and PUAE2021, most of the libretro cores
+
+... and many other changes, 
+If you find any issues with this update, please first test with a clean installation! if problem persists feel free to open an issue or visit us on [Discord](https://discord.gg/jQWCFwTn5T). 
+
+## Other versions
+While I tried testing as much as I could on Odroidm1, RK356x, OGA/OGS and GameForce, due to lack of time these devices are not properly tested, not everything is workin as smooth as on Amlogic devices, please update at your own risk.
+If you find any issue with these versions, please open an issue or visit us on [Discord](https://discord.gg/jQWCFwTn5T). 
+
 # v4.7
 
 It has been a long time since we released a new version, and after many changes, many bug fixes and the help of many people, finally here it is v4.7!

@@ -4,8 +4,8 @@
 # Copyright (C) 2022-present 7Ji (https://github.com/7Ji)
 
 PKG_NAME="SDL2"
-PKG_VERSION="2.28.5"
-PKG_SHA256="332cb37d0be20cb9541739c61f79bae5a477427d79ae85e352089afdaf6666e4"
+PKG_VERSION="2.32.10"
+#PKG_SHA256="332cb37d0be20cb9541739c61f79bae5a477427d79ae85e352089afdaf6666e4"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL="https://www.libsdl.org/release/SDL2-${PKG_VERSION}.tar.gz"

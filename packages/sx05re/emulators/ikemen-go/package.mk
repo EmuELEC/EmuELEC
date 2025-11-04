@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 2024-present DiegroSan github
-# 
+# Copyright (C) 2025-present DiegroSan (https://github.com/Diegrosan)
 # Thank you very much, leonkasovan, for the Port (aarch64/arm64 port) SDL ikemen-go
 #
 
@@ -12,7 +11,7 @@ PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/leonkasovan/Ikemen-GO"
 PKG_URL="https://github.com/leonkasovan/Ikemen-GO.git"
-PKG_DEPENDS_TARGET="toolchain go:host go SDL2 ${OPENGLES}"
+PKG_DEPENDS_TARGET="toolchain go:host go SDL2 ${OPENGLES} openal-soft sdlgamepadmap"
 PKG_TOOLCHAIN="manual"
 PKG_SHORTDESC="Open-source fighting game engine"
 PKG_LONGDESC="Ikemen GO is an open-source fighting game engine."
@@ -20,7 +19,7 @@ PKG_IS_TARGET=y
 GET_HANDLER_SUPPORT="git"
 
 pre_configure_target() {
-   
+
     export GOOS=linux 
     export GOARCH=arm64 
     export CGO_ENABLED=1
@@ -53,7 +52,11 @@ makeinstall_target() {
     
     mkdir -p "$INSTALL/usr/bin"
     mkdir -p "$INSTALL/usr/share/ikemen_go"
-
+	
+	# Copy alsa config
+	mkdir -p ${INSTALL}/usr/config
+	cp -rf ${PKG_DIR}/src/asound-ikemen.conf ${INSTALL}/usr/config/
+	
     cp -f "$PKG_DIR/src/Ikemen_Go.sh" "$INSTALL/usr/bin/Ikemen_Go.sh"
     cp "$PKG_BUILD/bin/Ikemen_Go_"* "$INSTALL/usr/bin/Ikemen_Go"
     
@@ -61,6 +64,7 @@ makeinstall_target() {
     cp -rf "$PKG_BUILD/data" "$INSTALL/usr/share/ikemen_go"
     cp -rf "$PKG_BUILD/external" "$INSTALL/usr/share/ikemen_go"
     cp -rf "$PKG_BUILD/font" "$INSTALL/usr/share/ikemen_go"
+    
 
     chmod +x "$INSTALL/usr/bin/Ikemen_Go.sh"
     chmod +x "$INSTALL/usr/bin/Ikemen_Go"

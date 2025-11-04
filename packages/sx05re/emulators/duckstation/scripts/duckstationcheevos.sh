@@ -13,21 +13,16 @@ token=$(grep "cheevos_token" /storage/.config/retroarch/retroarch.cfg | cut -d'"
 
 DUCK_INI="/storage/.config/emuelec/configs/duckstation/settings.ini"
 
-#Test the token if empty exit 1.
-if [ -z "${token}" ]
-then
-      echo "Token is empty you must log in retroachievement first in retroarch achievements"
-      exit 1
-fi
-
 #Variables for checking if [Cheevos] or enabled true or false are presente.
 zcheevos=$(grep -Fx "[Cheevos]" ${DUCK_INI})
 datets=$(date +%s%N | cut -b1-13)
 
-#Variables for do not duplicate the entries
-zusername=$(grep "Username =" ${DUCK_INI})
-ztoken=$(grep "Token =" ${DUCK_INI})
-zdts=$(grep "LoginTimestamp =" ${DUCK_INI})
+# Test the token if empty exit 1. // I don't think we should exit, it should continue but not enable cheevos
+if [[ -z "${token}" || "${token}" == *'"Success":false'* ]]
+then
+      token=""
+      zcheevos=""
+fi
 
 if ([ -z "${zcheevos}" ])
 then

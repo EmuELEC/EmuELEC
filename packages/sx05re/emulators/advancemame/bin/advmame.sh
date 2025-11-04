@@ -73,6 +73,10 @@ CRASH_STACK_SIZE=$( ulimit -c )
 # Hack - Revert crash stack size so it can poo nicely.
 ulimit -c ${CRASH_STACK_SIZE}
 
+emuelec-utils blank_buffer
+
 ARG=$(echo basename ${2} | sed 's/\.[^.]*$//')
 ARG="$(echo ${2} | sed 's=.*/==;s/\.[^.]*$//')"
 SDL_AUDIODRIVER=alsa advmame ${ARG} -quiet
+
+emuelec-utils blank_buffer

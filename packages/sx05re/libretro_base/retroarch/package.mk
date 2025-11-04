@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="fa42321488868a22145743640d819d9c187e8e43"
+PKG_VERSION="bfa603828d158b7014618fe169d459112f5c420d"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="${PKG_SITE}.git"
 PKG_LICENSE="GPLv3"
@@ -160,6 +160,7 @@ makeinstall_target() {
   sed -i -e "s/# input_remapping_directory =/input_remapping_directory = \/storage\/.config\/retroarch\/config\/remappings/" ${INSTALL}/etc/retroarch.cfg
   sed -i -e "s/# input_menu_toggle_gamepad_combo = 0/input_menu_toggle_gamepad_combo = 2/" ${INSTALL}/etc/retroarch.cfg
   sed -i -e "s/# all_users_control_menu = false/all_users_control_menu = true/" ${INSTALL}/etc/retroarch.cfg
+  sed -i -e "s/# menu_swap_ok_cancel_buttons = false/menu_swap_ok_cancel_buttons = false/" ${INSTALL}/etc/retroarch.cfg
 
   # Menu
   sed -i -e "s/# menu_mouse_enable = false/menu_mouse_enable = false/" ${INSTALL}/etc/retroarch.cfg

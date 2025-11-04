@@ -1,91 +1,94 @@
+# /emuelec/bin/connectbtwii.sh
 #!/bin/sh
-""":"
-# Shell part: stop the eventlircd service and re-execute this script with Python3
-/usr/bin/systemctl stop eventlircd
-exec python3 "$0" "$@"
-"""
-# Python code starts here
-import subprocess
-import re
-import sys
-import time
+# Wiimote connect for EmuELEC (bluetoothctl-only, multi-scan with re-arm prompts)
+# Copyright (C) 2025 worstcase_scenario (https://github.com/worstcase-scenario)
 
-def run_bluetoothctl_command(cmd):
-    """Executes a bluetoothctl command and returns its output."""
-    result = subprocess.run(["bluetoothctl"] + cmd.split(),
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            text=True)
-    return result.stdout
+. /etc/profile
+BTCTL="$(command -v bluetoothctl || echo /usr/bin/bluetoothctl)"
 
-def search_wiimote(keywords, timeout=30, interval=2):
-    """
-    Repeatedly searches the device list for an entry that contains one 
-    of the keywords.
-    """
-    start_time = time.time()
-    device_mac = None
-    while time.time() - start_time < timeout:
-        devices_out = run_bluetoothctl_command("devices")
-        for line in devices_out.splitlines():
-            if any(kw.lower() in line.lower() for kw in keywords):
-                match = re.search(r'Device\s+([0-9A-F:]{17})', line, re.I)
-                if match:
-                    device_mac = match.group(1)
-                    print("Found device: " + line)
-                    return device_mac
-        print("No matching Wiimote device found, waiting {} seconds...".format(interval))
-        time.sleep(interval)
-    return device_mac
+# Tunables
+SCAN_TIMEOUT="${SCAN_TIMEOUT:-25}"     # seconds per scan round
+SCAN_ROUNDS="${SCAN_ROUNDS:-4}"        # how many scan rounds
+REARM_PROMPT="${REARM_PROMPT:-1}"      # prompt to press 1+2 before next round
+REARM_PAUSE="${REARM_PAUSE:-3}"        # seconds to wait after prompt
+CONNECT_TRIES="${CONNECT_TRIES:-30}"   # connect attempts while scan is ON
+SLEEP_STEP=1
 
-def main():
-    print("Please put your Wiimote in pairing mode (hold buttons 1+2)!")
+log(){ printf '%s\n' "$*" >&2; }
 
-    # Ensure that the Bluetooth adapter is powered on and the agent is active.
-    run_bluetoothctl_command("power on")
-    run_bluetoothctl_command("agent on")
-    run_bluetoothctl_command("default-agent")
+# Prep
+/usr/bin/systemctl stop eventlircd 2>/dev/null || true
+modprobe uhid 2>/dev/null || true
+modprobe hid-wiimote 2>/dev/null || true
+modprobe hid-nintendo 2>/dev/null || true
+$BTCTL power on       >/dev/null 2>&1 || true
+$BTCTL pairable on    >/dev/null 2>&1 || true
+$BTCTL agent NoInputNoOutput >/dev/null 2>&1 || $BTCTL agent on >/dev/null 2>&1 || true
+$BTCTL default-agent  >/dev/null 2>&1 || true
 
-    # Start scanning for Bluetooth devices.
-    print("Starting scan ...")
-    run_bluetoothctl_command("scan on")
-    # Allow a short delay to collect initial scan results.
-    time.sleep(2)
+TMP="/tmp/btscan_$$.log"; rm -f "$TMP"
 
-    # Search for typical names that indicate a Wiimote.
-    keywords = ["Nintendo", "Wiimote", "RVL-CNT-01"]
-    device_mac = search_wiimote(keywords)
+pick_mac_round() {
+  # one scan round, append raw output to $TMP, return MAC or empty
+  $BTCTL --timeout "$SCAN_TIMEOUT" scan on 2>&1 | tee -a "$TMP" >/dev/null
+  awk 'BEGIN{IGNORECASE=1}
+    /Device/ && /(nintendo|wiimote|rvl-cnt)/ {
+      for (i=1;i<=NF;i++)
+        if ($i ~ /^[0-9A-F]{2}(:[0-9A-F]{2}){5}$/) { print $i; exit }
+    }' "$TMP" | head -n1
+}
 
-    # Stop the scanning process.
-    run_bluetoothctl_command("scan off")
+# Multi-scan with re-arm hints
+MAC=""
+round=1
+while [ $round -le "$SCAN_ROUNDS" ] && [ -z "$MAC" ]; do
+  if [ $round -eq 1 ]; then
+    log "Scanning… hold 1+2 on the Wiimote (round $round/$SCAN_ROUNDS)"
+  else
+    [ "$REARM_PROMPT" = "1" ] && log "Press 1+2 again now… (round $round/$SCAN_ROUNDS)" && sleep "$REARM_PAUSE"
+  fi
+  MAC="$(pick_mac_round)"
+  round=$((round+1))
+done
 
-    if not device_mac:
-        print("No Wiimote device found. Please check that it is in pairing mode!")
-        sys.exit(1)
+[ -n "$MAC" ] || { log "No Wiimote seen by BlueZ."; rm -f "$TMP"; exit 1; }
+log "Target: $MAC"
 
-    print("Target device: " + device_mac)
+# Keep scan ON during connect attempts
+$BTCTL scan on >/dev/null 2>&1 || true
 
-    # Mark the device as trusted, then attempt pairing and connection.
-    print("Setting device as trusted ...")
-    run_bluetoothctl_command("trust " + device_mac)
-    time.sleep(1)
+# Clean stale state but keep object if BlueZ just learned it
+$BTCTL disconnect "$MAC" >/dev/null 2>&1 || true
 
-    print("Initiating pairing ...")
-    run_bluetoothctl_command("pair " + device_mac)
-    time.sleep(4)
+# Ensure BlueZ keeps the device object
+for i in $(seq 1 10); do
+  $BTCTL info "$MAC" >/dev/null 2>&1 || true
+  $BTCTL devices | grep -qi "$MAC" && break
+  sleep "$SLEEP_STEP"
+done
 
-    print("Attempting to connect to the device ...")
-    run_bluetoothctl_command("connect " + device_mac)
-    time.sleep(4)
+# Connect loop
+$BTCTL trust "$MAC" >/dev/null 2>&1 || true
+ok=1
+for i in $(seq 1 "$CONNECT_TRIES"); do
+  $BTCTL connect "$MAC" >/dev/null 2>&1 || true
+  sleep "$SLEEP_STEP"
+  if $BTCTL info "$MAC" | grep -q "Connected: yes"; then ok=0; break; fi
+done
 
-    # Verify that the device is connected.
-    info = run_bluetoothctl_command("info " + device_mac)
-    if "Connected: yes" in info:
-        print("Wiimote successfully connected!")
-    else:
-        print("Error connecting to the device. 'info' output:")
-        print(info)
-        sys.exit(1)
+$BTCTL scan off >/dev/null 2>&1 || true
 
-if __name__ == '__main__':
-    main()
+if [ $ok -ne 0 ]; then
+  log "Connect failed."
+  [ -s "$TMP" ] && { log "Scan summary:"; grep -E 'Device|(\[NEW\])' "$TMP" | tail -n 20 >&2; }
+  rm -f "$TMP"
+  exit 1
+fi
+
+# Finalize
+$BTCTL pair  "$MAC" >/dev/null 2>&1 || true
+$BTCTL trust "$MAC" >/dev/null 2>&1 || true
+$BTCTL info "$MAC" | sed -n '1,60p'
+rm -f "$TMP"
+log "Wiimote connected."
+exit 0

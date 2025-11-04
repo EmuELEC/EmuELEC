@@ -104,12 +104,9 @@ set_pad(){
   local DEVICE_GUID=${3}
   local JOY_NAME="${4}"
 
-  local GC_CONFIG=$(cat "${GCDB}" | grep "${DEVICE_GUID}" | grep "platform:Linux" | head -1)
+  local GC_CONFIG="${5}"
   echo "GC_CONFIG=${GC_CONFIG}"
   [[ -z ${GC_CONFIG} ]] && return
-
-  JOY_NAME="$(cat "/tmp/JOYPAD_NAMES/JOYPAD${1}.txt" | cut -d'"' -f2 )"
-  [[ -z "${JOY_NAME}" ]] && return
 
   local GAMEPAD="$(advj | grep "'${JOY_NAME}'" | cut -d"'" -f2 | head -n 1 )"
   [[ -z "${GAMEPAD}" ]] && return

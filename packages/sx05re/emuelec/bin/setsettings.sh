@@ -20,6 +20,7 @@ RACORECONF="/storage/.config/retroarch/retroarch-core-options.cfg"
 PLATFORM=${1,,}
 CORE=${3,,}
 ROM="${2##*/}"
+ROM="$(printf '%s' "${ROM}" | sed 's/\([][]\)/\\\1/g')"
 SETF=0
 SHADERSET=0
 AUTOLOAD="false"
@@ -248,7 +249,20 @@ case ${1} in
         [ "${2}" == "1" ] && ISBEZEL="true" || ISBEZEL="false"
     ;;
     "integerscaleoverscale")
-        [ "${2}" == "1" ] && echo 'video_scale_integer_overscale = "true"' >> ${RACONF} || echo 'video_scale_integer_overscale = "false"' >> ${RACONF}
+		case "${2}" in
+			"1")
+				echo 'video_scale_integer_scaling = "1"' >> "${RACONF}"
+				echo 'video_scale_integer_axis = "1"' >> "${RACONF}"
+			;;
+			"2")
+				echo 'video_scale_integer_scaling = "2"' >> "${RACONF}"
+				echo 'video_scale_integer_axis = "1"' >> "${RACONF}"
+			;;
+			*)
+				echo 'video_scale_integer_overscale = "0"' >> "${RACONF}"
+				echo 'video_scale_integer_axis = "0"' >> "${RACONF}"
+			;;
+esac
     ;;
     "rgascale")
                 [ "${2}" == "1" ] && echo 'video_ctx_scaling = "true"' >> ${RACONF} || echo 'video_ctx_scaling = "false"' >> ${RACONF}
@@ -330,7 +344,13 @@ case ${1} in
 
                     # retroachievements_automatic_screenshot
                     get_setting "retroachievements.screenshot"
-                    [ "${EES}" == "1" ] && echo 'cheevos_auto_screenshot = "true"' >> ${RACONF} || echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
+                    if [ "${EES}" == "1" ]; then 
+						echo 'cheevos_auto_screenshot = "true"' >> ${RACONF}
+						set_ra_setting screenshot_directory "/roms/screenshots"
+						mkdir -p "/roms/screenshots"
+                    else
+						echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
+                    fi
                 else
                     echo 'cheevos_enable = "false"' >> ${RACONF}
                     echo 'cheevos_username = ""' >> ${RACONF}
@@ -558,11 +578,23 @@ sed -i "/atari800_system =/d" ${ATARI800CONF}
 fi
 
 if [ "${PLATFORM}" == "amstradgx4000" ]; then
-# Make sure cap32_model is set to "6128+"
-GX4000CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
-[[ ! -f "${GX4000CONF}" ]] && touch "${GX4000CONF}"
-    sed -i "/cap32_model =/d" "${GX4000CONF}"
-    echo "cap32_model = \"6128+\"" >> "${GX4000CONF}"
+# Make sure cap32_model is set to "6128+ (experimental)"
+CAP32CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
+[[ ! -f "${CAP32CONF}" ]] && touch "${CAP32CONF}"
+    sed -i "/cap32_model =/d" "${CAP32CONF}"
+    echo "cap32_model = \"6128+ (experimental)\"" >> "${CAP32CONF}"
+    sed -i "/cap32_gfx_colors =/d" "${CAP32CONF}"
+    echo "cap32_gfx_colors = \"24bit\"" >> "${CAP32CONF}"
+fi
+
+if [ "${PLATFORM}" == "amstradcpc" ]; then
+# But amstradcpc wants cap32_model set to "6128"
+CAP32CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
+[[ ! -f "${CAP32CONF}" ]] && touch "${CAP32CONF}"
+    sed -i "/cap32_model =/d" "${CAP32CONF}"
+    echo "cap32_model = \"6128\"" >> "${CAP32CONF}"
+    sed -i "/cap32_gfx_colors =/d" "${CAP32CONF}"
+    echo "cap32_gfx_colors = \"16bit\"" >> "${CAP32CONF}"
 fi
 
 if [ "${CORE}" == "gambatte" ]; then
@@ -641,4 +673,7 @@ echo "menu_driver = ${EES}" >> ${RACONF}
 get_setting "bezel"
 [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} bezels.sh "none" "default" "${ISBEZEL}" "${IRBEZEL}" || ${TBASH} bezels.sh "${PLATFORM}" "${ROM}" "${ISBEZEL}" "${IRBEZEL}"
 
-sleep 3 && show_splash.sh "stopplayer"
+inverted_ok_cancel=$(get_es_setting bool InvertButtons)
+[[ ${inverted_ok_cancel} == "true" ]] || inverted_ok_cancel="false";
+sed -i "/menu_swap_ok_cancel_buttons =/d" ${RACONF}
+echo "menu_swap_ok_cancel_buttons = ${inverted_ok_cancel}" >> ${RACONF}

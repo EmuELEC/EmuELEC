@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bk"
-PKG_VERSION="31af5ca5f307991eb596ed411d4d0e955c833421"
-PKG_SHA256="f90a9ecc31db054afd0f29690faf88ea6e695025e23526ec110df53b46ef08bc"
+PKG_VERSION="f95d929c8eca6c85075cd5c56a08aac9c58f3802"
+PKG_SHA256="7ed9976abe5c235061a44884346426509231d1237c9b7ff23e8a7aa6894fcf5d"
 PKG_LICENSE="NTP"
 PKG_SITE="https://github.com/libretro/bk-emulator"
 PKG_URL="https://github.com/libretro/bk-emulator/archive/${PKG_VERSION}.tar.gz"

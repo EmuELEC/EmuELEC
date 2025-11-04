@@ -107,7 +107,7 @@ set_pad() {
     local DEVICE_GUID=${3}
     local JOY_NAME="${4}"
 
-    local GC_CONFIG=$(grep -m 1 "${DEVICE_GUID}.*platform:Linux" "${GCDB}")
+    local GC_CONFIG="${5}"
     [[ -z ${GC_CONFIG} ]] && return
 
     local GC_MAP=$(cut -d',' -f3- <<< "${GC_CONFIG}")

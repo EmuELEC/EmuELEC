@@ -23,13 +23,12 @@ if [ "${EE_DEVICE}" == "Amlogic" ]; then
         sed -i "/<bool name=\"StopMusicOnScreenSaver\"/d" "${ES_CONF}"
         sed -i "s|</config>|    <bool name=\"StopMusicOnScreenSaver\" value=\"false\" />\n</config>|g" "${ES_CONF}"
     fi
-    
-elif [ "${EE_DEVICE}" == "Amlogic-ng" ]; then
+elif [ "${EE_DEVICE}" == "Amlogic-ng" ] || [ "${EE_DEVICE}" == "OdroidM1" ]; then
     rm "/storage/.config/asound.conf" > /dev/null 2>&1
     cp "/storage/.config/asound.conf-amlogic-ng" "/storage/.config/asound.conf"
 elif [ "${EE_DEVICE}" == "Amlogic-no" ]; then
     rm "/storage/.config/asound.conf" > /dev/null 2>&1
-    cp "/storage/.config/asound.conf-amlogic-no" "/storage/.config/asound.conf"
+    cp "/storage/.config/asound.conf-amlogic-ng" "/storage/.config/asound.conf"
     
     AUDIO_DEVICE_NO=$(get_ee_setting ee_audio_device)
     if [ "${AUDIO_DEVICE_NO,,}" = "auto" ] || [ -z "${AUDIO_DEVICE_NO}" ]; then

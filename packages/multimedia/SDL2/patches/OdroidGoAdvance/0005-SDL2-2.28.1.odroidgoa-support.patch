@@ -1,4 +1,4 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
+diff --git a/CMakeLists.txt b/CMakeLists.txt 
 index 26fe83205..32a339b05 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
@@ -28,35 +28,37 @@ diff --git a/src/video/kmsdrm/SDL_kmsdrmopengles.c b/src/video/kmsdrm/SDL_kmsdrm
 index 017372c..cff1b25 100644
 --- a/src/video/kmsdrm/SDL_kmsdrmopengles.c
 +++ b/src/video/kmsdrm/SDL_kmsdrmopengles.c
-@@ -29,10 +29,14 @@
+@@ -30,10 +30,14 @@
  #include "SDL_kmsdrmopengles.h"
  #include "SDL_kmsdrmdyn.h"
  #include <errno.h>
 +#include<stdbool.h>
-
+ 
  #ifndef EGL_PLATFORM_GBM_MESA
  #define EGL_PLATFORM_GBM_MESA 0x31D7
  #endif
 +
 +extern rga_info_t src_info;
 +extern rga_info_t dst_info;
-
+ 
  /* EGL implementation of SDL OpenGL support */
-
-@@ -92,6 +96,7 @@
+ 
+@@ -93,6 +97,7 @@
      SDL_VideoData *viddata = ((SDL_VideoData *)_this->driverdata);
      KMSDRM_FBInfo *fb_info;
      int ret = 0;
 +    struct gbm_bo* rga_buffer = NULL;
-
+ 
      /* Always wait for the previous issued flip before issuing a new one,
         even if you do async flips. */
-@@ -147,7 +152,26 @@
+@@ -143,7 +148,29 @@
      }
-
+ 
      /* Get an actual usable fb for the next front buffer. */
 -    fb_info = KMSDRM_FBFromBO(_this, windata->next_bo);
-+        if (src_info.fd) {
++    //fb_info = KMSDRM_FBFromBO(_this, windata->next_bo);
++
++    if (src_info.fd) {
 +            close(src_info.fd);
 +        }
 +        src_info.fd = KMSDRM_gbm_bo_get_fd(windata->next_bo);
@@ -75,23 +77,26 @@ index 017372c..cff1b25 100644
 +        }
 +
 +        viddata->rga_buffer_index = (viddata->rga_buffer_index + 1) % RGA_BUFFERS_MAX;
-+
-     if (fb_info == NULL) {
++    
++    
+     if (!fb_info) {
          SDL_LogError(SDL_LOG_CATEGORY_VIDEO, "Could not get a framebuffer");
          return 0;
+
 diff --git a/src/video/kmsdrm/SDL_kmsdrmsym.h b/src/video/kmsdrm/SDL_kmsdrmsym.h
 index 6956232..6d8b3fd 100644
 --- a/src/video/kmsdrm/SDL_kmsdrmsym.h
 +++ b/src/video/kmsdrm/SDL_kmsdrmsym.h
-@@ -123,7 +123,7 @@ SDL_KMSDRM_SYM(struct gbm_surface *,gbm_surface_create,(struct gbm_device *gbm,
- SDL_KMSDRM_SYM(void,gbm_surface_destroy,(struct gbm_surface *surf))
+@@ -133,6 +133,8 @@
  SDL_KMSDRM_SYM(struct gbm_bo *,gbm_surface_lock_front_buffer,(struct gbm_surface *surf))
  SDL_KMSDRM_SYM(void,gbm_surface_release_buffer,(struct gbm_surface *surf, struct gbm_bo *bo))
--
+ 
 +SDL_KMSDRM_SYM(int,gbm_bo_get_fd,(struct gbm_bo *bo))
++
+ SDL_KMSDRM_SYM_OPT(uint64_t,gbm_bo_get_modifier,(struct gbm_bo *bo))
+ SDL_KMSDRM_SYM_OPT(int,gbm_bo_get_plane_count,(struct gbm_bo *bo))
+ SDL_KMSDRM_SYM_OPT(uint32_t,gbm_bo_get_offset,(struct gbm_bo *bo, int plane))
 
- #undef SDL_KMSDRM_MODULE
- #undef SDL_KMSDRM_SYM
 diff --git a/src/video/kmsdrm/SDL_kmsdrmvideo.c b/src/video/kmsdrm/SDL_kmsdrmvideo.c
 index f7e7648..144f8f9 100644
 --- a/src/video/kmsdrm/SDL_kmsdrmvideo.c

@@ -13,14 +13,16 @@ username=$(get_ee_setting "global.retroachievements.username")
 password=$(get_ee_setting "global.retroachievements.password")
 token=$(grep "cheevos_token" /storage/.config/retroarch/retroarch.cfg | cut -d'"' -f2)
 
-# Test the token if empty exit 1.
-if [ -z "${token}" ]; then
-    echo "Token is empty you must log in retroachievement first in retroarch achievements"
-    exit 1
-fi
-
 # Variables for checking if [Cheevos] or enabled true or false are present.
 zcheevos=$(grep -Fx "[achievements]" ${FLYCAST_CFG})
+
+
+# Test the token if empty exit 1. // I don't think we should exit, it should continue but not enable cheevos
+if [[ -z "${token}" || "${token}" == *'"Success":false'* ]]
+then
+      token=""
+      zcheevos=""
+fi
 
 if [ -z "${zcheevos}" ]; then
     # Añadir la sección [achievements] con los valores

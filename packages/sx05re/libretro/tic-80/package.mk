@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="tic-80"
-PKG_VERSION="d348ab1d028e4dac12c4f511bcd0ff13a8660e90"
+PKG_VERSION="a2c875f7275541e7724199ce8e504fb578b819a6"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/nesbox/TIC-80"
 PKG_URL="${PKG_SITE}.git"
@@ -12,12 +12,13 @@ GET_HANDLER_SUPPORT="git"
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_LIBRETRO=ON \
 					   -DBUILD_PLAYER=ON \
-					   -DBUILD_DEMO_CARTS=OFF \
-                       -DBUILD_SOKOL=OFF \
                        -DBUILD_SDL=ON \
-                       -DBUILD_WITH_MRUBY=OFF \
+                       -DBUILD_WITH_RUBY=OFF \
+                       -DBUILD_WITH_YUE=OFF \
                        -DCMAKE_BUILD_TYPE=Release \
-                       -DBUILD_WITH_JANET=Off"
+                       -DBUILD_WITH_JANET=Off  \
+                       -DBUILD_WITH_ALL=On \
+                       -DBUILD_STATIC=On"
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib/libretro

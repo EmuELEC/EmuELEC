@@ -1,145 +1,238 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 0riginally created by Escalade (https://github.com/escalade)
+# Copyright (C) originally created by Escalade (https://github.com/escalade)
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
+# Copyright (C) 2025-present Langerz82 (https://github.com/Langerz82), worstcase_scenario (https://github.com/worstcase-scenario)
 
 . /etc/profile
 
-# Set some common variables
-AMIBERRY_DIR=/storage/.config/amiberry
-AMIBERRY_CONFIG_DIR=$AMIBERRY_DIR/conf
-AMIBERRY_TMP_DIR=/tmp/emulation/amiberry
-AMIBERRY_TMP_CONFIG="$AMIBERRY_TMP_DIR"/.amiberry_conf.uae
-AMIBERRY_LOG=/emuelec/logs/amiberry.log
+AMIBERRY_EXE=amiberry
+[[ "${2}" == "AMIBERRY-LITE" ]] && AMIBERRY_EXE=amiberry-lite
+
+# Core paths
+AMIBERRY_DIR=/storage/.config/${AMIBERRY_EXE}
+AMIBERRY_CONFIG_DIR="${AMIBERRY_DIR}/conf"
+AMIBERRY_TMP_DIR=/tmp/emulation/${AMIBERRY_EXE}
+AMIBERRY_TMP_CONFIG="${AMIBERRY_TMP_DIR}/.${AMIBERRY_EXE}_conf.uae"
+AMIBERRY_LOG=/emuelec/logs/${AMIBERRY_EXE}.log
 MAX_DRIVES=4
 i=0
 
-echo "EmuELEC Amiberry Log" > "$AMIBERRY_LOG"
+echo "EmuELEC ${AMIBERRY_EXE} Log" > "${AMIBERRY_LOG}"
+echo "Trying to boot this game: ${TARGET_FILE}" >> "${AMIBERRY_LOG}"
 
-find_gamepad() {
-# Search for connected gamepads based s0 and extract the name to $GAMEPAD
-for file in /tmp/joypads/*.cfg; do
-	EE_GAMEPAD=$(cat "$file" | grep input_device|  cut -d'"' -f 2)
-	ES_EE_GAMEPAD=$(printf %q "$EE_GAMEPAD")
-if cat /proc/bus/input/devices | grep -Ew -A 4 -B 1 "Name=\"${ES_EE_GAMEPAD}" | grep "js0" > /dev/null; then
-	sed -i "s|joyport1_friendlyname=.*|joyport1_friendlyname=${EE_GAMEPAD}|" "$AMIBERRY_TMP_CONFIG"
-	echo "Gamepad used $EE_GAMEPAD" >> "$AMIBERRY_LOG"
-	break;
+# Force SDL audio backend
+export SDL_AUDIODRIVER=alsa
+
+# Amiberry loads assets relative to its working directory
+cd "${AMIBERRY_DIR}"
+
+# Prepare a clean temp dir
+if [ -d "${AMIBERRY_TMP_DIR}" ]; then
+  echo "Clean up old working directory." >> "${AMIBERRY_LOG}"
+  rm -rf "${AMIBERRY_TMP_DIR}"
 fi
-done
-}
+mkdir -p "${AMIBERRY_TMP_DIR}"
 
-# Set SDL audio driver to alsa
-SDL_AUDIODRIVER=alsa
+###############################################################################
+# Helper: detect machine model (A500 / A1200 / CD32)
+# Result is later passed to --model if no config template exists
+###############################################################################
+AMIBERRY_SET_MODEL() {
+  local MODEL=A500
 
-# Which file should amiberry load?
-echo "Trying to boot this game:" "$1" >> $AMIBERRY_LOG
+  # Heuristic for A1200 / AGA
+  if [ "$(echo "${TARGET_FILE}" | grep -e 'AGA' | wc -l)" -eq 1 ] \
+  || [ "$(echo "${AMIBERRY_TMP_DIR}"/* | grep -e 'AGA' | wc -l)" -eq 1 ] \
+  || [[ "${TARGET_FILE}" = */amiga1200/* ]]; then
+    MODEL=A1200
 
-# Change working directory cause amiberry loads assets from there
-cd $AMIBERRY_DIR
-
-# Create a clean working directory
-if [ -d "$AMIBERRY_TMP_DIR" ]; then
-  echo "Clean up old working directory." >> $AMIBERRY_LOG
-  rm -rf "$AMIBERRY_TMP_DIR"
-fi
-mkdir -p "$AMIBERRY_TMP_DIR"
-
-# Check if the file is an Amiga 1200/CD32 game and set configuration options for an Amiga 1200
-AMIBERRY_SET_CONF() {
-  if [ `echo $1 | egrep 'AGA|CD32' | wc -l` -eq 1 -o `echo "$AMIBERRY_TMP_DIR"/* | egrep 'AGA|CD32' | wc -l` -eq 1 ]; then
-    echo "Loading Amiga 1200/CD32 config." >> $AMIBERRY_LOG
-    cp $AMIBERRY_CONFIG_DIR/AmigaA1200-default.uae "$AMIBERRY_TMP_CONFIG"
-  else
-    echo "Loading Amiga 500 config." >> $AMIBERRY_LOG
-    cp $AMIBERRY_CONFIG_DIR/AmigaA500-default.uae "$AMIBERRY_TMP_CONFIG"
+  # Heuristic for CD32
+  elif [ "$(echo "${TARGET_FILE}" | grep -e 'CD32' | wc -l)" -eq 1 ] \
+  || [ "$(echo "${AMIBERRY_TMP_DIR}"/* | grep -e 'CD32' | wc -l)" -eq 1 ] \
+  || [[ "${TARGET_FILE}" = */cd32/* ]] \
+  || [[ "${TARGET_FILE}" = */amigacd32/* ]]; then
+    MODEL=CD32
   fi
 
-find_gamepad 
+  echo "${MODEL}"
 }
 
-# Check if we are loading a .zip file
-if [ `echo $1 | grep -i .zip | wc -l` -eq 1 ]; then
-  
-  # Unpack the zip file
-  unzip -q -o "$1" -d "$AMIBERRY_TMP_DIR"
-  
-  if [ -f "$AMIBERRY_TMP_DIR"/*.*nfo ] && [ -f "$AMIBERRY_TMP_DIR"/*/*.*lave ]; then
+###############################################################################
+# Helper: pick a base config (.uae) for that model
+# Returns either '-f /tmp/.../.amiberry-lite_conf.uae' or an empty string
+###############################################################################
+AMIBERRY_SET_CONF() {
+  local CONF_MODEL="${1}"
+  local CONFIG_FILE="${AMIBERRY_CONFIG_DIR}/Amiga${CONF_MODEL}-custom.uae"
 
-    # WHDLoad file detected
-    echo "Loading a WHDLoad (.zip) file..." >> $AMIBERRY_LOG
+  if [ -f "${CONFIG_FILE}" ]; then
+    cp "${CONFIG_FILE}" "${AMIBERRY_TMP_CONFIG}"
+    echo "-f ${AMIBERRY_TMP_CONFIG}"
+    return
+  fi
 
-    # Set default config
-    AMIBERRY_SET_CONF "$1"
+  CONFIG_FILE="${AMIBERRY_CONFIG_DIR}/custom.uae"
+  if [ -f "${CONFIG_FILE}" ]; then
+    cp "${CONFIG_FILE}" "${AMIBERRY_TMP_CONFIG}"
+    echo "-f ${AMIBERRY_TMP_CONFIG}"
+    return
+  fi
 
-    # Add amiberry.uae conf & start amiberry with WHDLoad
-    amiberry -f "$AMIBERRY_TMP_CONFIG" --autoload "$1" >> $AMIBERRY_LOG 2>&1
+  # no template available
+  echo ""
+}
 
+###############################################################################
+# Helper: build Amiberry arg string
+# Example:
+#   "--model CD32 -G <extra> --log"
+# or "-f /tmp/.../.amiberry-lite_conf.uae --log"
+###############################################################################
+AMIBERRY_GET_ARGS() {
+  local MODEL
+  MODEL="$( AMIBERRY_SET_MODEL "${1}" )"
+
+  local CONF_ARG
+  CONF_ARG="$( AMIBERRY_SET_CONF "${MODEL}" )"
+
+  if [[ -z "${CONF_ARG}" ]]; then
+    # fall back to explicit model if no template .uae exists
+    CONF_ARG="--model ${MODEL}"
+  fi
+
+  echo ${CONF_ARG} -G ${AMIBERRY_ADD_ARGS} --log
+}
+
+TARGET_FILE="${1}"
+
+# extra args from caller if any
+AMIBERRY_ADD_ARGS="${3}"
+
+###############################################################################
+# CASE 1: .zip
+# - WHDLoad-in-zip (lha/slave content)  -> --autoload
+# - multi-floppy zip                    -> mount as DF0/DF1/DF2/DF3
+###############################################################################
+if echo "${TARGET_FILE}" | grep -qi .zip ; then
+  unzip -j -q -o "${TARGET_FILE}" -d "${AMIBERRY_TMP_DIR}"
+
+  # crude WHDLoad-in-zip detection: .nfo plus *.slave content
+  if [ -f "${AMIBERRY_TMP_DIR}"/*.*nfo ] && [ -f "${AMIBERRY_TMP_DIR}"/*/*.*lave ]; then
+    echo "Loading a WHDLoad (.zip) file" >> "${AMIBERRY_LOG}"
+
+    AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
+
+    ${AMIBERRY_EXE} ${AMIBERRY_ARGS} --autoload "${TARGET_FILE}" >> "${AMIBERRY_LOG}" 2>&1
   else
-    # .zip file detected
-    echo "Loading a .zip file..." >> $AMIBERRY_LOG
+    echo "Loading a .zip file with floppy images" >> "${AMIBERRY_LOG}"
 
-    # Set default config
-    AMIBERRY_SET_CONF "$1"
-  
-    # Assign files to floppy0-3
-    for FILE in "$AMIBERRY_TMP_DIR"/*
-    do
-      ARGS="$ARGS\nfloppy$i="$FILE""
-      i=$(($i+1))
-      # This emulator supports 4 floppies max
-      if [ $i -eq $MAX_DRIVES ]; then
-        break;
+    AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
+
+    FLOPPY_ARG=()
+    i=0
+    for FILE in "${AMIBERRY_TMP_DIR}"/*; do
+      FLOPPY_ARG+=(-${i} "${FILE}")
+      [[ "${FILE}" = *.cue ]] && CUE_FILE=${FILE} && break
+      if [ `echo ${TARGET_FILE} | grep -i -e .chd -e .cue -e .iso -e .bin | wc -l` -eq 1 ]; then
+        CD_FILE=${FILE}
+      fi
+      i=$((i+1))
+      if [ ${i} -eq ${MAX_DRIVES} ]; then
+        break
       fi
     done
-  
-    # Add game files as floppies 0-3 to amiberry.uae & start amiberry
-    echo -e ";" >> "$AMIBERRY_TMP_CONFIG"
-    echo -e "; *** temporary added Floppy Drives" >> "$AMIBERRY_TMP_CONFIG"
-    echo -e ";" >> "$AMIBERRY_TMP_CONFIG"
-    echo -e $ARGS >> "$AMIBERRY_TMP_CONFIG"
-    echo -e "\nAssigned floppy drives:" $ARGS "\n" >> "$AMIBERRY_LOG"
-    amiberry -f "$AMIBERRY_TMP_CONFIG" >> $AMIBERRY_LOG 2>&1
+
+    if [[ ! -z ${CUE_FILE} ]]; then
+      ${AMIBERRY_EXE} ${AMIBERRY_ARGS} --cdimage "${CUE_FILE}" >> "${AMIBERRY_LOG}" 2>&1
+    elif [[ ! -z ${CD_FILE} ]]; then
+      ${AMIBERRY_EXE} ${AMIBERRY_ARGS} --autoload "${CD_FILE}" >> "${AMIBERRY_LOG}" 2>&1
+    else
+      ${AMIBERRY_EXE} ${AMIBERRY_ARGS} "${FLOPPY_ARG[@]}" >> "${AMIBERRY_LOG}" 2>&1
+    fi
   fi
 
-# Check for WHDload files (.lha)
-elif [ `echo $1 | grep -i .lha | wc -l` -eq 1 ]; then
-    
-  #.lha file detected
-  echo "Loading a WHDLoad (.lha) file..." >> $AMIBERRY_LOG
+###############################################################################
+# CASE 2: .lha (WHDLoad install)
+# -> just --autoload
+###############################################################################
+elif echo "${TARGET_FILE}" | grep -qi .lha ; then
+  echo "Loading a WHDLoad (.lha) file" >> "${AMIBERRY_LOG}"
 
-  # Set default config
-  AMIBERRY_SET_CONF "$1"
+  AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
 
-  # Add amiberry.uae conf & start amiberry with WHDLoad
-  amiberry -f "$AMIBERRY_TMP_CONFIG" --autoload "$1" >> $AMIBERRY_LOG 2>&1
+  ${AMIBERRY_EXE} ${AMIBERRY_ARGS} --autoload "${TARGET_FILE}" >> "${AMIBERRY_LOG}" 2>&1
 
-# Check for .uae config file
-elif [ `echo $1 | grep -i .uae | wc -l` -eq 1 ]; then
+###############################################################################
+# CASE 3: .uae (explicit Amiberry config)
+###############################################################################
+elif echo "${TARGET_FILE}" | grep -qi .uae ; then
+  echo "Loading a .uae file" >> "${AMIBERRY_LOG}"
 
-  # .uae file detected
-  echo "Loading an .uae file..." >> $AMIBERRY_LOG
+  AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
 
-  # Load .uae config file
-  amiberry -f "$1" >> $AMIBERRY_LOG 2>&1
+  ${AMIBERRY_EXE} ${AMIBERRY_ARGS} -f "${TARGET_FILE}" >> "${AMIBERRY_LOG}" 2>&1
 
-# All other files (.adf .adz .ipf)
+###############################################################################
+# CASE 4: .hdf (hardfile / HDD image)
+# We build a temp config that mounts the .hdf as DH0 and boots from it
+# We force model A1200 in this path
+###############################################################################
+elif echo "${TARGET_FILE}" | grep -qi .hdf ; then
+  echo "Loading a hardfile (.hdf)" >> "${AMIBERRY_LOG}"
+
+  # try A1200 template first, then custom.uae
+  BASE_CFG="${AMIBERRY_CONFIG_DIR}/AmigaA1200-custom.uae"
+  if [ ! -f "${BASE_CFG}" ]; then
+    BASE_CFG="${AMIBERRY_CONFIG_DIR}/custom.uae"
+  fi
+  if [ -f "${BASE_CFG}" ]; then
+    cp "${BASE_CFG}" "${AMIBERRY_TMP_CONFIG}"
+  else
+    : > "${AMIBERRY_TMP_CONFIG}"
+  fi
+
+  # append HDD mapping
+  cat >> "${AMIBERRY_TMP_CONFIG}" <<EOF
+use_gui=no
+hardfile2=rw,DH0:${TARGET_FILE},0,0,0,512,0,
+boot_priority=1
+EOF
+
+  # run forced as A1200, no --autoload here
+  ${AMIBERRY_EXE} --model A1200 -G --log ${AMIBERRY_ADD_ARGS} -f "${AMIBERRY_TMP_CONFIG}" >> "${AMIBERRY_LOG}" 2>&1
+
+###############################################################################
+# CASE 5: CD / CD32 images (.chd .cue .iso .bin)
+# This is the critical amigacd32 path
+# We call --autoload so Amiberry mounts it as CD drive instead of DF0
+# AMIBERRY_GET_ARGS will set --model CD32 if the path matches amigacd32
+###############################################################################
+elif echo "${TARGET_FILE}" | grep -qi -e .cue ; then
+  echo "Loading a CD or CD32 image file" >> "${AMIBERRY_LOG}"
+
+  AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
+
+  ${AMIBERRY_EXE} ${AMIBERRY_ARGS} --cdimage "${TARGET_FILE}" >> "${AMIBERRY_LOG}" 2>&1
+
+elif echo "${TARGET_FILE}" | grep -qi -e .chd -e .iso -e .bin ; then
+  echo "Loading a CD or CD32 image file" >> "${AMIBERRY_LOG}"
+
+  AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
+
+  ${AMIBERRY_EXE} ${AMIBERRY_ARGS} --autoload "${TARGET_FILE}" >> "${AMIBERRY_LOG}" 2>&1
+
+###############################################################################
+# CASE 6: default floppy images (.adf .adz .ipf etc)
+# We mount the file as DF0 using -0
+###############################################################################
 else
+  echo "Loading a single floppy image (.adf or .adz or .ipf)" >> "${AMIBERRY_LOG}"
 
-  #.adf or .adz or .ipf file detected
-  echo "Loading a single .adf or .adz or .ipf file..." >> $AMIBERRY_LOG
+  AMIBERRY_ARGS="$( AMIBERRY_GET_ARGS "${TARGET_FILE}" )"
 
-  # Set default config
-  AMIBERRY_SET_CONF "$1"
-
-  # Add game file as floppy0 to amiberry.uae & start amiberry
-  echo -e ";" >> "$AMIBERRY_TMP_CONFIG"
-  echo -e "; *** temporary added Floppy Drives" >> "$AMIBERRY_TMP_CONFIG"
-  echo -e ";" >> "$AMIBERRY_TMP_CONFIG"
-  echo -e "\nfloppy0=$1" >> "$AMIBERRY_TMP_CONFIG"
-  echo -e "\nAssigned floppy drive:\nfloppy0=$1\n" >> "$AMIBERRY_LOG"
-  amiberry -f "$AMIBERRY_TMP_CONFIG" >> $AMIBERRY_LOG 2>&1
+  ${AMIBERRY_EXE} ${AMIBERRY_ARGS} -0 "${TARGET_FILE}" >> "${AMIBERRY_LOG}" 2>&1
 fi
 
-# Remove temporary dir
-rm -rf "$AMIBERRY_TMP_DIR"
+# cleanup temp dir
+rm -rf "${AMIBERRY_TMP_DIR}"

@@ -22,13 +22,16 @@
  	#endif
 --- a/es-app/src/FileData.cpp
 +++ b/es-app/src/FileData.cpp
-@@ -538,9 +538,6 @@
+@@ -741,10 +741,12 @@
  	VolumeControl::getInstance()->deinit();
  
  	bool hideWindow = Settings::getInstance()->getBool("HideWindow");
--#ifdef _ENABLEEMUELEC
--	hideWindow = false;
--#endif
++/*
+ #ifdef _ENABLEEMUELEC
+ 	// attempts to fix screen tearing issue, we always need hideWindow to false
+ 	hideWindow = false;
+ #endif
++*/
  	window->deinit(hideWindow);
  	
  	const std::string rom = Utils::FileSystem::getEscapedPath(getPath());

@@ -302,6 +302,7 @@ gambatte \
 gearboy \
 gearcoleco \
 geargrafx \
+gearlynx \
 gearsystem \
 genesis-plus-gx \
 genesis_plus_gx_cart_special \
@@ -328,7 +329,6 @@ pcsx_rearmed \
 picodrive \
 pocketcdg \
 pokemini \
-ppsspp \
 prboom \
 prosystem \
 puae \
@@ -368,7 +368,6 @@ yabause"
 
 LIBRETRO_S922X_CORES="beetle-saturn \
 mesen \
-mame \
 mesen-s \
 quicknes \
 virtualjaguar"

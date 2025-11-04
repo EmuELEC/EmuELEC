@@ -2,7 +2,7 @@
   OS_MAJOR="4"
 
 # OS_MINOR: OS minor Version
-  OS_MINOR="7"
+  OS_MINOR="8"
 
 # OS_VERSION: OS Version
   OS_VERSION="${OS_MAJOR}.${OS_MINOR}"

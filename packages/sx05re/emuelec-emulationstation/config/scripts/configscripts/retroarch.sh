@@ -10,6 +10,48 @@
 #
 # Modified 2019 by Shanti Gilbert for EmuELEC/CoreELEC (https//www.coreelec.org)
 
+# Function to find udev device name using /proc/bus/input/devices from a SDL GUID
+get_udev_name_from_guid() {
+    local guid="$1"
+
+    if [[ ! "$guid" =~ ^[0-9A-Fa-f]{32}$ ]]; then
+        echo "Invalid GUID format" >&2
+        return 1
+    fi
+
+    guid=${guid,,}  # lowercase for safety
+
+    # Helper: swap endian (little → big)
+    swap_endian() {
+        echo "$1" | sed 's/\(..\)\(..\)/\2\1/'
+    }
+
+    # Extract relevant fields (note: byte order)
+    local bus_le=${guid:0:4}
+    local vendor_le=${guid:8:4}
+    local product_le=${guid:16:4}
+    local version_le=${guid:24:4}
+
+    local bus=$(swap_endian "$bus_le")
+    local vendor=$(swap_endian "$vendor_le")
+    local product=$(swap_endian "$product_le")
+    local version=$(swap_endian "$version_le")
+
+    # Find the block starting with I: that matches all three fields
+    local name
+    name=$(sed -n "/I:.*Bus=${bus}.*Vendor=${vendor}.*Product=${product}/,/^$/p" /proc/bus/input/devices \
+        | sed -n 's/^N: Name="\([^"]*\)"/\1/p' \
+        | head -n1)
+
+    if [[ -n "$name" ]]; then
+        echo "$name"
+    else
+    #fall back to ES name 
+        echo "${DEVICE_NAME}"
+    fi
+}
+
+
 function onstart_retroarch_joystick() {
     iniConfig " = " '"' "${configdir}/retroarch/retroarch.cfg"
     iniGet "input_joypad_driver"
@@ -24,8 +66,6 @@ function onstart_retroarch_joystick() {
     getAutoConf "8bitdo_hack" && _atebitdo_hack=1
 
     iniConfig " = " "\"" "/tmp/tempconfig.cfg"
-    iniSet "input_device" "${DEVICE_NAME}"
-    iniSet "input_driver" "${input_joypad_driver}"
 
     v=${DEVICE_GUID:8:8}
     part1=$(echo ${v:6:2}${v:4:2}${v:2:2}${v:0:2})
@@ -35,8 +75,12 @@ function onstart_retroarch_joystick() {
     input_vendor=$(echo $((16#${part1:4})))
     input_product=$(echo $((16#${part2:4})))
 
+    RA_DEVICE_NAME=$(get_udev_name_from_guid "${DEVICE_GUID}")
+    iniSet "input_device" "${RA_DEVICE_NAME}"
+    iniSet "input_driver" "${input_joypad_driver}"
     iniSet "input_vendor_id" "${input_vendor}"
     iniSet "input_product_id" "${input_product}"
+
     
 }
 
@@ -272,7 +316,7 @@ function map_retroarch_joystick() {
                 # workaround for mismatched controller mappings
                 iniGet "input_driver"
                 if [[ "${ini_value}" == "udev" ]]; then
-                    case "${DEVICE_NAME}" in
+                    case "${RA_DEVICE_NAME}" in
                         "8Bitdo FC30"*|"8Bitdo NES30"*|"8Bitdo SFC30"*|"8Bitdo SNES30"*|"8Bitdo Zero"*)
                             if [[ "$_atebitdo_hack" -eq 1 ]]; then
                                 value="$((input_id+11))"
@@ -382,7 +426,7 @@ function onend_retroarch_joystick() {
     local dir="/tmp/joypads"
     while read -r file; do
         mv "${file}" "${file}.bak" > /dev/null 2>&1
-    done < <(grep -Fl "\"${DEVICE_NAME}\"" "${dir}/"*.cfg 2>/dev/null)
+    done < <(grep -Fl "\"${RA_DEVICE_NAME}\"" "${dir}/"*.cfg 2>/dev/null)
 
 		for file in /tmp/joypads/*.*; do
 			txt=$( cat "$file" | grep -E -c "^input_vendor_id = \"${input_vendor}\"$|^input_product_id = \"${input_product}\"$" )
@@ -390,7 +434,7 @@ function onend_retroarch_joystick() {
 		done
 
     # sanitise filename
-    file="${DEVICE_NAME//[\?\<\>\\\/:\*\|]/}.cfg"
+    file="${RA_DEVICE_NAME//[\?\<\>\\\/:\*\|]/}.cfg"
 
     if [[ -f "${dir}/${file}" ]]; then
         mv "${dir}/${file}" "${dir}/${file}.bak"
