@@ -244,7 +244,7 @@
       "hardware": "arcade",
       "path": "/storage/roms/pgm2",
       "platform": "pgm2",
-      "theme": "pgm2",
+      "theme": "pgm",
       "command": "default",
       "extensions": [
         ".zip"
@@ -425,9 +425,6 @@
             },
             {
               "name": "mednafen_lynx"
-            },
-            {
-              "name": "gearlynx"
             }
           ]
         }
@@ -843,6 +840,7 @@
           "cores": [
             {
               "name": "AMIBERRY-LITE",
+              "default": true,
               "incompatible": [".m3u"]
             },
             {
@@ -855,8 +853,7 @@
           "name": "libretro",
           "cores": [
             {
-              "name": "puae",
-              "default": true
+              "name": "puae"
             },
             {
               "name": "puae2021"
@@ -892,7 +889,7 @@
           "cores": [
             {
               "name": "AMIBERRY-LITE",
-              "incompatible": [".m3u"]
+              "default": true
             },
             {
               "name": "AMIBERRY",              
@@ -904,8 +901,7 @@
           "name": "libretro",
           "cores": [
             {
-              "name": "puae",
-              "default": true
+              "name": "puae"
             },
             {
               "name": "puae2021"
@@ -991,9 +987,7 @@
         ".com",
         ".exe",
         ".sh",
-        ".zip",
-        ".iso",
-        ".cue"
+        ".zip"
       ],
       "emulators": [
         {
@@ -1693,39 +1687,6 @@
       ]
     },
     {
-      "name": "nds",
-      "fullname": "Nintendo DS",
-      "manufacturer": "Nintendo",
-      "release": "2004",
-      "hardware": "portable",
-      "path": "/storage/roms/nds",
-      "platform": "nds",
-      "theme": "nds",
-      "command": "default",
-      "extensions": [
-        ".7z",
-        ".nds",
-        ".zip"
-      ],
-      "emulators": [
-        {
-          "name": "libretro",
-          "cores": [
-            {
-              "name": "desmume_32b",
-              "default": true
-            },
-            {
-              "name": "desmume"
-            },
-            {
-              "name": "melonds"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "name": "nes",
       "fullname": "Nintendo Entertainment System",
       "manufacturer": "Nintendo",
@@ -2332,7 +2293,7 @@
       "hardware": "console",
       "path": "/storage/roms/snesmsu1",
       "platform": "snes",
-      "theme": "snesmsu1",
+      "theme": "snes-msu1",
       "command": "default",
       "extensions": [
         ".7z",
@@ -2358,9 +2319,6 @@
             },
             {
               "name": "mednafen_supafaust"
-            },
-            {
-              "name": "mesen-s"
             }
           ]
         }
@@ -2392,9 +2350,6 @@
             {
               "name": "snes9x",
               "default": true
-            },
-            {
-              "name": "mesen-s"
             }
           ]
         }
@@ -2426,9 +2381,6 @@
             {
               "name": "snes9x",
               "default": true
-            },
-            {
-              "name": "mesen-s"
             }
           ]
         }
@@ -2462,9 +2414,9 @@
       ]
     },
     {
-      "name": "philips-cdi",
-      "fullname": "Philips CDI",
-      "manufacturer": "Philips",
+      "name": "phillips-cdi",
+      "fullname": "Phillips CDI",
+      "manufacturer": "Phillips",
       "release": "1990",
       "hardware": "console",
       "path": "/storage/roms/cdi",
@@ -3204,7 +3156,7 @@
       "hardware": "console",
       "path": "/storage/roms/megadrivemsu",
       "platform": "megadrive",
-      "theme": "megadrivemsu",
+      "theme": "megadrive-msu",
       "command": "default",
       "extensions": [
         ".7z",
@@ -3550,7 +3502,7 @@
       "hardware": "computer",
       "path": "/storage/roms/x1",
       "platform": "x1",
-      "theme": "sharpx1",
+      "theme": "x1",
       "command": "default",
       "extensions": [
         ".2d",
@@ -3714,6 +3666,14 @@
               "default": true
             }
           ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "ppsspp"
+            }
+          ]
         }
       ]
     },
@@ -3739,6 +3699,14 @@
             {
               "name": "PPSSPPSDL",
               "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "ppsspp"
             }
           ]
         }
@@ -3888,7 +3856,7 @@
       "hardware": "console",
       "path": "/storage/roms/tic-80",
       "platform": "tic80",
-      "theme": "tic-80",
+      "theme": "tic80",
       "command": "default",
       "extensions": [
         ".tic"
