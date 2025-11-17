@@ -31,29 +31,14 @@ PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="libretro wrapper for desmume NDS emulator."
 PKG_LONGDESC="libretro wrapper for desmume NDS emulator."
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
 
-PKG_MAKE_OPTS_TARGET="-C desmume/src/frontend/libretro -f Makefile.libretro GIT_VERSION=${PKG_VERSION:0:7}"
-
-
-pre_configure_target() {
-  case ${TARGET_CPU} in
-    arm1176jzf-s)
-      PKG_MAKE_OPTS_TARGET+=" platform=armv6-hardfloat-${TARGET_CPU}"
-      ;;
-    cortex-a7|cortex-a9|cortex-a53|cortex-a35)
-      PKG_MAKE_OPTS_TARGET+=" platform=armv7-neon-hardfloat-${TARGET_CPU}"
-      ;;
-    *cortex-a53|cortex-a35)
-      PKG_MAKE_OPTS_TARGET+=" platform=armv8-neon-hardfloat-${TARGET_CPU}"
-      ;;
-  esac
+make_target() {
+cd ${PKG_BUILD}/desmume/src/frontend/libretro
+make CC=${CC} platform=arm64-unix
 }
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib/libretro
-  cp desmume/src/frontend/libretro/desmume_libretro.so ${INSTALL}/usr/lib/libretro/
+  cp ${PKG_BUILD}/desmume/src/frontend/libretro/desmume_libretro.so ${INSTALL}/usr/lib/libretro/
 }

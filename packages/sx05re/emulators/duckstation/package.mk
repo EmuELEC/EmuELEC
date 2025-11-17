@@ -54,6 +54,8 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/usr/config/emuelec/configs/duckstation
   cp -rf ${PKG_BUILD}/.${TARGET_NAME}/bin/* ${INSTALL}/usr/config/emuelec/configs/duckstation
   cp -rf ${PKG_DIR}/config/* ${INSTALL}/usr/config/emuelec/configs/duckstation
+  rm -rf ${INSTALL}/usr/config/emuelec/configs/duckstation/database/gamecontrollerdb.txt
+  ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt ${INSTALL}/usr/config/emuelec/configs/duckstation/database/gamecontrollerdb.txt
   
   rm -rf ${INSTALL}/usr/config/emuelec/configs/duckstation/duckstation-nogui
   rm -rf ${INSTALL}/usr/config/emuelec/configs/duckstation/common-tests

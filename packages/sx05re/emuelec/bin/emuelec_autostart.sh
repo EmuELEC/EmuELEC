@@ -132,6 +132,16 @@ systemctl restart bluetooth
 emuelec-bluetooth ${BTSCANTIME} &
 fi
 
+# Auto shutdown will persist between reboots as long as ee_auto_shutdown_timeout is > 0
+ASHD=$(get_ee_setting ee_auto_shutdown_persistent)
+
+if [ "${ASHD}" != "1" ]; then 
+	set_ee_setting ee_auto_shutdown_timeout 0
+	set_ee_setting ee_auto_shutdown_persistent 0 # Paranoia 
+fi
+killall ee_asd > /dev/null 2>&1 # Paranoia 
+ee_asd
+
 # What to start at boot?
 DEFE=$(get_ee_setting ee_boot)
 

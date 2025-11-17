@@ -113,15 +113,18 @@ fi
 }
 
 function onend_gamecontrollerdb_joystick() {
-SDL_GAMECONTROLLERCONFIG_FILE="/storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt"
-# We remove previous UUID if it exists 
-echo "Removing ${DEVICE_GUID}"
-    sed -i "/${DEVICE_GUID}/d" "${SDL_GAMECONTROLLERCONFIG_FILE}"
-
+    SDL_GAMECONTROLLERCONFIG_FILE="/storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt"
+    
     CONF=$(cat "${TMPCONF}")
-    sed -i "/EmuELEC extra gamepads/c # EmuELEC extra gamepads\n${CONF}platform:Linux," "${SDL_GAMECONTROLLERCONFIG_FILE}"
 
+    if grep -q "${DEVICE_GUID}" "${SDL_GAMECONTROLLERCONFIG_FILE}"; then
+        # If DEVICE_GUID exists, replace the existing entry
+        sed -i "/${DEVICE_GUID}/c ${CONF}platform:Linux," "${SDL_GAMECONTROLLERCONFIG_FILE}"
+    else
+        sed -i "5i ${CONF}platform:Linux," "${SDL_GAMECONTROLLERCONFIG_FILE}"
+    fi
 
-# cleanup
-rm "${TMPCONF}" > /dev/null 2>&1
+    # Cleanup
+    rm -f "${TMPCONF}" > /dev/null 2>&1
 }
+

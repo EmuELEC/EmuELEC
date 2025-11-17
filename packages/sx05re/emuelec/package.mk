@@ -11,7 +11,7 @@ PKG_LONGDESC="EmuELEC Meta Package"
 PKG_TOOLCHAIN="manual"
 
 PKG_EXPERIMENTAL="nestopiaCV quasi88 xmil np2kai hypseus-singe yabasanshiroSA_1_11 yabasanshiroSA_1_5 fbneoSA same_cdi ikemen-go" 
-PKG_EMUS="${LIBRETRO_CORES} advancemame PPSSPPSDL amiberry amiberry-lite hatarisa openbor dosbox-staging mupen64plus-nx mupen64plus-nx-alt scummvmsa stellasa solarus dosbox-pure pcsx_rearmed ecwolf potator freej2me duckstation flycastsa fmsx-libretro jzintv mupen64plussa"
+PKG_EMUS="${LIBRETRO_CORES} desmume melonds advancemame PPSSPPSDL amiberry amiberry-lite hatarisa openbor dosbox-staging mupen64plus-nx mupen64plus-nx-alt scummvmsa stellasa solarus dosbox-pure pcsx_rearmed ecwolf potator freej2me duckstation flycastsa fmsx-libretro jzintv mupen64plussa"
 PKG_DEPENDS_TARGET+=" emuelec-tools ${PKG_EMUS} ${PKG_EXPERIMENTAL}"
 
 
@@ -49,7 +49,7 @@ if [ "${ARCH}" == "aarch64" ]; then
                         lib32-parallel-n64 \
                         lib32-bennugd-monolithic \
                         lib32-droidports \
-                        lib32-box86
+                        lib32-box86 \
                         lib32-libusb"
 
   if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
@@ -126,6 +126,8 @@ post_install() {
   ln -sf emuelec.target ${INSTALL}/usr/lib/systemd/system/default.target
   enable_service emuelec-autostart.service
   enable_service emuelec-disable_small_cores.service
+  enable_service emuelec-reboot.service
+  enable_service emuelec-shutdown.service
 
 
   # Remove scripts from OdroidGoAdvance build

@@ -145,6 +145,9 @@ CURRENTVER="${CVER%%.*}${CVER#*.}"
 UPDATEVER="${UVER%%.*}${UVER#*.}"
 UPDATEVERP="${UVER}"
 
+CURRENTVER="${CURRENTVER%%-*}"
+UPDATEVER="${UPDATEVER%%-*}"
+
 # If current or update version is only 2 digits, then we add 99999999 to allow updating from beta to stable and viceversa
 [ ${#CURRENTVER} == 2 ] && CURRENTVER="${CURRENTVER}99999999" 
 [ ${#UPDATEVER} == 2 ] && UPDATEVER="${UPDATEVER}99999999"

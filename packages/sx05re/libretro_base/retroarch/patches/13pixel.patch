@@ -1,6 +1,6 @@
 --- a/cheevos/cheevos.c	2024-12-22 21:25:46.767207900 +0100
 +++ b/cheevos/cheevos.c	2024-12-22 21:31:50.025471176 +0100
-@@ -289,7 +289,11 @@
+@@ -293,7 +293,11 @@
  
     if (!cheevo)
        return;
@@ -13,3 +13,18 @@
     /* Show the on screen message. */
     if (settings->bools.cheevos_visibility_unlock)
     {
+@@ -1279,12 +1283,14 @@
+                MESSAGE_QUEUE_ICON_DEFAULT, MESSAGE_QUEUE_CATEGORY_INFO);
+    }
+ 
++ if (settings->bools.cheevos_unsupported_notification) {
+    if (summary.num_unsupported_achievements)
+    {
+       const char* warning = msg_hash_to_str(MSG_CHEEVOS_UNSUPPORTED_WARNING);
+       runloop_msg_queue_push(warning, strlen(warning), 0, 3 * 60, false, NULL,
+          MESSAGE_QUEUE_ICON_DEFAULT, MESSAGE_QUEUE_CATEGORY_WARNING);
+    }
++ }
+ }
+ 
+ static uint32_t rcheevos_client_read_memory(uint32_t address,

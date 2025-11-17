@@ -5,7 +5,6 @@
        AR = clang
     endif
 -
-+   
 +   # ARM64
 +   ifneq (,$(findstring arm64,$(platform)))
 +      DESMUME_JIT = 0
@@ -13,8 +12,9 @@
 +      override TARGET_ARCH := arm64
 +      CXXFLAGS += -DUSE_POSIX_MEMALIGN
 +      CXXFLAGS += -DARM64
++      DESMUME_OPENGL = 0
++      DESMUME_OPENGL_CORE = 0
 +   endif
-+   
     # Generic ARM
     ifneq (,$(findstring armv,$(platform)))
        DESMUME_JIT_ARM = 1

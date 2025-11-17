@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang='fr'>
+<head>			
+	<title>EmuELEC-EmulationStation Web services</title>
+	<link rel="shortcut icon" href="favicon.png">
+	<link href="main.css" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<div class="container">
+		<div id="notificationBanner" class="notification-banner" style="display: none;">
+			<span id="notificationText"></span>
+			<button onclick="document.getElementById('notificationBanner').style.display='none'" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0 10px;">×</button>
+		</div>
+		
+		<div class="header">
+			<div class="header-left">
+				<img src="favicon.png" alt="ES">
+				<h1>EmuELEC-EmulationStation Web Services</h1>
+			</div>
+			<div class="status-bar">
+				<div class="status-item">
+					<div class="status-dot"></div>
+					<span id="statusText">Ready</span>
+				</div>
+				<div class="status-item" id="runningGame" style="display: none;">
+					Playing: <span id="runningGameText">None</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="toolbar">
+			<button class="btn btn-primary" onclick="app.showView('games')">Games</button>
+			<button class="btn btn-primary" onclick="app.showView('config')">Config Editor</button>
+			<button class="btn btn-primary" onclick="app.showView('tools')">Tools</button>
+			<button class="btn btn-secondary" onclick="app.showMessageBox()">Send Message To Box</button>
+			<button class="btn btn-secondary" onclick="app.showNotification()">Send Notification To Box</button>
+			<button class="btn btn-warning" onclick="app.killEmulator()">Kill Emulator</button>
+			<button class="btn btn-warning" onclick="app.reloadGames()">Reload ES Games</button>
+			<button class="btn btn-danger" onclick="app.quit()">Restart ES</button>
+			<button class="btn btn-danger" onclick="app.restart()">Restart System</button>
+		</div>
+
+		<div class="main-content" id="gamesView">
+			<div class="sidebar">
+				<h3>Systems</h3>
+				<div id="systemList"></div>
+			</div>
+
+			<div class="content-area">
+				<div class="search-bar">
+					<div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+						<input type="text" class="search-input" id="searchInput" placeholder="Search games..." onkeyup="app.filterGames()" style="flex: 1; min-width: 200px;">
+						<button class="btn btn-primary" onclick="app.scrapeSystem()" style="white-space: nowrap;">Scrape System</button>
+						<select id="filterField" class="search-input" style="flex: 0 0 200px;" onchange="app.filterGames()">
+							<option value="">Filter by: None</option>
+							<option value="favorite">Filter by: Favorite</option>
+							<option value="notscraped">Filter by: Not Scraped</option>
+							<option value="hascheevos">Filter by: Has Cheevos</option>
+						</select>
+						<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; cursor: pointer;">
+							<input type="checkbox" id="invertFilter" onchange="app.filterGames()" style="cursor: pointer;">
+							<span style="font-size: 14px;">Invert</span>
+						</label>
+						<select id="sortField" class="search-input" style="flex: 0 0 200px;" onchange="app.sortGames()">
+							<option value="favorite">Sort by: Favorite</option>
+							<option value="name">Sort by: Name</option>
+							<option value="rating">Sort by: Rating</option>
+							<option value="releasedate">Sort by: Release Date</option>
+							<option value="developer">Sort by: Developer</option>
+							<option value="publisher">Sort by: Publisher</option>
+							<option value="genre">Sort by: Genre</option>
+							<option value="family">Sort by: Family</option>
+							<option value="players">Sort by: Players</option>
+							<option value="playcount">Sort by: Play Count</option>
+							<option value="lastplayed">Sort by: Last Played</option>
+							<option value="gametime">Sort by: Game Time</option>
+							<option value="region">Sort by: Region</option>
+							<option value="lang">Sort by: Language</option>
+						</select>
+						<select id="sortOrder" class="search-input" style="flex: 0 0 120px;" onchange="app.sortGames()">
+							<option value="desc">Descending</option>
+							<option value="asc">Ascending</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="games-grid" id="gamesContainer">
+					<div class="loading">
+						<div class="spinner"></div>
+						<p>Select a system to view games</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="main-content" id="configView" style="display: none;">
+			<div class="sidebar">
+				<h3>Config Files</h3>
+				<div style="padding: 10px 20px;">
+					<button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="app.loadConfigList()">Refresh</button>
+					<button class="btn btn-secondary" style="width: 100%;" onclick="app.createNewConfigFile()">New File</button>
+				</div>
+				<div id="configList"></div>
+			</div>
+
+			<div class="content-area">
+				<div id="configEditorContainer" class="games-grid">
+					<div class="empty-state">
+						<div class="empty-state-icon">[ ]</div>
+						<h3>Select a config file to edit</h3>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="main-content" id="toolsView" style="display: none;">
+			<div class="content-area" style="width: 100%;">
+				<div class="games-grid">
+					<div class="tools-section">
+						<h2>System Tools</h2>
+						
+						<div class="tool-card">
+							<h3>Add/Update System</h3>
+							<p>Add a new system or update an existing one in es_systems.cfg.</p>
+							
+							<div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+								<strong style="color: #334155;">Default run command:</strong><br>
+								<code style="background: white; padding: 8px; display: block; margin-top: 8px; border-radius: 4px; font-size: 12px; color: #334155; word-break: break-all;">emuelecRunEmu.sh %ROM% -P%SYSTEM% --core=%CORE% --emulator=%EMULATOR% --controllers="%CONTROLLERSCONFIG%"</code>
+							</div>
+							
+							<label class="tool-label">System XML:</label>
+							<textarea id="addSystemXML" class="tool-textarea" style="height: 300px;" placeholder="<system>
+  <name>systemname</name>
+  <fullname>System Name</fullname>
+  <path>/storage/roms/systemname</path>
+  <extension>.zip .ZIP</extension>
+  <command>emuelecRunEmu.sh %ROM%</command>
+  <platform>systemname</platform>
+  <theme>systemname</theme>
+</system>"></textarea>
+							<button class="btn btn-primary" onclick="app.addSystem()">Add/Update System</button>
+							<div id="addSystemResult" class="tool-result"></div>
+						</div>
+
+						<div class="tool-card">
+							<h3>Remove System</h3>
+							<p>Remove a system from es_systems.cfg. This does NOT delete ROM files.</p>
+							<label class="tool-label">Select System:</label>
+							<select id="removeSystemSelect" class="tool-input">
+								<option value="">-- Select a system --</option>
+							</select>
+							<button class="btn btn-danger" onclick="app.removeSystem()">Remove System</button>
+							<div id="removeSystemResult" class="tool-result"></div>
+						</div>
+
+						<div class="tool-card">
+							<h3>Add/Update Emulator or Core</h3>
+							<p>Add an emulator with cores to a system, or update an existing one.</p>
+							<label class="tool-label">Select System:</label>
+							<select id="addEmulatorSystem" class="tool-input">
+								<option value="">-- Select a system --</option>
+							</select>
+							<label class="tool-label">Emulator XML:</label>
+							<textarea id="addEmulatorXML" class="tool-textarea" style="height: 200px;" placeholder='<emulator name="libretro">
+  <cores>
+    <core default="true">corename</core>
+    <core>another_core</core>
+  </cores>
+</emulator>'></textarea>
+							<button class="btn btn-primary" onclick="app.addEmulator()">Add/Update Emulator</button>
+							<div id="addEmulatorResult" class="tool-result"></div>
+						</div>
+
+						<div class="tool-card">
+							<h3>Remove Emulator</h3>
+							<p>Remove an emulator and all its cores from a system.</p>
+							<label class="tool-label">Select System:</label>
+							<select id="removeEmulatorSystem" class="tool-input">
+								<option value="">-- Select a system --</option>
+							</select>
+							<label class="tool-label">Emulator Name:</label>
+							<input type="text" id="removeEmulatorName" placeholder="e.g., libretro" class="tool-input">
+							<button class="btn btn-danger" onclick="app.removeEmulator()">Remove Emulator</button>
+							<div id="removeEmulatorResult" class="tool-result"></div>
+						</div>
+
+						<div class="tool-card">
+							<h3>Add Games</h3>
+							<p>Import games to a system using gamelist.xml format. This will add new games or update existing ones.</p>
+							<label class="tool-label">Select System:</label>
+							<select id="addGamesSystem" class="tool-input">
+								<option value="">-- Select a system --</option>
+							</select>
+							<label class="tool-label">Gamelist XML:</label>
+							<textarea id="addGamesXML" class="tool-textarea" style="height: 200px;" placeholder="<?xml version=&quot;1.0&quot;?>
+<gameList>
+    <game>
+        <path>./MyGame.zip</path>
+        <name>My Game</name>
+        <desc>Description here</desc>
+        <rating>0.8</rating>
+        <developer>Developer</developer>
+        <genre>Action</genre>
+    </game>
+</gameList>"></textarea>
+							<button class="btn btn-primary" onclick="app.addGames()">Add Games</button>
+							<div id="addGamesResult" class="tool-result"></div>
+						</div>
+
+						<div class="tool-card">
+							<h3>Remove Games</h3>
+							<p>Remove games from a system. This will delete the ROM files and remove them from gamelists.</p>
+							<label class="tool-label">Select System:</label>
+							<select id="removeGamesSystem" class="tool-input">
+								<option value="">-- Select a system --</option>
+							</select>
+							<label class="tool-label">Gamelist XML (with games to remove):</label>
+							<textarea id="removeGamesXML" class="tool-textarea" style="height: 200px;" placeholder="<?xml version=&quot;1.0&quot;?>
+<gameList>
+    <game>
+        <path>./GameToRemove.zip</path>
+    </game>
+</gameList>"></textarea>
+							<button class="btn btn-danger" onclick="app.removeGames()">Remove Games (Deletes Files!)</button>
+							<div id="removeGamesResult" class="tool-result"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal" id="gameModal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title" id="modalTitle">Game Details</h2>
+				<button class="modal-close" onclick="app.closeModal()">&#10005;</button>
+			</div>
+			<div class="modal-body" id="modalBody"></div>
+		</div>
+	</div>
+
+	<script src="main.js"></script>
+</body>
+</html>

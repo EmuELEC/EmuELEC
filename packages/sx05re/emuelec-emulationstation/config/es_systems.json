@@ -1693,6 +1693,36 @@
       ]
     },
     {
+      "name": "nds",
+      "fullname": "Nintendo DS",
+      "manufacturer": "Nintendo",
+      "release": "2004",
+      "hardware": "portable",
+      "path": "/storage/roms/nds",
+      "platform": "nds",
+      "theme": "nds",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".nds",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "melonds",
+              "default": true
+            },
+            {
+              "name": "desmume"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "nes",
       "fullname": "Nintendo Entertainment System",
       "manufacturer": "Nintendo",
@@ -2429,9 +2459,9 @@
       ]
     },
     {
-      "name": "phillips-cdi",
-      "fullname": "Phillips CDI",
-      "manufacturer": "Phillips",
+      "name": "philips-cdi",
+      "fullname": "Philips CDI",
+      "manufacturer": "Philips",
       "release": "1990",
       "hardware": "console",
       "path": "/storage/roms/cdi",

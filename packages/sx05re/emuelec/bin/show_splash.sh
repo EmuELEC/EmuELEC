@@ -246,9 +246,10 @@ is_image() { case "${1,,}" in *.png|*.jpg|*.jpeg|*.bmp|*.gif) return 0;; *) retu
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
  if [ "${ACTION_TYPE}" != "intro" ]; then
-   LOADING_DURATION="$(get_ee_setting ee_splash_loading_duration)"
-   DURATION="${LOADING_DURATION}"
+   DURATION="$(get_ee_setting ee_splash_loading_duration)"
    FALLBACK_SPLASH="${GAMELOADINGSPLASH}"
+
+write_log "DURATION is ${DURATION}"
 
    if [ "${ACTION_TYPE}" = "exit" ]; then
      EXIT_DURATION="$(get_ee_setting ee_splash_exit_duration)"
@@ -273,9 +274,26 @@ if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]];
        sleep ${DURATION}
      fi
    elif is_video "${SPLASH}"; then
-     if [ "${DURATION}" -eq 0 ]; then
+   
+   # get video lenght
+	VID_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${SPLASH}")
+	write_log "Video duration: ${VID_DURATION}"
+	
+	DURATION_INT=${DURATION%.*}
+	VID_DURATION_INT=${VID_DURATION%.*}
+	
+	# compare durations and set the one that is lower
+	if [ "$VID_DURATION_INT" -lt "$DURATION_INT" ]; then
+		DURATION=${VID_DURATION}
+		write_log "Setting Duration to video duration: ${VID_DURATION}"
+	fi
+   
+     if [ "${DURATION}" -le 3 ]; then
        DURATION=3
      fi
+     
+     write_log "FINAL DURATION ${DURATION}"
+     
      if [ "${PLAYER_VID}" = "ffplay" ]; then
        ${PLAYER_VID} -fs -autoexit -loglevel error -nostats -vf "${FILTER_FILL}" -t ${DURATION} -i "${SPLASH}" >/dev/null 2>&1
      else

@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="09356d0dae6291008a074d8ac4f8c20678d822d2"
+PKG_VERSION="4826365da13164770f824a27f6bf6be0a9074040"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -82,6 +82,7 @@ makeinstall_target() {
 	mkdir -p ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/scripts ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/*.cfg ${INSTALL}/usr/config/emulationstation
+	cp -rf ${PKG_DIR}/config/resources ${INSTALL}/usr/config/emulationstation/
 
 	# Generate es_systems.cfg from json
 	python3 ${PKG_DIR}/generate_es_systems.py -i ${PKG_DIR}/config/es_systems.json -o ${INSTALL}/usr/config/emulationstation/es_systems.cfg -b manufacturer
@@ -120,7 +121,7 @@ if [[ "${DEVICE}" != "Amlogic-ng" || "${DEVICE}" != "Amlogic-ne" || "${DEVICE}" 
     elif [ "${DEVICE}" == "Amlogic-old" ]; then
         remove_cores="mesen-s quicknes mame2016 mesen yabasanshiroSA yabasanshiro"
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" ${CORESFILE}
-        xmlstarlet ed -L -P -d "/systemList/system[name='phillips-cdi']" ${CORESFILE}
+        xmlstarlet ed -L -P -d "/systemList/system[name='philips-cdi']" ${CORESFILE}
         xmlstarlet ed -L -P -d "/systemList/system/emulators/emulator[@name='Duckstation']" ${CORESFILE}
     fi
     

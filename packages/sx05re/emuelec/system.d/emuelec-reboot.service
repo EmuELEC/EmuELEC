@@ -1,0 +1,14 @@
+[Unit]
+Description=EmuELEC reboot script
+After=emustation.service
+Before=systemd-reboot.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+Environment=HOME=/storage
+ExecStart=-/bin/sh -c ". /etc/profile; exec /bin/sh /storage/.config/shutdown.sh reboot"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=reboot.target

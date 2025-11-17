@@ -43,7 +43,7 @@
 
 --- ./configuration.h	2017-08-14 02:20:37.546187576 -0500
 +++ ./configuration.h	2017-08-14 02:20:46.390236188 -0500
-@@ -47,6 +47,10 @@
+@@ -47,6 +47,11 @@
     {
        bool placeholder;
  
@@ -51,12 +51,13 @@
 +      bool emuelec_exit_to_kodi;
 +      bool video_oga_vertical_enable;
 +      bool video_ogs_vertical_enable;
++      bool cheevos_unsupported_notification;
        /* Video */
        bool video_fullscreen;
        bool video_windowed_fullscreen;
 --- ./configuration.c	2017-08-18 06:30:31.000000000 -0500
 +++ ./configuration.c	2017-08-23 01:24:28.009570267 -0500
-@@ -1329,6 +1329,11 @@
+@@ -1329,6 +1329,12 @@
  {
     struct config_bool_setting  *tmp    = (struct config_bool_setting*)calloc(1, (*size + 1) * sizeof(struct config_bool_setting));
     unsigned count                      = 0;
@@ -64,6 +65,7 @@
 +   SETTING_BOOL("emuelec_exit_to_kodi",           &settings->bools.emuelec_exit_to_kodi, true, false, false);
 +   SETTING_BOOL("video_oga_vertical_enable",      &settings->bools.video_oga_vertical_enable, true, false, false);
 +   SETTING_BOOL("video_ogs_vertical_enable",      &settings->bools.video_ogs_vertical_enable, true, false, false);
++   SETTING_BOOL("cheevos_unsupported_notification",      &settings->bools.cheevos_unsupported_notification, true, false, false);
 +   /* emuelec */
  
     SETTING_BOOL("accessibility_enable", &settings->bools.accessibility_enable, true, DEFAULT_ACCESSIBILITY_ENABLE, false);

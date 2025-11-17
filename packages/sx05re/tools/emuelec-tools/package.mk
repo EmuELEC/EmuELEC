@@ -64,7 +64,8 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       progressor \
                       timidity \
                       sdlterm \
-                      btop"
+                      btop \
+                      ee_utils"
 
 if [ "${PROJECT}" == "Amlogic-ce" ]; then
                       PKG_DEPENDS_TARGET+=" CoreELEC-Debug-Scripts"
