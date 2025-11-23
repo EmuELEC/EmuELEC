@@ -1,0 +1,477 @@
+From 1d3627c1a7810a238ff7c9be941961100b5d94da Mon Sep 17 00:00:00 2001
+From: camdenorrb <me@12oclock.dev>
+Date: Fri, 20 Dec 2024 22:31:48 -0600
+Subject: [PATCH] Vulkan DRM/KMS Support
+
+---
+ CMakeLists.txt                                |   5 +
+ Source/Core/Common/WindowSystemInfo.h         |   1 +
+ Source/Core/DolphinNoGUI/CMakeLists.txt       |   4 +
+ Source/Core/DolphinNoGUI/MainNoGUI.cpp        |   9 +
+ Source/Core/DolphinNoGUI/Platform.h           |   4 +
+ Source/Core/DolphinNoGUI/PlatformDRM.cpp      |  63 +++++++
+ Source/Core/VideoBackends/Vulkan/VKMain.cpp   |  20 +--
+ .../Core/VideoBackends/Vulkan/VKSwapChain.cpp | 160 +++++++++++++++++-
+ .../Core/VideoBackends/Vulkan/VKSwapChain.h   |   3 +-
+ .../VideoBackends/Vulkan/VulkanContext.cpp    |  14 ++
+ .../Vulkan/VulkanEntryPoints.inl              |   9 +
+ .../Core/VideoBackends/Vulkan/VulkanLoader.h  |   4 +
+ 12 files changed, 283 insertions(+), 13 deletions(-)
+ create mode 100644 Source/Core/DolphinNoGUI/PlatformDRM.cpp
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 40dd391a1999..7b6d15604f70 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -106,6 +106,7 @@ option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence, show the current gam
+ option(USE_MGBA "Enables GBA controllers emulation using libmgba" ON)
+ option(ENABLE_AUTOUPDATE "Enables support for automatic updates" ON)
+ option(USE_RETRO_ACHIEVEMENTS "Enables integration with retroachievements.org" ON)
++option(ENABLE_DRM "Enables DRM support" OFF)
+ 
+ # Maintainers: if you consider blanket disabling this for your users, please
+ # consider the following points:
+@@ -502,6 +503,10 @@ if (OPENGL_GL)
+   include_directories(${OPENGL_INCLUDE_DIR})
+ endif()
+ 
++if(ENABLE_DRM)
++  add_definitions(-DHAVE_DRM)
++endif()
++
+ if(ENABLE_X11)
+   pkg_check_modules(X11 x11 IMPORTED_TARGET)
+   if(X11_FOUND)
+diff --git a/Source/Core/Common/WindowSystemInfo.h b/Source/Core/Common/WindowSystemInfo.h
+index 8936ad1a02e7..279d57880d48 100644
+--- a/Source/Core/Common/WindowSystemInfo.h
++++ b/Source/Core/Common/WindowSystemInfo.h
+@@ -13,6 +13,7 @@ enum class WindowSystemType
+   Wayland,
+   FBDev,
+   Haiku,
++  DRM,
+ };
+ 
+ struct WindowSystemInfo
+diff --git a/Source/Core/DolphinNoGUI/CMakeLists.txt b/Source/Core/DolphinNoGUI/CMakeLists.txt
+index 566a643c8969..3a8c9f18ea48 100644
+--- a/Source/Core/DolphinNoGUI/CMakeLists.txt
++++ b/Source/Core/DolphinNoGUI/CMakeLists.txt
+@@ -23,6 +23,10 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+   target_sources(dolphin-nogui PRIVATE PlatformFBDev.cpp)
+ endif()
+ 
++if(ENABLE_DRM)
++  target_sources(dolphin-nogui PRIVATE PlatformDRM.cpp)
++endif()
++
+ set_target_properties(dolphin-nogui PROPERTIES OUTPUT_NAME dolphin-emu-nogui)
+ 
+ target_link_libraries(dolphin-nogui
+diff --git a/Source/Core/DolphinNoGUI/MainNoGUI.cpp b/Source/Core/DolphinNoGUI/MainNoGUI.cpp
+index 539bbe769ffe..3327d2df6ac6 100644
+--- a/Source/Core/DolphinNoGUI/MainNoGUI.cpp
++++ b/Source/Core/DolphinNoGUI/MainNoGUI.cpp
+@@ -172,6 +172,11 @@ static std::unique_ptr<Platform> GetPlatform(const optparse::Values& options)
+ {
+   std::string platform_name = static_cast<const char*>(options.get("platform"));
+ 
++#if HAVE_DRM
++  if (platform_name == "drm" || platform_name.empty())
++    return Platform::CreateDRMPlatform();
++#endif
++
+ #if HAVE_X11
+   if (platform_name == "x11" || platform_name.empty())
+     return Platform::CreateX11Platform();
+@@ -215,6 +220,10 @@ int main(int argc, char* argv[])
+             ,
+             "fbdev"
+ #endif
++#if HAVE_DRM
++            ,
++            "drm"
++#endif
+ #if HAVE_X11
+             ,
+             "x11"
+diff --git a/Source/Core/DolphinNoGUI/Platform.h b/Source/Core/DolphinNoGUI/Platform.h
+index f4dc8a94745a..3b3c869bd0ba 100644
+--- a/Source/Core/DolphinNoGUI/Platform.h
++++ b/Source/Core/DolphinNoGUI/Platform.h
+@@ -30,6 +30,10 @@ class Platform
+   // Request an immediate shutdown.
+   void Stop();
+ 
++#if HAVE_DRM
++  static std::unique_ptr<Platform> CreateDRMPlatform();
++#endif
++
+   static std::unique_ptr<Platform> CreateHeadlessPlatform();
+ #ifdef HAVE_X11
+   static std::unique_ptr<Platform> CreateX11Platform();
+diff --git a/Source/Core/DolphinNoGUI/PlatformDRM.cpp b/Source/Core/DolphinNoGUI/PlatformDRM.cpp
+new file mode 100644
+index 000000000000..557841dda291
+--- /dev/null
++++ b/Source/Core/DolphinNoGUI/PlatformDRM.cpp
+@@ -0,0 +1,63 @@
++// Copyright 2024 Dolphin Emulator Project
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#include <unistd.h>
++
++#include "DolphinNoGUI/Platform.h"
++
++#include "Common/MsgHandler.h"
++#include "Core/ConfigManager.h"
++#include "Core/Core.h"
++#include "Core/State.h"
++#include "Core/System.h"
++
++#include <climits>
++#include <cstdio>
++#include <thread>
++
++#include <fcntl.h>
++#include <sys/types.h>
++
++namespace
++{
++class PlatformDRM : public Platform
++{
++public:
++  void SetTitle(const std::string& string) override;
++  void MainLoop() override;
++
++  WindowSystemInfo GetWindowSystemInfo() const override;
++};
++
++void PlatformDRM::SetTitle(const std::string& string)
++{
++  std::fprintf(stdout, "%s\n", string.c_str());
++}
++
++void PlatformDRM::MainLoop()
++{
++  while (IsRunning())
++  {
++    UpdateRunningFlag();
++    Core::HostDispatchJobs(Core::System::GetInstance());
++
++    // TODO: Is this sleep appropriate?
++    std::this_thread::sleep_for(std::chrono::milliseconds(1));
++  }
++}
++
++WindowSystemInfo PlatformDRM::GetWindowSystemInfo() const
++{
++  WindowSystemInfo wsi;
++  wsi.type = WindowSystemType::DRM;
++  wsi.display_connection = nullptr;
++  wsi.render_window = nullptr;
++  wsi.render_surface = nullptr;
++  return wsi;
++}
++}  // namespace
++
++std::unique_ptr<Platform> Platform::CreateDRMPlatform()
++{
++  return std::make_unique<PlatformDRM>();
++}
+diff --git a/Source/Core/VideoBackends/Vulkan/VKMain.cpp b/Source/Core/VideoBackends/Vulkan/VKMain.cpp
+index e5ecd5a4dee5..675e055d39ed 100644
+--- a/Source/Core/VideoBackends/Vulkan/VKMain.cpp
++++ b/Source/Core/VideoBackends/Vulkan/VKMain.cpp
+@@ -142,11 +142,20 @@ bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
+   VulkanContext::PopulateBackendInfo(&g_backend_info);
+   VulkanContext::PopulateBackendInfoAdapters(&g_backend_info, gpu_list);
+ 
++  // Since we haven't called InitializeShared yet, iAdapter may be out of range,
++  // so we have to check it ourselves.
++  size_t selected_adapter_index = static_cast<size_t>(g_Config.iAdapter);
++  if (selected_adapter_index >= gpu_list.size())
++  {
++    WARN_LOG_FMT(VIDEO, "Vulkan adapter index out of range, selecting first adapter.");
++    selected_adapter_index = 0;
++  }
++
+   // We need the surface before we can create a device, as some parameters depend on it.
+   VkSurfaceKHR surface = VK_NULL_HANDLE;
+   if (enable_surface)
+   {
+-    surface = SwapChain::CreateVulkanSurface(instance, wsi);
++    surface = SwapChain::CreateVulkanSurface(instance, gpu_list[selected_adapter_index], wsi);
+     if (surface == VK_NULL_HANDLE)
+     {
+       PanicAlertFmt("Failed to create Vulkan surface.");
+@@ -156,15 +165,6 @@ bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
+     }
+   }
+ 
+-  // Since we haven't called InitializeShared yet, iAdapter may be out of range,
+-  // so we have to check it ourselves.
+-  size_t selected_adapter_index = static_cast<size_t>(g_Config.iAdapter);
+-  if (selected_adapter_index >= gpu_list.size())
+-  {
+-    WARN_LOG_FMT(VIDEO, "Vulkan adapter index out of range, selecting first adapter.");
+-    selected_adapter_index = 0;
+-  }
+-
+   // Now we can create the Vulkan device. VulkanContext takes ownership of the instance and surface.
+   g_vulkan_context =
+       VulkanContext::Create(instance, gpu_list[selected_adapter_index], surface, enable_debug_utils,
+diff --git a/Source/Core/VideoBackends/Vulkan/VKSwapChain.cpp b/Source/Core/VideoBackends/Vulkan/VKSwapChain.cpp
+index 840a7b2c4e58..7db55b37fa46 100644
+--- a/Source/Core/VideoBackends/Vulkan/VKSwapChain.cpp
++++ b/Source/Core/VideoBackends/Vulkan/VKSwapChain.cpp
+@@ -37,8 +37,163 @@ SwapChain::~SwapChain()
+   DestroySurface();
+ }
+ 
+-VkSurfaceKHR SwapChain::CreateVulkanSurface(VkInstance instance, const WindowSystemInfo& wsi)
++VkSurfaceKHR SwapChain::CreateVulkanSurface(VkInstance instance, [[maybe_unused]] VkPhysicalDevice physical_device,
++                                            const WindowSystemInfo& wsi)
+ {
++#if defined(VK_USE_PLATFORM_DISPLAY_KHR)
++  if (wsi.type == WindowSystemType::DRM)
++  {
++    // Get the first display
++    uint32_t display_count = 1;
++    VkDisplayPropertiesKHR display_props;
++    if (VkResult err = vkGetPhysicalDeviceDisplayPropertiesKHR(physical_device, &display_count,
++                                                               &display_props);
++        err != VK_SUCCESS && err != VK_INCOMPLETE)
++    {
++      LOG_VULKAN_ERROR(err, "vkGetPhysicalDeviceDisplayPropertiesKHR failed: ");
++      return VK_NULL_HANDLE;
++    }
++
++    // Get the first mode of the display
++    uint32_t mode_count = 0;
++    if (VkResult err = vkGetDisplayModePropertiesKHR(physical_device, display_props.display,
++                                                     &mode_count, nullptr);
++        err != VK_SUCCESS)
++    {
++      LOG_VULKAN_ERROR(err, "vkGetDisplayModePropertiesKHR failed: ");
++      return VK_NULL_HANDLE;
++    }
++
++    if (mode_count == 0)
++    {
++      ERROR_LOG_FMT(VIDEO, "Cannot find any mode for the display!");
++      return VK_NULL_HANDLE;
++    }
++
++    VkDisplayModePropertiesKHR mode_props;
++    mode_count = 1;
++    if (VkResult err = vkGetDisplayModePropertiesKHR(physical_device, display_props.display,
++                                                     &mode_count, &mode_props);
++        err != VK_SUCCESS && err != VK_INCOMPLETE)
++    {
++      LOG_VULKAN_ERROR(err, "vkGetDisplayModePropertiesKHR failed: ");
++      return VK_NULL_HANDLE;
++    }
++
++    // Get the list of planes
++    uint32_t plane_count = 0;
++    if (VkResult err =
++            vkGetPhysicalDeviceDisplayPlanePropertiesKHR(physical_device, &plane_count, nullptr);
++        err != VK_SUCCESS)
++    {
++      LOG_VULKAN_ERROR(err, "vkGetPhysicalDeviceDisplayPlanePropertiesKHR failed: ");
++      return VK_NULL_HANDLE;
++    }
++
++    if (plane_count == 0)
++    {
++      ERROR_LOG_FMT(VIDEO, "No display planes found!");
++      return VK_NULL_HANDLE;
++    }
++
++    // Find a plane compatible with the display
++    uint32_t compatible_plane_index = UINT32_MAX;
++
++    for (uint32_t plane_index = 0; plane_index < plane_count; plane_index++)
++    {
++      // Query the number of displays supported by the plane
++      display_count = 0;
++      VkResult err = vkGetDisplayPlaneSupportedDisplaysKHR(physical_device, plane_index,
++                                                           &display_count, nullptr);
++      if (err != VK_SUCCESS)
++      {
++        LOG_VULKAN_ERROR(err, "vkGetDisplayPlaneSupportedDisplaysKHR (count query) failed: ");
++        return VK_NULL_HANDLE;
++      }
++
++      if (display_count == 0)
++        continue;  // Skip planes that support no displays
++
++      // Allocate memory to hold the supported displays
++      std::vector<VkDisplayKHR> displays(display_count);
++      err = vkGetDisplayPlaneSupportedDisplaysKHR(physical_device, plane_index, &display_count,
++                                                  displays.data());
++      if (err != VK_SUCCESS)
++      {
++        LOG_VULKAN_ERROR(err, "vkGetDisplayPlaneSupportedDisplaysKHR (fetch displays) failed: ");
++        return VK_NULL_HANDLE;
++      }
++
++      // Check if the target display is among the supported displays
++      if (std::ranges::find(displays, display_props.display) != displays.end())
++      {
++        compatible_plane_index = plane_index;
++      }
++
++      if (compatible_plane_index != UINT32_MAX)
++        break;  // Exit early if a compatible plane is found
++    }
++
++    if (compatible_plane_index == UINT32_MAX)
++    {
++      ERROR_LOG_FMT(VIDEO, "No compatible plane found for the display!");
++      return VK_NULL_HANDLE;
++    }
++
++    // Get capabilities of the compatible plane
++    VkDisplayPlaneCapabilitiesKHR plane_capabilities;
++    if (VkResult err = vkGetDisplayPlaneCapabilitiesKHR(
++            physical_device, mode_props.displayMode, compatible_plane_index, &plane_capabilities);
++        err != VK_SUCCESS)
++    {
++      LOG_VULKAN_ERROR(err, "vkGetDisplayPlaneCapabilitiesKHR failed: ");
++      return VK_NULL_HANDLE;
++    }
++
++    // Find a supported alpha mode
++    VkDisplayPlaneAlphaFlagBitsKHR alpha_mode = VK_DISPLAY_PLANE_ALPHA_OPAQUE_BIT_KHR;
++    VkDisplayPlaneAlphaFlagBitsKHR alpha_modes[] = {
++        VK_DISPLAY_PLANE_ALPHA_OPAQUE_BIT_KHR,
++        VK_DISPLAY_PLANE_ALPHA_GLOBAL_BIT_KHR,
++        VK_DISPLAY_PLANE_ALPHA_PER_PIXEL_BIT_KHR,
++        VK_DISPLAY_PLANE_ALPHA_PER_PIXEL_PREMULTIPLIED_BIT_KHR,
++    };
++
++    for (auto& curr_alpha_mode : alpha_modes)
++    {
++      if (plane_capabilities.supportedAlpha & curr_alpha_mode)
++      {
++        alpha_mode = curr_alpha_mode;
++        break;
++      }
++    }
++
++    // Create the display surface
++    VkDisplaySurfaceCreateInfoKHR surface_create_info = {};
++    surface_create_info.sType = VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR;
++    surface_create_info.displayMode = mode_props.displayMode;
++    surface_create_info.planeIndex = compatible_plane_index;
++    surface_create_info.planeStackIndex = 0;
++    surface_create_info.transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
++    surface_create_info.globalAlpha = 1.0f;
++    surface_create_info.alphaMode = alpha_mode;
++    surface_create_info.imageExtent.width = display_props.physicalResolution.width;
++    surface_create_info.imageExtent.height = display_props.physicalResolution.height;
++
++    VkSurfaceKHR surface;
++    if (VkResult res =
++            vkCreateDisplayPlaneSurfaceKHR(instance, &surface_create_info, nullptr, &surface);
++        res != VK_SUCCESS)
++    {
++      LOG_VULKAN_ERROR(res, "vkCreateDisplayPlaneSurfaceKHR failed: ");
++      return VK_NULL_HANDLE;
++    }
++
++    return surface;
++  }
++
++#endif
++
+ #if defined(VK_USE_PLATFORM_WIN32_KHR)
+   if (wsi.type == WindowSystemType::Windows)
+   {
+@@ -578,7 +733,8 @@ bool SwapChain::RecreateSurface(void* native_handle)
+ 
+   // Re-create the surface with the new native handle
+   m_wsi.render_surface = native_handle;
+-  m_surface = CreateVulkanSurface(g_vulkan_context->GetVulkanInstance(), m_wsi);
++  m_surface = CreateVulkanSurface(g_vulkan_context->GetVulkanInstance(),
++                                  g_vulkan_context->GetPhysicalDevice(), m_wsi);
+   if (m_surface == VK_NULL_HANDLE)
+     return false;
+ 
+diff --git a/Source/Core/VideoBackends/Vulkan/VKSwapChain.h b/Source/Core/VideoBackends/Vulkan/VKSwapChain.h
+index 5f173185a0e4..f7bf31f18fb2 100644
+--- a/Source/Core/VideoBackends/Vulkan/VKSwapChain.h
++++ b/Source/Core/VideoBackends/Vulkan/VKSwapChain.h
+@@ -25,7 +25,8 @@ class SwapChain
+   ~SwapChain();
+ 
+   // Creates a vulkan-renderable surface for the specified window handle.
+-  static VkSurfaceKHR CreateVulkanSurface(VkInstance instance, const WindowSystemInfo& wsi);
++  static VkSurfaceKHR CreateVulkanSurface(VkInstance instance, VkPhysicalDevice physical_device,
++                                          const WindowSystemInfo& wsi);
+ 
+   // Create a new swap chain from a pre-existing surface.
+   static std::unique_ptr<SwapChain> Create(const WindowSystemInfo& wsi, VkSurfaceKHR surface,
+diff --git a/Source/Core/VideoBackends/Vulkan/VulkanContext.cpp b/Source/Core/VideoBackends/Vulkan/VulkanContext.cpp
+index c6ff5e148d50..d3340dc7cdc7 100644
+--- a/Source/Core/VideoBackends/Vulkan/VulkanContext.cpp
++++ b/Source/Core/VideoBackends/Vulkan/VulkanContext.cpp
+@@ -361,6 +361,20 @@ bool VulkanContext::SelectInstanceExtensions(std::vector<const char*>* extension
+     return false;
+   }
+ #endif
++
++#if defined(VK_USE_PLATFORM_DISPLAY_KHR)
++  if (wstype == WindowSystemType::DRM)
++  {
++    if (!AddExtension(VK_KHR_DISPLAY_EXTENSION_NAME, true))
++    {
++      return false;
++    }
++    if (!AddExtension(VK_KHR_SURFACE_EXTENSION_NAME, true))
++    {
++      return false;
++    }
++  }
++#endif
+ #if defined(VK_USE_PLATFORM_ANDROID_KHR)
+   if (wstype == WindowSystemType::Android &&
+       !AddExtension(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME, true))
+diff --git a/Source/Core/VideoBackends/Vulkan/VulkanEntryPoints.inl b/Source/Core/VideoBackends/Vulkan/VulkanEntryPoints.inl
+index d716ce49d28b..da46ece84963 100644
+--- a/Source/Core/VideoBackends/Vulkan/VulkanEntryPoints.inl
++++ b/Source/Core/VideoBackends/Vulkan/VulkanEntryPoints.inl
+@@ -49,6 +49,15 @@ VULKAN_INSTANCE_ENTRY_POINT(vkCreateXlibSurfaceKHR, false)
+ VULKAN_INSTANCE_ENTRY_POINT(vkGetPhysicalDeviceXlibPresentationSupportKHR, false)
+ #endif
+ 
++#if defined(VK_USE_PLATFORM_DISPLAY_KHR)
++VULKAN_INSTANCE_ENTRY_POINT(vkCreateDisplayPlaneSurfaceKHR, false)
++VULKAN_INSTANCE_ENTRY_POINT(vkGetDisplayPlaneCapabilitiesKHR, false)
++VULKAN_INSTANCE_ENTRY_POINT(vkGetPhysicalDeviceDisplayPlanePropertiesKHR, false)
++VULKAN_INSTANCE_ENTRY_POINT(vkGetDisplayPlaneSupportedDisplaysKHR, false)
++VULKAN_INSTANCE_ENTRY_POINT(vkGetDisplayModePropertiesKHR, false)
++VULKAN_INSTANCE_ENTRY_POINT(vkGetPhysicalDeviceDisplayPropertiesKHR, false)
++#endif
++
+ #if defined(VK_USE_PLATFORM_ANDROID_KHR)
+ VULKAN_INSTANCE_ENTRY_POINT(vkCreateAndroidSurfaceKHR, false)
+ #endif
+diff --git a/Source/Core/VideoBackends/Vulkan/VulkanLoader.h b/Source/Core/VideoBackends/Vulkan/VulkanLoader.h
+index 33784d5d2ea0..13ad118f77b2 100644
+--- a/Source/Core/VideoBackends/Vulkan/VulkanLoader.h
++++ b/Source/Core/VideoBackends/Vulkan/VulkanLoader.h
+@@ -9,6 +9,10 @@
+ #define VK_USE_PLATFORM_WIN32_KHR
+ #endif
+ 
++#if defined(HAVE_DRM)
++#define VK_USE_PLATFORM_DISPLAY_KHR
++#endif
++
+ #if defined(HAVE_X11)
+ #define VK_USE_PLATFORM_XLIB_KHR
+ #endif
