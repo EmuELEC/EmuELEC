@@ -18,13 +18,21 @@ PKG_CMAKE_OPTS_TARGET=" -DENABLE_LTO=ON \
                         -DDISTRIBUTOR='EmuELEC' \
                         -DBUILD_SHARED_LIBS=OFF \
                         -DTHREADS_PTHREAD_ARG=OFF \
-                        -DENABLE_FBDEV=ON \
                         -DENABLE_EGL=ON \
                         -DENABLE_X11=OFF \
                         -DENABLE_NOGUI=ON \
                         -DUSE_DISCORD_PRESENCE=OFF \
                         -DENABLE_QT=OFF \
                         -DCMAKE_BUILD_TYPE=Release"
+
+
+if [ ${DEVICE} = "Amlogic-no" ]; then
+   PKG_CMAKE_OPTS_TARGET+=" -DENABLE_DRM=ON \
+                        -DENABLE_VULKAN=ON"
+else
+   PKG_CMAKE_OPTS_TARGET+=" -DENABLE_DRM=OFF \
+                        -DENABLE_VULKAN=OFF"
+fi
 
 makeinstall_target() {
 export CXXFLAGS="`echo ${CXXFLAGS} | sed -e "s|-O.|-O3|g"`"

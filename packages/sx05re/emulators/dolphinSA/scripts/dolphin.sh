@@ -24,5 +24,9 @@ if [[ "${AUTOGP}" != "0" ]]; then
 	set_dolphin_joy.sh
 fi
 
-fbfix $( emuelec-utils getmainfb )
-XDG_CONFIG_HOME=/emuelec/configs XDG_DATA_HOME=/storage/roms/dolphin /usr/bin/dolphin-emu-nogui -p fbdev "${1}"
+if [ "${EE_DEVICE}" == "Amlogic-no" ]; then
+	XDG_CONFIG_HOME=/emuelec/configs XDG_DATA_HOME=/storage/roms/dolphin /usr/bin/dolphin-emu-nogui -p drm "${1}"
+else
+	fbfix $( emuelec-utils getmainfb )
+	XDG_CONFIG_HOME=/emuelec/configs XDG_DATA_HOME=/storage/roms/dolphin /usr/bin/dolphin-emu-nogui -p fbdev "${1}"
+fi

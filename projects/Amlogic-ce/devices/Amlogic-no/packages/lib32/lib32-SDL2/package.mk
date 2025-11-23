@@ -10,7 +10,7 @@ PKG_ARCH="aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL=""
-PKG_DEPENDS_TARGET="lib32-toolchain lib32-alsa-lib lib32-systemd-libs lib32-dbus lib32-${OPENGLES} lib32-libpulse lib32-vulkan-loader lib32-wayland"
+PKG_DEPENDS_TARGET="lib32-toolchain lib32-alsa-lib lib32-systemd-libs lib32-dbus lib32-${OPENGLES} lib32-libpulse lib32-vulkan-loader lib32-wayland lib32-vulkan-loader"
 PKG_LONGDESC="Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware. (lib32)"
 PKG_BUILD_FLAGS="lib32"
 

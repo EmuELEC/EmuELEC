@@ -111,18 +111,15 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  #ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
-     ##                 aic8800-sdio RTW88 RTL8189FS RTL8852BE-aml RTL8723DS-aml
-      #                RTL8851BU RTL8852BS-aml mt76 mt7668-wifi-bt w1-aml"
-      
- ADDITIONAL_DRIVERS=" $ADDITIONAL_DRIVERS gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
+  ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
                       aic8800-sdio RTW88 RTL8189FS RTL8852BE-aml RTL8723DS-aml
                       RTL8733BS RTL8851BU RTL8852BS-aml mt76 mt7668-wifi-bt w1-aml w2-aml
                       aml_bt EA6X21QX"
-  # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
-  # Space separated list is supported,
-  # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml
+
+# additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
+# Space separated list is supported,
+# e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
+  FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml
             rtkbt-firmware-aml qca-firmware-aml"
 
   # build and install ATV IR remote support (yes / no)
@@ -153,7 +150,7 @@
 
 ADDITIONAL_PACKAGES="u-boot-script dtc CoreELEC-Debug-Scripts inject_bl301 ceemmc
                        nfs-utils dtb-xml megatools tmate parse-android-dynparts aml_recovery"
-
+                       
   # add OOTB support for IR remote
   # IR_REMOTE_KEYMAPS+=""
 
@@ -161,8 +158,11 @@ ADDITIONAL_PACKAGES="u-boot-script dtc CoreELEC-Debug-Scripts inject_bl301 ceemm
     ENTWARE_SUPPORT="yes"
     ENTWARE_ARCH="aarch64-k3.10"
 
-  # CoreELEC Subdevices "Khadas_VIM4 Khadas_VIM1S Odroid_C4 Odroid_C5 Odroid_N2 Radxa_Zero Radxa_Zero2 Alta Solitude"
-    SUBDEVICES=" Odroid_C5 Odroid_N2"
+  # CoreELEC Subdevices 
+    SUBDEVICES=Khadas_VIM4 Khadas_VIM1S Odroid_C4 Odroid_C5 Odroid_N2 Radxa_Zero Radxa_Zero2 Alta Solitude
 
   # TEE supported SoC
     TEE_SOC="S928X A311D2 S905W2 S905X4 S905Y4 S905X5M S905X5"
+  
+  # VULKAN
+  VULKAN_SUPPORT=yes

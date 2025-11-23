@@ -1,0 +1,17 @@
+--- a/src/video/SDL_egl.c
++++ b/src/video/SDL_egl.c
+@@ -446,6 +446,14 @@ static int SDL_EGL_LoadLibraryInternal(_THIS, const char *egl_path)
+             SDL_UnloadObject(egl_dll_handle);
+         }
+         path = SDL_getenv("SDL_VIDEO_EGL_DRIVER");
++        
++        /* For 32-bit EmuELEC, default to /usr/lib32/libMali.so if no env var set */
++#if defined(__arm__) || defined(__ARM_ARCH)
++        if (!path) {
++            path = "/usr/lib32/libMali.so";
++        }
++#endif
++        
+         if (!path) {
+             path = DEFAULT_EGL;
+         }

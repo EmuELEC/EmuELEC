@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="PPSSPPSDL"
-PKG_VERSION="f8261ae7ff93baa30f94214965547ed0f124da14"
+PKG_VERSION="e49c0bd8836a8a8f678565357773386f1174d3f5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -14,7 +14,6 @@ PKG_LONGDESC="PPSSPP Standalone"
 GET_HANDLER_SUPPORT="git"
 PKG_BUILD_FLAGS="-lto"
 
-
 PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_FBDEV=ON \
                         -DUSING_EGL=OFF \
@@ -23,11 +22,15 @@ PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSE_DISCORD=OFF"
 
 if [ ${ARCH} == "aarch64" ]; then
-PKG_CMAKE_OPTS_TARGET+=" -DARM64=ON"
+	PKG_CMAKE_OPTS_TARGET+=" -DARM64=ON"
 else
-PKG_CMAKE_OPTS_TARGET+=" -DARMV7=ON"
+	PKG_CMAKE_OPTS_TARGET+=" -DARMV7=ON"
 fi
 
+if [ ${DEVICE} = "Amlogic-no" ]; then
+	PKG_CMAKE_OPTS_TARGET+="-DUSE_WAYLAND_WSI=ON \
+                        -DUSE_VULKAN_DISPLAY_KHR=ON"
+fi
 
 pre_configure_target() {
 if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then

@@ -1,0 +1,54 @@
+diff --git a/SDL/SDLMain.cpp b/SDL/SDLMain.cpp
+index 92537c9bd..a697ff157 100644
+--- a/SDL/SDLMain.cpp
++++ b/SDL/SDLMain.cpp
+@@ -603,11 +603,11 @@ void UpdateWindowState(SDL_Window *window) {
+ 
+ 		Uint32 window_flags = SDL_GetWindowFlags(window);
+ 		if (g_windowState.toggleFullScreenType == -1) {
+-			window_flags ^= SDL_WINDOW_FULLSCREEN_DESKTOP;
++			window_flags ^= SDL_WINDOW_FULLSCREEN;
+ 		} else if (g_windowState.toggleFullScreenType == 1) {
+-			window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
++			window_flags |= SDL_WINDOW_FULLSCREEN;
+ 		} else {
+-			window_flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
++			window_flags &= ~SDL_WINDOW_FULLSCREEN;
+ 		}
+ 		SDL_SetWindowFullscreen(window, window_flags);
+ 	}
+@@ -718,7 +718,7 @@ int main(int argc, char *argv[]) {
+ 	Uint32 mode = 0;
+ 	for (int i = 1; i < argc; i++) {
+ 		if (!strcmp(argv[i],"--fullscreen")) {
+-			mode |= SDL_WINDOW_FULLSCREEN_DESKTOP;
++			mode |= SDL_WINDOW_FULLSCREEN;
+ 			g_Config.iForceFullScreen = 1;
+ 		} else if (set_xres == -2)
+ 			set_xres = parseInt(argv[i]);
+@@ -791,14 +791,14 @@ int main(int argc, char *argv[]) {
+ 
+ 	// Force fullscreen if the resolution is too low to run windowed.
+ 	if (g_DesktopWidth < 480 * 2 && g_DesktopHeight < 272 * 2) {
+-		mode |= SDL_WINDOW_FULLSCREEN_DESKTOP;
++		mode |= SDL_WINDOW_FULLSCREEN;
+ 	}
+ 
+ 	// If we're on mobile, don't try for windowed either.
+ #if defined(MOBILE_DEVICE) && !PPSSPP_PLATFORM(SWITCH)
+ 	mode |= SDL_WINDOW_FULLSCREEN;
+ #elif defined(USING_FBDEV) || PPSSPP_PLATFORM(SWITCH)
+-	mode |= SDL_WINDOW_FULLSCREEN_DESKTOP;
++	mode |= SDL_WINDOW_FULLSCREEN;
+ #else
+ 	mode |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+ #endif
+@@ -868,7 +868,7 @@ int main(int argc, char *argv[]) {
+ 
+ 	// Use the setting from the config when initing the window.
+ 	if (g_Config.UseFullScreen())
+-		mode |= SDL_WINDOW_FULLSCREEN_DESKTOP;
++		mode |= SDL_WINDOW_FULLSCREEN;
+ 
+ 	int x = SDL_WINDOWPOS_UNDEFINED_DISPLAY(getDisplayNumber());
+ 	int y = SDL_WINDOWPOS_UNDEFINED;

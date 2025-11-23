@@ -18,7 +18,12 @@ fi
 
 pre_configure_target() {
 export CXXFLAGS="${CXXFLAGS} -Wno-error=array-bounds"
-PKG_CMAKE_OPTS_TARGET+="-DUSE_GLES=ON -DUSE_VULKAN=OFF -DUSE_HOST_SDL=ON"
+PKG_CMAKE_OPTS_TARGET+="-DUSE_GLES=ON -DUSE_HOST_SDL=ON"
+
+if [ ${DEVICE} = "Amlogic-no" ]; then
+	PKG_CMAKE_OPTS_TARGET+=" -DUSE_VULKAN=ON"
+fi
+
 }
 
 makeinstall_target() {
