@@ -1,0 +1,89 @@
+http://lists.busybox.net/pipermail/busybox/2022-May/089734.html
+
+[PATCH] add ip sub commands needed by wg-quick script
+Konstantin Koshelev kkoshelev at gmail.com
+Wed May 11 21:47:51 UTC 2022
+
+1. "ip rule" now supports "not" keyword
+2. "ip" command now supports arbitrary numeric routing tables above 1024
+
+diff --git a/networking/libiproute/iprule.c b/networking/libiproute/iprule.c
+index a23a00d..dcf2abe 100644
+--- a/networking/libiproute/iprule.c
++++ b/networking/libiproute/iprule.c
+@@ -26,6 +26,10 @@
+ #include "rt_names.h"
+ #include "utils.h"
+ 
++#ifndef FIB_RULE_INVERT
++#define FIB_RULE_INVERT 0x00000002
++#endif
++
+ #include <linux/version.h>
+ /* RTA_TABLE is not a define, can't test with ifdef. */
+ /* As a proxy, test which kernels toolchain expects: */
+@@ -33,18 +37,18 @@
+ 
+ /* If you add stuff here, update iprule_full_usage */
+ static const char keywords[] ALIGN1 =
+-	"from\0""to\0""preference\0""order\0""priority\0"
++	"not\0""from\0""to\0""preference\0""order\0""priority\0"
+ 	"tos\0""fwmark\0""realms\0""table\0""lookup\0"
+ 	"suppress_prefixlength\0""suppress_ifgroup\0"
+ 	"dev\0""iif\0""nat\0""map-to\0""type\0""help\0"
+ 	;
+-#define keyword_preference            (keywords           + sizeof("from") + sizeof("to"))
++#define keyword_preference            (keywords           + sizeof("from") + sizeof("to") + sizeof("not"))
+ #define keyword_fwmark                (keyword_preference + sizeof("preference") + sizeof("order") + sizeof("priority") + sizeof("tos"))
+ #define keyword_realms                (keyword_fwmark     + sizeof("fwmark"))
+ #define keyword_suppress_prefixlength (keyword_realms     + sizeof("realms") + sizeof("table") + sizeof("lookup"))
+ #define keyword_suppress_ifgroup      (keyword_suppress_prefixlength + sizeof("suppress_prefixlength"))
+ enum {
+-	ARG_from = 1, ARG_to, ARG_preference, ARG_order, ARG_priority,
++	ARG_not = 1, ARG_from, ARG_to, ARG_preference, ARG_order, ARG_priority,
+ 	ARG_tos, ARG_fwmark, ARG_realms, ARG_table, ARG_lookup,
+ 	ARG_suppress_prefixlength, ARG_suppress_ifgroup,
+ 	ARG_dev, ARG_iif, ARG_nat, ARG_map_to, ARG_type, ARG_help,
+@@ -80,6 +84,8 @@ static int FAST_FUNC print_rule(const struct sockaddr_nl *who UNUSED_PARAM,
+ 	printf("%u:\t", tb[RTA_PRIORITY] ?
+ 					*(unsigned*)RTA_DATA(tb[RTA_PRIORITY])
+ 					: 0);
++	if (r->rtm_flags & FIB_RULE_INVERT)
++		printf("not ");
+ 	printf("from ");
+ 	if (tb[RTA_SRC]) {
+ 		if (r->rtm_src_len != host_len) {
+@@ -241,7 +247,9 @@ static int iprule_modify(int cmd, char **argv)
+ 		key = index_in_substrings(keywords, *argv) + 1;
+ 		if (key == 0) /* no match found in keywords array, bail out. */
+ 			invarg_1_to_2(*argv, applet_name);
+-		if (key == ARG_from) {
++		if (key == ARG_not) {
++			req.r.rtm_flags |= FIB_RULE_INVERT;
++		} else if (key == ARG_from) {
+ 			inet_prefix dst;
+ 			NEXT_ARG();
+ 			get_prefix(&dst, *argv, req.r.rtm_family);
+diff --git a/networking/libiproute/rt_names.c b/networking/libiproute/rt_names.c
+index 3c2fad9..199f89a 100644
+--- a/networking/libiproute/rt_names.c
++++ b/networking/libiproute/rt_names.c
+@@ -251,7 +251,17 @@ const char* FAST_FUNC rtnl_rttable_n2a(int id)
+ int FAST_FUNC rtnl_rttable_a2n(uint32_t *id, char *arg)
+ {
+ 	rtnl_rttable_initialize();
+-	return rtnl_a2n(rtnl_rttable_tab, id, arg, 0);
++
++	if (!rtnl_a2n(rtnl_rttable_tab, id, arg, 0))
++		return 0;
++
++	unsigned i = bb_strtou(arg, NULL, 0);
++	if (i > RT_TABLE_MAX) {
++		*id = i;
++		return 0;
++	}
++
++	return -1;
+ }
+ 
+ #endif

@@ -4,10 +4,8 @@ After=graphical.target
 
 [Service]
 Type=forking
-ExecStartPre=/bin/sh -c "exec sh /storage/.kodi/addons/service.hyperion.ng/bin/platform.sh start"
 ExecStart=/bin/sh -c "exec sh /storage/.kodi/addons/service.hyperion.ng/bin/hyperiond.start"
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStopPost=/bin/sh -c "exec sh /storage/.kodi/addons/service.hyperion.ng/bin/platform.sh stop"
 PIDFile=/run/hyperiond.pid
 TimeoutStopSec=2
 Restart=always

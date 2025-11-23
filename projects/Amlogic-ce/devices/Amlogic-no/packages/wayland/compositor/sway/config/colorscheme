@@ -1,0 +1,20 @@
+## Base16 Black Metal (Dark Funeral)
+# Author: metalelf0   (https://github.com/metalelf0)
+# Source: base16-sway (https://github.com/rkubosz/base16-sway)
+
+set $base00 #000000
+set $base01 #121212
+set $base02 #222222
+set $base03 #333333
+set $base04 #999999
+set $base05 #c1c1c1
+set $base06 #999999
+set $base07 #c1c1c1
+set $base08 #5f8787
+set $base09 #aaaaaa
+set $base0A #5f81a5
+set $base0B #d0dfee
+set $base0C #aaaaaa
+set $base0D #888888
+set $base0E #999999
+set $base0F #444444

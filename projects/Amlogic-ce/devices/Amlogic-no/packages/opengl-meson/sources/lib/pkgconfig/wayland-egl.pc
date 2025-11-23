@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: wayland-egl
+Description: Amlogic implementation wayland EGL
+Version: 1.0
+Libs: -L${libdir} -lwayland-egl -lwayland-client -lwayland-server
+Cflags: -I${includedir}/ 

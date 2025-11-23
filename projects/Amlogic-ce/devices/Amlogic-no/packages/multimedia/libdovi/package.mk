@@ -31,7 +31,7 @@ pre_make_target() {
                    --target ${TARGET_NAME}"
   CARGO_BUILD_OPTS="--library-type staticlib \
                     --profile release \
-                    --prefix /usr
+                    --prefix /usr \
                     ${CARGO_BASE_OPTS}"
 }
 

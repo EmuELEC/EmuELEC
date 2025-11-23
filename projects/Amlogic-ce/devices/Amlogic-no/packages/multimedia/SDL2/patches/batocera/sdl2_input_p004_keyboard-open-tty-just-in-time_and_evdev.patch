@@ -1,0 +1,16 @@
+diff --git a/src/core/linux/SDL_evdev.c b/src/core/linux/SDL_evdev.c
+index 8f3c8bc..1a1135a 100644
+--- a/src/core/linux/SDL_evdev.c
++++ b/src/core/linux/SDL_evdev.c
+@@ -272,6 +272,11 @@ SDL_EVDEV_Poll(void)
+                             SDL_SendKeyboardKey(SDL_PRESSED, scan_code);
+                         }
+                     }
++
++		    // retry to init in case something failed at init (like tty not yet opened)
++		    if (!_this->kbd) {
++		      _this->kbd = SDL_EVDEV_kbd_init();
++		    }
+                     SDL_EVDEV_kbd_keycode(_this->kbd, events[i].code, events[i].value);
+                     break;
+                 case EV_ABS:

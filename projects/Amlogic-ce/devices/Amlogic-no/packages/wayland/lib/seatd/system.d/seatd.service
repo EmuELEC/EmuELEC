@@ -1,0 +1,14 @@
+[Unit]
+Description=Seat Management Daemon
+Before=graphical.target sway.service
+After=multi-user.target
+ConditionKernelCommandLine=!installer
+
+[Service]
+ExecStart=/usr/bin/seatd -u root
+Restart=always
+RestartSec=1
+
+[Install]
+Alias=seat-management-daemon.service
+WantedBy=graphical.target

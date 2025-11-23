@@ -1,28 +1,51 @@
-From 39abee3ef0e84e21e3a5bc1d863475547e5dc500 Mon Sep 17 00:00:00 2001
+From 24ea8554e04fdb38eafb336697d2883dea52675c Mon Sep 17 00:00:00 2001
 From: Peter <peter.vicman@gmail.com>
 Date: Thu, 29 Feb 2024 12:07:46 +0100
-Subject: [PATCH] fix from forum and fix for linux 5.15.119
+Subject: [PATCH] fix from forum and fix for linux 5.15.170
 
 ---
- src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c    | 2 +-
- src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c       | 2 +-
+ .../driver_fw/driver/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c | 4 ++--
+ src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h  | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
-index b95e754..599bda3 100644
+index 813c0f3..12d746d 100644
 --- a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
 +++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
-@@ -486,7 +486,7 @@ static int aicbsp_platform_power_on(void)
+@@ -503,7 +503,7 @@ static int aicbsp_platform_power_on(void)
  		extern_wifi_set_enable(1);
  		mdelay(200);
  		sdio_reinit();
 -		set_power_control_lock(1);
 +		//set_power_control_lock(1);
  #endif
- 
+
  #ifdef CONFIG_PLATFORM_ROCKCHIP2
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
+index 59502b8..e9641c5 100644
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
+@@ -49,7 +49,7 @@ void aicwf_prealloc_rxbuff_free(struct rx_buff *rxbuff, spinlock_t *lock)
+     spin_unlock_irqrestore(lock, flags);
+ }
+
+-int aicwf_prealloc_init()
++int aicwf_prealloc_init(void)
+ {
+     struct rx_buff *rxbuff;
+     int i = 0;
+@@ -79,7 +79,7 @@ int aicwf_prealloc_init()
+     return 0;
+ }
+
+-void aicwf_prealloc_exit()
++void aicwf_prealloc_exit(void)
+ {
+     struct rx_buff *rxbuff;
+     struct rx_buff *pos;
 diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h
-index 9287eca..10e3697 100644
+index 49f5cdd..a2d663e 100644
 --- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h
 +++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_compat.h
 @@ -43,7 +43,7 @@
@@ -30,10 +53,9 @@ index 9287eca..10e3697 100644
  #define HIGH_KERNEL_VERSION2 KERNEL_VERSION(5, 15, 41)
  #define HIGH_KERNEL_VERSION3 KERNEL_VERSION(5, 15, 104)
 -#define HIGH_KERNEL_VERSION4 KERNEL_VERSION(6, 1, 0)
-+#define HIGH_KERNEL_VERSION4 KERNEL_VERSION(5, 15, 119)
++#define HIGH_KERNEL_VERSION4 KERNEL_VERSION(5, 15, 170)
  #else
  #define HIGH_KERNEL_VERSION KERNEL_VERSION(6, 0, 0)
  #define HIGH_KERNEL_VERSION2 KERNEL_VERSION(6, 1, 0)
--- 
-2.41.0
-
+--
+2.43.0

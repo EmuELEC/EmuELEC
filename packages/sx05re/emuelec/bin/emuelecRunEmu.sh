@@ -91,6 +91,7 @@ KILLTHIS="none"
 KILLSIGNAL="15"
 
 if [[ "${CORE}" == *"_32b"* ]]; then
+	export VK_ICD_FILENAMES=/usr/share/vulkan32/icd.d/mali.json
     BIT32="yes"
     #LD_LIBRARY_PATH="/emuelec/lib32:${LD_LIBRARY_PATH}"
     RABIN="retroarch32"

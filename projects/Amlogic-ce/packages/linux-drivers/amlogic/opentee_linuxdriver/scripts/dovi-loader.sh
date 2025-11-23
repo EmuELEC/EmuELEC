@@ -72,56 +72,64 @@ load_dovi() {
     mountpoint -q /android/oem || mount -o ro /dev/oem /android/oem
 
     DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
-    insmod_dovi && return
+    insmod_dovi && umount_partitions && return
   fi
 
   # Android 11
-  # if mounted from tee-loader don't mount/unmount from dovi-loader
-  if ! ls /dev/mapper/dynpart-* &>/dev/null && [ -b /dev/super ]; then
-    dmsetup create --concise "$(parse-android-dynparts /dev/super)"
-    systemctl set-environment dmsetup_remove=yes
-  fi
+  dmsetup create --concise "$(parse-android-dynparts /dev/super)"
 
-  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+  local active_slot=""
 
   if [ -b /dev/mapper/dynpart-system_a ]; then
     active_slot="_a"
   elif [ -b /dev/mapper/dynpart-system_b ]; then
     active_slot="_b"
-  else
-    active_slot=""
+  fi
+
+  # Xiaomi Android 14
+  if [ -b /dev/oem${active_slot} ]; then
+    mount -o ro /dev/oem${active_slot} /android/oem
+  
+    DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
+    insmod_dovi && umount_partitions && return
   fi
 
   if [ -b /dev/mapper/dynpart-odm${active_slot} ]; then
-    mountpoint -q /android/odm || mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
+    mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
 
     DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
-    insmod_dovi && return
+    insmod_dovi && umount_partitions && return
   fi
 
   # older Android
-  mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
+  if [ -b /dev/vendor ]; then
+    mount -o ro /dev/vendor /android/vendor
 
-  for DOVI_KO_ANDROID in /android/vendor/lib/modules/dovi.ko \
-                         /android/vendor/lib/modules/dovi_vs10.ko \
-                         ; do
-    insmod_dovi && return
-  done
+    for DOVI_KO_ANDROID in /android/vendor/lib/modules/dovi.ko \
+                           /android/vendor/lib/modules/dovi_vs10.ko \
+                           ; do
+      insmod_dovi && umount_partitions && return
+    done
+  fi
 
+  message "dovi not supported"
   cleanup_dovi
+}
+
+umount_partitions() {
+  mountpoint -q /android/oem && umount /android/oem
+  mountpoint -q /android/odm && umount /android/odm
+  mountpoint -q /android/vendor && umount /android/vendor
+  ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
+  return 0  # success
 }
 
 cleanup_dovi() {
   rmmod dovi 2>/dev/null
-  mountpoint -q /android/odm && umount /android/odm
-  mountpoint -q /android/oem && umount /android/oem
-  mountpoint -q /android/vendor && umount /android/vendor
-  # unmount only if mounted from this script
-  [ "${dmsetup_remove}" = "yes" ] && \
-    ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
+  umount_partitions
 }
 
-message "run dovi '${1}'"
+message "run dovi ${1}"
 
 case "${1}" in
   start)

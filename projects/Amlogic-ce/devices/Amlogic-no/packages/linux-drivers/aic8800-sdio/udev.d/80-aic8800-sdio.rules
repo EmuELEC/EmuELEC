@@ -1,0 +1,10 @@
+### Aicsemi aic8800 Wi-Fi
+
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="C8A1:0082", ENV{BUS_TYPE}="sdio", GOTO="run_service"
+
+GOTO="end"
+
+LABEL="run_service"
+TAG+="systemd", ENV{SYSTEMD_WANTS}+="aic8800-sdio.service"
+
+LABEL="end"

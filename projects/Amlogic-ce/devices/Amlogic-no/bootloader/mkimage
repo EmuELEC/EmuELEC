@@ -45,11 +45,24 @@ if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CFGLOAD}" ]; then
   # using Android bootloader
   # copy amlogic cfgload file to part1
   mcopy "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CFGLOAD}" "::/cfgload"
+  mcopy "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CFGLOAD}_env" "::/cfgload_env"
 
   # copy amlogic autoscript file to part1
   mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/aml_autoscript" "::/aml_autoscript"
+
+  # copy amlogic recovery image to part1
+  mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/recovery.img" "::"
 fi
 
 # copy chain u-boot to part1
 mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CHAIN_UBOOT}" "::/u-boot.bin"
 mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_SCR}" "::/boot.scr"
+
+if [ -n "${DTBIMG}" -a "${SUBDEVICE}" = "Generic" ]; then
+  if [ -f "${RELEASE_DIR}/3rdparty/bootloader/device_trees/${DTBIMG}" ]; then
+    echo "image: include ${DTBIMG} as dtb.img"
+    mcopy ${RELEASE_DIR}/3rdparty/bootloader/device_trees/${DTBIMG} "::/dtb.img"
+  else
+    echo "image: can't include \"${DTBIMG}\", file doesn't exist"
+  fi
+fi

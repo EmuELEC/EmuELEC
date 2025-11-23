@@ -1,0 +1,41 @@
+From ea7f1fa47fb3807b6dbb118891d5d6baa5296931 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 5 Nov 2025 20:48:31 +0100
+Subject: [PATCH 1/2] fix firmware path
+
+---
+ drivers/seekwaveplatform/skwutil/skw_boot.c | 4 ++--
+ drivers/skwifi/skw_core.c                   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/seekwaveplatform/skwutil/skw_boot.c b/drivers/seekwaveplatform/skwutil/skw_boot.c
+index cc3361f..5f05de6 100755
+--- a/drivers/seekwaveplatform/skwutil/skw_boot.c
++++ b/drivers/seekwaveplatform/skwutil/skw_boot.c
+@@ -566,8 +566,8 @@ static int seekwave_boot_probe(struct  platform_device *pdev)
+ 		boot_data->iram_file_path = "SWT6621_IRAM_USB.bin";
+ 		boot_data->dram_file_path = "SWT6621_DRAM_USB.bin";
+ 	} else {
+-		boot_data->iram_file_path = "SWT6621_IRAM_SDIO.bin";
+-		boot_data->dram_file_path = "SWT6621_DRAM_SDIO.bin";
++		boot_data->iram_file_path = "/lib/firmware/skw/SWT6621_IRAM_SDIO.bin";
++		boot_data->dram_file_path = "/lib/firmware/skw/SWT6621_DRAM_SDIO.bin";
+ 	}
+ 	skw_boot_init(boot_data);
+ #ifdef STR_MODE_REINITBUS
+diff --git a/drivers/skwifi/skw_core.c b/drivers/skwifi/skw_core.c
+index e9e36b9..c0cb442 100755
+--- a/drivers/skwifi/skw_core.c
++++ b/drivers/skwifi/skw_core.c
+@@ -1479,7 +1479,7 @@ int skw_sync_chip_info(struct wiphy *wiphy, struct skw_chip_info *chip)
+ 	revision = skw->hw_pdata->chipid[15];
+ 
+ 	snprintf(skw->fw.calib_file, sizeof(skw->fw.calib_file),
+-		"%s_%s_R%02x%03x.bin", chipid, CONFIG_SKW_PROJECT_NAME,
++		"/lib/firmware/skw/%s_%s_R%02x%03x.bin", chipid, CONFIG_SKW_PROJECT_NAME,
+ 		vendor & 0xff, revision);
+ 
+ 	skw_set_ext_capa(skw, chip);
+-- 
+2.34.1
+

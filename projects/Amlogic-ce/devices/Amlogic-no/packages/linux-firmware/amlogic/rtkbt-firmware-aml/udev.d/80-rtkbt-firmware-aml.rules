@@ -8,6 +8,8 @@ SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xb723", TAG+="syst
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xb822", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtkbt-firmware-aml.service"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xc822", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtkbt-firmware-aml.service"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xb852", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtkbt-firmware-aml.service"
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xb733", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtkbt-firmware-aml.service"
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xb73A", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtkbt-firmware-aml.service"
 
 SUBSYSTEMS=="pci",  ENV{PCI_ID}=="10EC:B852", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtkbt-firmware-aml.service"
 

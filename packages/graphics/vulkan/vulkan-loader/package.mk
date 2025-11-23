@@ -39,6 +39,6 @@ pre_configure_target() {
   else
     PKG_CMAKE_OPTS_TARGET+=" -DBUILD_WSI_XCB_SUPPORT=OFF \
                              -DBUILD_WSI_XLIB_SUPPORT=OFF \
-                             -DBUILD_WSI_WAYLAND_SUPPORT=OFF"
+                             -DBUILD_WSI_WAYLAND_SUPPORT=ON"
   fi
 }

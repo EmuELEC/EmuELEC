@@ -53,7 +53,6 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
                            --disable-opengl \
                            --enable-egl \
                            --enable-opengles \
-                           --disable-wayland \
                            --disable-x11 \
                            --enable-zlib \
                            --enable-freetype \
@@ -68,9 +67,16 @@ PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
                            --enable-opengles3_2 \
                            --enable-kms \
                            --disable-mali_fbdev"
+elif [ "${DEVICE}" == "Amlogic-no" ]; then
+PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
+                           --enable-opengles3_2 \
+                           --enable-kms \
+                           --enable-wayland \
+						   --enable-vulkan"
 else
 PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
-                           --enable-mali_fbdev"
+                          --enable-mali_fbdev \
+                          --disable-wayland"
 fi
 
 if [ "${DEVICE}" == "OdroidGoAdvance" ]; then

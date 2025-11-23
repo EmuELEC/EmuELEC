@@ -14,6 +14,13 @@ PKG_LONGDESC="Realtek RTL8852BE-aml Linux driver"
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
+
+pre_make_target() {
+
+  find ${PKG_BUILD}/rtl8852BE -name "*.cmd" -delete
+  find ${PKG_BUILD}/rtl8852BE -name ".*.cmd" -delete
+}
+
 make_target() {
   kernel_make -C ${PKG_BUILD}/rtl8852BE \
     M=${PKG_BUILD}/rtl8852BE \

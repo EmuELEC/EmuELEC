@@ -15,7 +15,7 @@ index deed2de5ac..9b4c418b81 100644
      endif()
    endif()
 
-+  string(APPEND LIBDVDCSS_CFLAGS " -Wno-array-parameter")
++  string(APPEND ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_CFLAGS "-Wno-array-parameter")
 +
    if(CORE_SYSTEM_NAME MATCHES windows)
      set(CMAKE_ARGS -DDUMMY_DEFINE=ON
@@ -25,7 +25,7 @@ index deed2de5ac..9b4c418b81 100644
                            --libdir=${DEPENDS_PATH}/lib
                            "CC=${CMAKE_C_COMPILER}"
 -                          "CFLAGS=${CMAKE_C_FLAGS}"
-+                          "CFLAGS=${CMAKE_C_FLAGS} ${LIBDVDCSS_CFLAGS}"
++                          "CFLAGS=${CMAKE_C_FLAGS} ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_CFLAGS}"
                            "LDFLAGS=${CMAKE_EXE_LINKER_FLAGS} ${LIBDVDCSS_FLAGS}")
      set(BUILD_COMMAND ${MAKE_EXECUTABLE})
      set(INSTALL_COMMAND ${MAKE_EXECUTABLE} install)
@@ -36,11 +36,11 @@ index 503f559e10..bf070db8d3 100644
 @@ -47,6 +47,7 @@ if(NOT TARGET LibDvdNav::LibDvdNav)
    endif()
 
-   string(APPEND LIBDVDNAV_CFLAGS "-D_XBMC")
-+  string(APPEND LIBDVDNAV_CFLAGS " -Wno-double-promotion -Wno-return-type")
+   string(APPEND ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_CFLAGS "-D_XBMC")
++  string(APPEND ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_CFLAGS "-Wno-double-promotion -Wno-return-type")
 
    if(APPLE)
-     set(LIBDVDNAV_LDFLAGS "-framework CoreFoundation")
+     set(${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_LDFLAGS "-framework CoreFoundation")
 diff --git a/cmake/modules/FindLibDvdRead.cmake b/cmake/modules/FindLibDvdRead.cmake
 index 4dead2d137..1a3ceb70cc 100644
 --- a/cmake/modules/FindLibDvdRead.cmake
@@ -50,8 +50,8 @@ index 4dead2d137..1a3ceb70cc 100644
      find_program(MAKE_EXECUTABLE make REQUIRED)
 
 +    if(ARCH STREQUAL arm OR ARCH STREQUAL aarch64)
-+      string(APPEND LIBDVDREAD_CFLAGS " -Wno-double-promotion -Wno-builtin-macro-redefined")
-+      string(APPEND LIBDVDREAD_CFLAGS " -Wno-address-of-packed-member")
++      string(APPEND ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_CFLAGS "-Wno-double-promotion -Wno-builtin-macro-redefined")
++      string(APPEND ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_CFLAGS "-Wno-address-of-packed-member")
 +      set (PATCH_COMMAND sed -i "s|((packed,gcc_struct))|((packed))|" src/dvdread/ifo_types.h &&
 +                         sed -i "s|-Wsign-compare|-Wno-sign-compare|" configure.ac)
 +    endif()

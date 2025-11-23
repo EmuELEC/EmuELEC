@@ -17,6 +17,11 @@ PKG_TOOLCHAIN="manual"
 post_unpack() {
   sed -i 's/#define DEFAULT_RANDOM_MACADDR.*/#define DEFAULT_RANDOM_MACADDR 0/g' ${PKG_BUILD}/core/rtw_ieee80211.c
 }
+pre_make_target() {
+
+  find ${PKG_BUILD}/ -name "*.cmd" -delete
+  find ${PKG_BUILD}/ -name ".*.cmd" -delete
+}
 
 make_target() {
   kernel_make -C ${PKG_BUILD} \

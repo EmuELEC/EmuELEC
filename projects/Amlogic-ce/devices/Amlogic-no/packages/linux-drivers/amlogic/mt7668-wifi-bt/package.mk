@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="mt7668-wifi-bt"
-PKG_VERSION="8039c882e313782c8b3e9594fcc9ee89a003fce4"
-PKG_SHA256="5f04e8289b4384e56c7c27072bb0f53c6198d195fdda2f8bcf62e58aa2aa489e"
+PKG_VERSION="8d712778da4da5d09400f005e561b92a4bf54ea0"
+PKG_SHA256="da01759c269f4fc00625eeffa3946538b0d6273e93351b821ac65d0ecb2eedf3"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/noob404yt/mt7668-wifi-bt"
@@ -13,6 +13,13 @@ PKG_NEED_UNPACK="${LINUX_DEPENDS}"
 PKG_LONGDESC="WiFi & Bluetooth Drivers for MT7668"
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
+
+pre_make_target() {
+
+  find ${PKG_BUILD} -name "*.cmd" -delete 2>/dev/null || true
+  find ${PKG_BUILD} -name ".*.cmd" -delete 2>/dev/null || true
+}
+
 
 make_target() {
   cd ${PKG_BUILD}/MT7668-Bluetooth

@@ -8,18 +8,22 @@ PKG_DEPENDS_TARGET="u-boot-tools"
 PKG_TOOLCHAIN="manual"
 PKG_LONGDESC="Compile scripts for u-boot environment."
 
-PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
-[ -n "$DEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
+PKG_NEED_UNPACK="${PROJECT_DIR}/${PROJECT}/bootloader"
+[ -n "${DEVICE}" ] && PKG_NEED_UNPACK+=" ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/bootloader"
 
 make_target() {
   if find_dir_path bootloader/scripts ; then
-    for src in $FOUND_PATH/*.src ; do
-      mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$src" "$(basename $src .src)"
+    for src in ${FOUND_PATH}/*.src ; do
+      base_src="$(basename ${src} .src)"
+      mkimage -A ${TARGET_KERNEL_ARCH} -O linux -T script -C none -d "${src}" "${base_src}"
+      if [ "${base_src}" = *"_cfgload" ]; then
+        echo -n "ceboot=$(grep -v '^$' ${src} | sed '$!s/$/; \\/')" > ${PKG_BUILD}/${base_src}_env
+      fi
     done
   fi
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/bootloader
-    cp -a $PKG_BUILD/* $INSTALL/usr/share/bootloader/
+  mkdir -p ${INSTALL}/usr/share/bootloader
+    cp -a ${PKG_BUILD}/* ${INSTALL}/usr/share/bootloader/
 }

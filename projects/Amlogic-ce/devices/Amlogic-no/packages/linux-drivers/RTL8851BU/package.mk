@@ -12,6 +12,14 @@ PKG_NEED_UNPACK="${LINUX_DEPENDS}"
 PKG_LONGDESC="Realtek RTL8851BU Linux driver"
 PKG_IS_KERNEL_PKG="yes"
 
+
+pre_make_target() {
+
+  find ${PKG_BUILD} -name "*.cmd" -delete 2>/dev/null || true
+  find ${PKG_BUILD} -name ".*.cmd" -delete 2>/dev/null || true
+}
+
+
 pre_make_target() {
   unset LDFLAGS
 }

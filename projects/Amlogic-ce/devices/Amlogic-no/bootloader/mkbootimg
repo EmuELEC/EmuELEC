@@ -4,6 +4,7 @@
 DTBIMG_PATH="common_drivers/arch/${TARGET_KERNEL_ARCH}/boot"
 DTB_PATH="${DTBIMG_PATH}/dts/amlogic"
 ANDROID_BOOTIMG_SECOND=""
+INITRAMFS="${1}.cpio"
 
 SUBDEVICES+=" Generic"
 for device in ${SUBDEVICES}; do
@@ -24,7 +25,6 @@ for device in ${SUBDEVICES}; do
         multidtb=$(xmlstarlet sel -t -v "//dtb/multidtb[${cnt_m}]/@name" ${MULTIDTB_CONF}) || :
         subdevice=$(xmlstarlet sel -t -v "//dtb/multidtb[${cnt_m}]/@subdevice" ${MULTIDTB_CONF}) || :
         if [ "${device}" = "${subdevice}" ]; then
-          echo "Device tree multidtb subdevice: ${device}, ${multidtb%%.*}.dtb"
           MULTIDTB_BLOB="${multidtb%%.*}.dtb"
           break
         fi
@@ -51,10 +51,10 @@ if [ -f ${DTBIMG_PATH}/Generic_dtb.img ]; then
   ANDROID_BOOTIMG_SECOND="--second ${DTBIMG_PATH}/Generic_dtb.img"
 fi
 
-RAMDISK=${BUILD}/image/initramfs.cpio
+RAMDISK=${BUILD}/image/${INITRAMFS}
 
 echo
-echo "Compressing initramfs.cpio with zstd"
+echo "Compressing ${INITRAMFS} with zstd"
 stat -c "  %s bytes  %n" ${RAMDISK}
 # with 3 as default compresion
 zstd -q -f ${RAMDISK}

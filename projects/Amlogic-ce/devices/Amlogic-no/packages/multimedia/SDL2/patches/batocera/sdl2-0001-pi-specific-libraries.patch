@@ -1,0 +1,17 @@
+diff --git a/configure b/configure
+index 9c46ffe..80f942b 100755
+--- a/configure
++++ b/configure
+@@ -23814,10 +23814,10 @@ fi
+         if test x$video_rpi = xno; then
+             if test x$ARCH = xnetbsd; then
+                 RPI_CFLAGS="-I/usr/pkg/include -I/usr/pkg/include/interface/vcos/pthreads -I/usr/pkg/include/interface/vmcs_host/linux"
+-                RPI_LIBS="-L/usr/pkg/lib -lbcm_host"
++                RPI_LIBS="-L/usr/pkg/lib -lbcm_host -lvchostif"
+             else
+                 RPI_CFLAGS="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
+-                RPI_LIBS="-L/opt/vc/lib -lbcm_host"
++                RPI_LIBS="-L/opt/vc/lib -lbcm_host -lvchostif"
+             fi
+         fi
+ 

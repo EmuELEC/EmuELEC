@@ -1,0 +1,20 @@
+[Unit]
+Description=Sway Wayland Compositor
+Before=graphical.target kodi.service
+After=multi-user.target
+ConditionKernelCommandLine=!installer
+
+[Service]
+Environment=HOME=/storage
+Environment=XDG_RUNTIME_DIR=/var/run/0-runtime-dir
+EnvironmentFile=/usr/share/sway/sway-daemon.conf
+EnvironmentFile=-/run/sway/sway-daemon.conf
+WorkingDirectory=/storage
+ExecStartPre=-/usr/lib/sway/sway-config
+ExecStart=/usr/bin/sway.sh
+Restart=always
+RestartSec=5
+
+[Install]
+Alias=display-manager.service
+WantedBy=graphical.target

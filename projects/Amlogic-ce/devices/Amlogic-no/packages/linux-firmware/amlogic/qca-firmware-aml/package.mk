@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="qca-firmware-aml"
-PKG_VERSION="56716df3468fd87ade0ac98af5ec687376e9b4ef"
-PKG_SHA256="4f3dd7ad50695c3f8205e38a1a703801d6033fcfda969c55606589229738178e"
+PKG_VERSION="b81b3d60a0f3651b3c368cf2c1e73262d337976f"
+PKG_SHA256=""
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="BSD-3c"
 PKG_SITE="https://github.com/CoreELEC/qca-firmware-aml"

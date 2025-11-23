@@ -12,12 +12,16 @@ PKG_LONGDESC="entware: A software repository that offers various software progra
 PKG_TOOLCHAIN="manual"
 
 post_install() {
-  mkdir -p $INSTALL/usr/sbin
-    cp -P $PKG_DIR/scripts/installentware $INSTALL/usr/sbin
+  mkdir -p ${INSTALL}/usr/sbin
+    cp -P ${PKG_DIR}/scripts/installentware ${INSTALL}/usr/sbin
 
-    # Replace Entware Arch
-    sed -e "s/@ENTWARE_ARCH@/$ENTWARE_ARCH/g" \
-        -i $INSTALL/usr/sbin/installentware
+    # Replace distro name
+    sed -e "s/@DISTRONAME@/${DISTRONAME}/g" \
+        -i ${INSTALL}/usr/sbin/installentware
+
+    # Replace target architecture
+    sed -e "s/@ENTWARE_ARCH@/${ENTWARE_ARCH}/g" \
+        -i ${INSTALL}/usr/sbin/installentware
 
   enable_service entware.service
 }

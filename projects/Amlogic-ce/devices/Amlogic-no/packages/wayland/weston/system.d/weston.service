@@ -1,0 +1,18 @@
+[Unit]
+Description=Weston Launcher
+Before=graphical.target
+After=multi-user.target
+ConditionKernelCommandLine=!installer
+
+[Service]
+Environment=HOME=/storage
+Environment=XDG_RUNTIME_DIR=/var/run/0-runtime-dir
+WorkingDirectory=/storage
+ExecStartPre=-/usr/lib/weston/weston-config
+ExecStart=/usr/bin/weston --tty=1 --log=/var/log/weston.log
+Restart=always
+RestartSec=10
+
+[Install]
+Alias=display-manager.service
+WantedBy=graphical.target

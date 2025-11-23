@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="aic8800-sdio"
-PKG_VERSION="bf2b14e8357f65e6fa84da2905ea5c0756c7791c"
-PKG_SHA256="2623b85b977d7792d0bc765d4a47d32028bd328756bca2b3f75536366389be62"
+PKG_VERSION="2bf2dc64bedaf3f0fcbcc206125afa5da8b3835b"
+PKG_SHA256=""
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/radxa-pkg/aic8800"
@@ -13,6 +13,13 @@ PKG_NEED_UNPACK="${LINUX_DEPENDS}"
 PKG_LONGDESC="AIC8800 SDIO WiFi and Bluetooth drivers"
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
+
+pre_make_target() {
+
+  find ${PKG_BUILD} -name "*.cmd" -delete 2>/dev/null || true
+  find ${PKG_BUILD} -name ".*.cmd" -delete 2>/dev/null || true
+}
+
 
 make_target() {
   kernel_make -C ${PKG_BUILD}/src/SDIO/driver_fw/driver/aic8800 \
@@ -30,5 +37,5 @@ makeinstall_target() {
   cp ${PKG_BUILD}/src/SDIO/driver_fw/driver/aic8800/*/*.ko ${INSTALL}/$(get_full_module_dir)/${PKG_NAME}
 
   mkdir -p ${INSTALL}/$(get_full_firmware_dir)/aic8800D80
-  cp ${PKG_BUILD}/src/SDIO/driver_fw/fw/aic8800/* ${INSTALL}/$(get_full_firmware_dir)/aic8800D80
+  cp ${PKG_BUILD}/src/SDIO/driver_fw/fw/aic8800*/* ${INSTALL}/$(get_full_firmware_dir)/aic8800D80
 }

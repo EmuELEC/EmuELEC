@@ -1,0 +1,21 @@
+From d42f920c22e329c9ce97eccbb50e32ec6ca4d030 Mon Sep 17 00:00:00 2001
+From: Peter <peter.vicman@gmail.com>
+Date: Fri, 14 Nov 2025 13:46:37 +0100
+Subject: [PATCH] [cmake] FindLibDovi use correct library name
+
+---
+ cmake/modules/FindLibDovi.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/cmake/modules/FindLibDovi.cmake b/cmake/modules/FindLibDovi.cmake
+index edc43124a15c7..a6bfc414e1d05 100644
+--- a/cmake/modules/FindLibDovi.cmake
++++ b/cmake/modules/FindLibDovi.cmake
+@@ -11,6 +11,7 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
+   include(cmake/scripts/common/ModuleHelpers.cmake)
+ 
+   set(${CMAKE_FIND_PACKAGE_NAME}_MODULE_LC libdovi)
++  set(${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME dovi)
+   set(${${CMAKE_FIND_PACKAGE_NAME}_MODULE_LC}_DISABLE_VERSION ON)
+ 
+   SETUP_BUILD_VARS()

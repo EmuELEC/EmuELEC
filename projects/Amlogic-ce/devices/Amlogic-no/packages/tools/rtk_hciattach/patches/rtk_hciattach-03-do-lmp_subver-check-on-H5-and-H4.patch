@@ -1,0 +1,94 @@
+From ebd96dbbdc142b1ee94dda951dc9f2d469a51571 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Thu, 14 Aug 2025 13:16:16 +0200
+Subject: [PATCH 1/2] do lmp_subver check on H5 and H4
+
+---
+ hciattach_rtk.c | 70 +++++++++++++--------------
+ 1 file changed, 35 insertions(+), 35 deletions(-)
+
+diff --git a/hciattach_rtk.c b/hciattach_rtk.c
+index 574f523..f3f5b32 100644
+--- a/hciattach_rtk.c
++++ b/hciattach_rtk.c
+@@ -1756,43 +1756,43 @@ static int rtb_config(int fd, int proto, int speed, struct termios *ti)
+ #endif
+ 		h4_read_local_ver(fd);
+ 		h4_vendor_read_rom_ver(fd);
+-		if (rtb_cfg.lmp_subver == ROM_LMP_8761btc) {
+-			/* 8761B Test Chip */
+-			rtb_cfg.chip_type = CHIP_8761BTC;
+-			rtb_cfg.uart_flow_ctrl = 1;
++	}
++
++	if (rtb_cfg.lmp_subver == ROM_LMP_8761btc) {
++		/* 8761B Test Chip */
++		rtb_cfg.chip_type = CHIP_8761BTC;
++		rtb_cfg.uart_flow_ctrl = 1;
++		/* TODO: Change to different uart baud */
++		std_speed_to_vendor(1500000, &rtb_cfg.vendor_baud);
++		goto change_baud;
++	} else if (rtb_cfg.lmp_subver == ROM_LMP_8761a) {
++		if (rtb_cfg.hci_rev == 0x000b) {
++			/* 8761B Test Chip without download */
++			rtb_cfg.chip_type = CHIP_8761BH4;
++			/* rtb_cfg.uart_flow_ctrl = 1; */
+ 			/* TODO: Change to different uart baud */
+-			std_speed_to_vendor(1500000, &rtb_cfg.vendor_baud);
+-			goto change_baud;
+-		} else if (rtb_cfg.lmp_subver == ROM_LMP_8761a) {
+-			if (rtb_cfg.hci_rev == 0x000b) {
+-				/* 8761B Test Chip without download */
+-				rtb_cfg.chip_type = CHIP_8761BH4;
+-				/* rtb_cfg.uart_flow_ctrl = 1; */
+-				/* TODO: Change to different uart baud */
+-				/* std_speed_to_vendor(1500000, &rtb_cfg.vendor_baud);
+-				 * goto change_baud;
+-				 */
+-			} else if (rtb_cfg.hci_rev == 0x000a) {
+-				if (rtb_cfg.eversion == 3)
+-					rtb_cfg.chip_type = CHIP_8761ATF;
+-				else if (rtb_cfg.eversion == 2)
+-					rtb_cfg.chip_type = CHIP_8761AT;
+-				else
+-					rtb_cfg.chip_type = CHIP_UNKNOWN;
+-			}
+-		} else if (rtb_cfg.lmp_subver == ROM_LMP_8723b) {
+-			if (rtb_cfg.hci_ver == 0x08 &&
+-			    rtb_cfg.hci_rev == 0x000d) {
+-				rtb_cfg.chip_type = CHIP_8723DS;
+-			} else if (rtb_cfg.hci_ver == 0x06 &&
+-				 rtb_cfg.hci_rev == 0x000b) {
+-				rtb_cfg.chip_type = CHIP_8723BS;
+-			} else {
+-				RS_ERR("H4: unknown chip");
+-				return -1;
+-			}
++			/* std_speed_to_vendor(1500000, &rtb_cfg.vendor_baud);
++			 * goto change_baud;
++			 */
++		} else if (rtb_cfg.hci_rev == 0x000a) {
++			if (rtb_cfg.eversion == 3)
++				rtb_cfg.chip_type = CHIP_8761ATF;
++			else if (rtb_cfg.eversion == 2)
++				rtb_cfg.chip_type = CHIP_8761AT;
++			else
++				rtb_cfg.chip_type = CHIP_UNKNOWN;
++		}
++	} else if (rtb_cfg.lmp_subver == ROM_LMP_8723b) {
++		if (rtb_cfg.hci_ver == 0x08 &&
++		    rtb_cfg.hci_rev == 0x000d) {
++			rtb_cfg.chip_type = CHIP_8723DS;
++		} else if (rtb_cfg.hci_ver == 0x06 &&
++			 rtb_cfg.hci_rev == 0x000b) {
++			rtb_cfg.chip_type = CHIP_8723BS;
++		} else {
++			RS_ERR("H4: unknown chip");
++			return -1;
+ 		}
+-
+ 	}
+
+ 	RS_INFO("LMP Subversion 0x%04x", rtb_cfg.lmp_subver);
+--
+2.43.0

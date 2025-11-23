@@ -89,6 +89,9 @@ for arg in $(cat /proc/cmdline); do
           *odroid_c4*)
             SUBDEVICE="Odroid_C4"
             ;;
+          *odroid_c5*)
+            SUBDEVICE="Odroid_C5"
+            ;;
           *odroid_n2*)
             SUBDEVICE="Odroid_N2"
             ;;
@@ -196,6 +199,7 @@ if [ -f ${BOOT_ROOT}/cfgload ]; then
   if [ -f /usr/share/bootloader/${DEVICE_CFGLOAD} ]; then
     echo "Updating cfgload..."
     cp -p /usr/share/bootloader/${DEVICE_CFGLOAD} ${BOOT_ROOT}/cfgload
+    cp -p /usr/share/bootloader/${DEVICE_CFGLOAD}_env ${BOOT_ROOT}/cfgload_env
   fi
 
   if [ -f /usr/share/bootloader/aml_autoscript ]; then
@@ -210,6 +214,11 @@ if [ -f ${BOOT_ROOT}/cfgload ]; then
         [ -n "${cmd}" ] && eval ${cmd}
       done
     fi
+  fi
+
+  if [ -f /usr/share/bootloader/recovery.img ]; then
+    echo "Updating recovery.img..."
+    cp -p /usr/share/bootloader/recovery.img ${BOOT_ROOT}
   fi
 
   /usr/lib/coreelec/check-bl301
@@ -240,7 +249,7 @@ if [ -f ${BOOT_ROOT}/boot.ini ]; then
   fi
 fi
 
-mount -o ro,remount ${BOOT_ROOT}
+[ "$(stat -c %d ${BOOT_ROOT})" != "$(stat -c %d /storage)" ] && mount -o ro,remount ${BOOT_ROOT}
 
 # Leave a hint that we just did an update
 echo "UPDATE" > /storage/.config/boot.hint

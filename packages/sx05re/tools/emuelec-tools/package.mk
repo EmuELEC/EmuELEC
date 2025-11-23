@@ -64,7 +64,8 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       timidity \
                       sdlterm \
                       btop \
-                      ee_utils"
+                      ee_utils \
+                      vulkan-tools"
 
 if [ "${PROJECT}" == "Amlogic-ce" ]; then
                       PKG_DEPENDS_TARGET+=" CoreELEC-Debug-Scripts"

@@ -26,7 +26,6 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
                            --disable-opengl \
                            --enable-egl \
                            --enable-opengles \
-                           --disable-wayland \
                            --disable-x11 \
                            --enable-zlib \
                            --enable-freetype \
@@ -37,10 +36,11 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
                            --enable-ffmpeg \
                            --enable-neon"
 
-if [ "${PROJECT}" = "Amlogic-ce" ]; then
+if [ "${DEVICE}" != "Amlogic-no" ]; then
   PKG_PATCH_DIRS+=" ${RA_DIRECTORY}/patches/Amlogic"
   PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
-                           --enable-mali_fbdev"
+                           --enable-mali_fbdev \
+                            --disable-wayland"
 elif [[ "${DEVICE}" =~ ^(OdroidGoAdvance|GameForce|RK356x|OdroidM1)$ ]]; then
   PKG_RKMISC="yes"
   PKG_DEPENDS_TARGET+=" lib32-libdrm lib32-librga"
@@ -54,8 +54,16 @@ elif [[ "${DEVICE}" =~ ^(OdroidGoAdvance|GameForce|RK356x|OdroidM1)$ ]]; then
   elif [ "${DEVICE}" = "GameForce" ]; then
     PKG_PATCH_DIRS+=" ${RA_DIRECTORY}/patches/OdroidGoAdvance"
   fi
+elif [ "${DEVICE}" = "Amlogic-no" ]; then
+  PKG_PATCH_DIRS+=" ${RA_DIRECTORY}/patches/Amlogic"
+  PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
+                           --enable-opengles3_2 \
+                           --enable-kms \
+                           --enable-wayland \
+						   --enable-vulkan \
+						   --sysconfdir=/usr/lib"
 else
-  echo "${PKG_NAME}: Unsupported devices ${DEVICE} when only AmlNG, AmlOld, OGA, GF, RK356X, M1 is supported" 1>&2
+  echo "${PKG_NAME}: Unsupported devices ${DEVICE} when only AmlNG, AmlNO, OGA, GF, RK356X, M1 is supported" 1>&2
   false
 fi
 
@@ -72,6 +80,7 @@ unpack() {
 pre_configure_target() {
 # Retroarch does not like -O3 for CHD loading with cheevos
   export CFLAGS="${CFLAGS} -O3 -fno-tree-vectorize"
+  export PKG_CONFIG_PATH=/usr/lib/pkgconfig
   TARGET_CONFIGURE_OPTS=""
   cd ${PKG_BUILD}
 }

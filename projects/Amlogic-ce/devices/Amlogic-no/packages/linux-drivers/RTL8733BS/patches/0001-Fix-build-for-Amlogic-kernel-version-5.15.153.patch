@@ -1,0 +1,162 @@
+diff --git a/Makefile b/Makefile
+index 94045f8..8534096 100644
+--- a/Makefile
++++ b/Makefile
+@@ -68,7 +68,7 @@ CONFIG_GSPI_HCI = n
+ CONFIG_AP_MODE = y
+ CONFIG_P2P = y
+ CONFIG_MP_INCLUDED = y
+-CONFIG_POWER_SAVING = y
++CONFIG_POWER_SAVING = n
+ CONFIG_IPS_MODE = default
+ CONFIG_LPS_MODE = default
+ CONFIG_USB_AUTOSUSPEND = n
+@@ -115,7 +115,7 @@ EXTRA_CFLAGS += -DCONFIG_RTW_ANDROID=$(CONFIG_RTW_ANDROID)
+ endif
+ 
+ ########################## Debug ###########################
+-CONFIG_RTW_DEBUG = y
++CONFIG_RTW_DEBUG = n
+ # default log level is _DRV_INFO_ = 4,
+ # please refer to "How_to_set_driver_debug_log_level.doc" to set the available level.
+ CONFIG_RTW_LOG_LEVEL = 4
+diff --git a/include/rtw_mlme_ext.h b/include/rtw_mlme_ext.h
+index 19cddeb..6104386 100644
+--- a/include/rtw_mlme_ext.h
++++ b/include/rtw_mlme_ext.h
+@@ -274,7 +274,7 @@ enum TDLS_option {
+ #if defined(CONFIG_ATMEL_RC_PATCH)
+ 	#define RTW_SCAN_NUM_OF_CH 2
+ 	#define RTW_BACK_OP_CH_MS 200
+-#elseif defined(CONFIG_CUSTOMER_EZVIZ_CHIME2)
++#elif defined(CONFIG_CUSTOMER_EZVIZ_CHIME2)
+ 	#define RTW_SCAN_NUM_OF_CH 1
+ 	#define RTW_BACK_OP_CH_MS 200
+ #else
+diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
+index 4362fb9..426f335 100644
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -500,8 +500,11 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
+ 		 *  the quiet is set to false here first. May need to refine it if
+ 		 *  called by others with block-tx.
+ 		 */
+-
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
++		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false, 0);
++#else
+ 		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, false);
++#endif
+ #else
+ 		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0);
+ #endif
+@@ -514,9 +517,13 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
+ 
+ #if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
++#else
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
++	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0, 0);
+ #else
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
+ #endif
++#endif
+ 
+ #else
+ 	int freq = rtw_ch2freq(ch);
+@@ -1185,7 +1192,7 @@ check_bss:
+ 		#endif
+ 
+ 		#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
+-		#if defined(CONFIG_MLD_KERNEL_PATCH)
++		#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
+ 		roam_info.links[0].bssid = cur_network->network.MacAddress;
+ 		#else	
+ 		roam_info.bssid = cur_network->network.MacAddress;
+@@ -1959,7 +1966,7 @@ exit:
+ }
+ 
+ static int cfg80211_rtw_add_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
+ 	, int link_id
+ #endif
+ 	, u8 key_index
+@@ -2124,7 +2131,7 @@ addkey_end:
+ }
+ 
+ static int cfg80211_rtw_get_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
+ 	, int link_id
+ #endif
+ 	, u8 keyid
+@@ -2315,7 +2322,7 @@ exit:
+ }
+ 
+ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
+ 	, int link_id
+ #endif
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+@@ -2338,7 +2345,7 @@ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev
+ }
+ 
+ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
+ 	, int link_id
+ #endif
+ 	, u8 key_index
+@@ -2389,7 +2396,7 @@ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy, struct net_device *
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
+ int cfg80211_rtw_set_default_mgmt_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
+ 	, int link_id
+ #endif
+ 	, u8 key_index)
+@@ -5642,7 +5649,7 @@ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *nd
+ }
+ 
+ static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev
+-#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
++#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153)))
+ 	, unsigned int link_id
+ #endif
+ )
+@@ -7024,7 +7031,7 @@ exit:
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+ static int cfg80211_rtw_get_channel(struct wiphy *wiphy,
+ 	struct wireless_dev *wdev,
+-#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
++#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153)))
+ 	unsigned int link_id,
+ #endif
+ 	struct cfg80211_chan_def *chandef)
+@@ -11139,7 +11146,7 @@ void rtw_wdev_unregister(struct wireless_dev *wdev)
+ 	rtw_cfg80211_indicate_scan_done(adapter, _TRUE);
+ 
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(COMPAT_KERNEL_RELEASE)
+-	#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
++	#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153)))
+ 	if (wdev->valid_links && wdev->links[0].client.current_bss)
+ 	#else
+ 	if (wdev->current_bss)
+diff --git a/os_dep/osdep_service.c b/os_dep/osdep_service.c
+index 09c8551..a8a31e9 100644
+--- a/os_dep/osdep_service.c
++++ b/os_dep/osdep_service.c
+@@ -2550,6 +2550,9 @@ inline bool ATOMIC_INC_UNLESS(ATOMIC_T *v, int u)
+ * @param mode please refer to linux document
+ * @return Linux specific error code
+ */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 153))
++MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
++#endif
+ static int openFile(struct file **fpp, const char *path, int flag, int mode)
+ {
+ 	struct file *fp;
+

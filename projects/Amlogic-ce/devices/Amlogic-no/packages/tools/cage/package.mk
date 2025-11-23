@@ -1,0 +1,11 @@
+PKG_NAME="cage"
+PKG_VERSION="f9626f79519f8ee22d7bb0c3880a66791d82f923"
+PKG_REV="1"
+PKG_ARCH="any"
+PKG_LICENSE="GPL"
+PKG_SITE="https://github.com/cage-kiosk/cage"
+PKG_URL="${PKG_SITE}.git"
+PKG_DEPENDS_TARGET="toolchain wayland wlroots"
+PKG_SHORTDESC="A Wayland kiosk"
+GET_HANDLER_SUPPORT="git"
+

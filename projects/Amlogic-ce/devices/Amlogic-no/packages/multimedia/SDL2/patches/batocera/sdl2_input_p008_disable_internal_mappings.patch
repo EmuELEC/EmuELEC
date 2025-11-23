@@ -1,0 +1,25 @@
+diff --git a/src/joystick/SDL_gamecontroller.c b/src/joystick/SDL_gamecontroller.c
+index 6ebdf66..fee2e4d 100644
+--- a/src/joystick/SDL_gamecontroller.c
++++ b/src/joystick/SDL_gamecontroller.c
+@@ -1878,13 +1878,13 @@
+ 
+     SDL_AssertJoysticksLocked();
+ 
+-    pMappingString = s_ControllerMappings[i];
+-    while (pMappingString) {
+-        SDL_PrivateGameControllerAddMapping(pMappingString, SDL_CONTROLLER_MAPPING_PRIORITY_DEFAULT);
+-
+-        i++;
+-        pMappingString = s_ControllerMappings[i];
+-    }
++    //pMappingString = s_ControllerMappings[i];
++    //while (pMappingString) {
++    //    SDL_PrivateGameControllerAddMapping(pMappingString, SDL_CONTROLLER_MAPPING_PRIORITY_DEFAULT);
++    //
++    //    i++;
++    //    pMappingString = s_ControllerMappings[i];
++    //}
+ 
+     if (SDL_GetControllerMappingFilePath(szControllerMapPath, sizeof(szControllerMapPath))) {
+         SDL_GameControllerAddMappingsFromFile(szControllerMapPath);

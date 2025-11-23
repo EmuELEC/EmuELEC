@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="@ADDON_REPO_ID@"
-		name="@ADDON_REPO_NAME@"
+<addon id="repository.coreelec"
+		name="CoreELEC Add-ons"
 		version="@ADDON_VERSION@"
 		provider-name="CoreELEC">
 	<extension point="xbmc.addon.repository"
-		name="@ADDON_REPO_NAME@">
+		name="CoreELEC Add-ons">
 		<dir>
 			<info>@ADDON_URL@/addons.xml.gz</info>
 			<checksum verify="sha256">@ADDON_URL@/addons.xml.gz?sha256</checksum>
-			<datadir>@ADDON_URL@</datadir>
+			<datadir zip="true">@ADDON_URL@</datadir>
+			<hashes>false</hashes>
 		</dir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary>@ADDON_REPO_NAME@</summary>
+		<summary>CoreELEC Add-ons</summary>
 		<description>The CoreELEC add-on repository contains Kodi PVR Clients and Servers, Screensavers, Visualisations, and more. Add-ons in this repository are maintained and supported by CoreELEC staff and YOU the community. If you find a broken or non-working add-on please report it via the forums, or help by submitting fixes via GitHub.</description>
 		<platform>all</platform>
 	</extension>

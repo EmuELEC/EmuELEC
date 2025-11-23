@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
+
+export XDG_RUNTIME_DIR=/var/run/0-runtime-dir
+
+if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+  mkdir "$XDG_RUNTIME_DIR"
+  chmod 0700 "$XDG_RUNTIME_DIR"
+fi
+
+if [ ! -f /storage/.config/weston.ini ]; then
+  cp /usr/share/weston/weston.ini /storage/.config/weston.ini
+fi

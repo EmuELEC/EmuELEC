@@ -11,7 +11,7 @@ PKG_LONGDESC="OP-TEE SECPU FW Loader"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-  :
+  ${CC} -Wall -shared -fPIC -o tee-dummy-rpmb.so tee-dummy-rpmb.c
 }
 
 makeinstall_target() {
@@ -28,6 +28,8 @@ makeinstall_target() {
     install -m 0755 ${PKG_DIR}/scripts/dovi-loader.sh ${INSTALL}/usr/lib/coreelec/dovi-loader
 
   cp -rP $(get_pkg_directory ${PKG_NAME})/filesystem/${ARCH}/usr ${INSTALL}
+
+  cp tee-dummy-rpmb.so ${INSTALL}/usr/lib/coreelec
 }
 
 post_install() {

@@ -2,23 +2,33 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="inject_bl301"
-PKG_VERSION="fdd519917b8c257ea56cced7e962a2a89f60fb37"
-PKG_SOURCE_NAME="${PKG_NAME}-${ARCH}-${PKG_VERSION}.tar.xz"
+PKG_VERSION="67cf0989180b73c3d9189278f90bc5bb8e6ba532"
+PKG_SHA256="2497559cfd7d7c34fe2bf68f15028e5c3f6226b2a1724f50dfe5c2a9a18768c0"
+PKG_SOURCE_NAME="${PKG_NAME}-aarch64-${PKG_VERSION}.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://sources.coreelec.org/${PKG_SOURCE_NAME}"
-PKG_DEPENDS_TARGET="toolchain bl30"
+PKG_DEPENDS_TARGET="toolchain bl30 bl301_xxxxxx bl301_221119 bl301_091020"
 PKG_LONGDESC="Tool to inject bootloader blob BL30.bin on internal eMMC"
 PKG_TOOLCHAIN="manual"
 
-case "${ARCH}" in
-  arm)
-    PKG_SHA256="5be388fd4728b5d44a9f68321aa840bba94b5e050d58a04b77320885f2851281"
-    ;;
-  aarch64)
-    PKG_SHA256="04a38b47264cccf2dbdf8f9f1a9606740687d3e30d4d21a02b0845901dcde456"
-    ;;
-esac
+pre_make_target() {
+  cp -av ${PKG_DIR}/config/bl301.conf ${PKG_BUILD}/bl301.conf
+  for PKG_DEPEND_TARGET in ${PKG_DEPENDS_TARGET}; do
+    case ${PKG_DEPEND_TARGET} in "bl301_"*)
+      for f in $(find $(get_build_dir ${PKG_DEPEND_TARGET}) -mindepth 1 -name 'coreelec_config.c'); do
+        cat ${f} | awk -F'[(),"]' '/.config_id_a\s*=\s*HASH/ {printf("%s %s\n", $2, $3)}' | \
+          while read id name; do
+            if ! grep -Fwq "${id}" ${PKG_BUILD}/bl301.conf; then
+              echo -e '\n['${id}']' >> ${PKG_BUILD}/bl301.conf;
+              cat ${f%.*}.h | awk -v id="HASHSTR_${id} " '$0 ~ id {printf("config_id=%s\n", $3)}' >> ${PKG_BUILD}/bl301.conf;
+              echo -e "config_name=${name}" >> ${PKG_BUILD}/bl301.conf;
+            fi
+          done
+      done
+    esac
+  done
+}
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/sbin

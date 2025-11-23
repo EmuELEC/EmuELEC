@@ -1,0 +1,14 @@
+--- a/src/joystick/linux/SDL_sysjoystick.c	2024-05-09 16:43:08.110716779 +0200
++++ b/src/joystick/linux/SDL_sysjoystick.c	2024-05-09 16:43:36.127405653 +0200
+@@ -312,10 +312,7 @@
+         }
+     }
+ 
+-    name = SDL_CreateJoystickName(inpid.vendor, inpid.product, NULL, product_string);
+-    if (!name) {
+-        return 0;
+-    }
++    name = SDL_strdup(product_string);
+ 
+ #ifdef SDL_JOYSTICK_HIDAPI
+     if (!IsVirtualJoystick(inpid.vendor, inpid.product, inpid.version, name) &&

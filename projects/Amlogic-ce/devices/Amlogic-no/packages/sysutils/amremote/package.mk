@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="amremote"
-PKG_VERSION="455eb8ef8507acf899d4723c022de1c981bb697e"
-PKG_SHA256="985bd796995cd756b0edcc34a88e31392a21c04b6c9a4a46e20f4bca19ab1511"
+PKG_VERSION="c979ec379706e023471f28fc49c92633ab9a370a"
+PKG_SHA256="8d4c38b51758538069907f280d3e0d50ddb2e7b79492c4e2b1465d2ee67448e3"
 PKG_LICENSE="other"
 PKG_SITE="http://www.amlogic.com"
 PKG_URL="https://github.com/CoreELEC/amremote/archive/${PKG_VERSION}.tar.gz"

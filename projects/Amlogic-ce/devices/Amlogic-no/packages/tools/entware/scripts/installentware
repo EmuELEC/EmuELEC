@@ -3,18 +3,35 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-export PATH=/opt/bin:/opt/sbin:$PATH
-
-[ ! -d /storage/.opt ] && mkdir -p /storage/.opt
+export PATH=/opt/bin:/opt/sbin:${PATH}
 
 if [ ! -f /opt/bin/opkg ]; then
-  wget -O - http://bin.entware.net/@ENTWARE_ARCH@/installer/generic.sh | /bin/sh
-
+  echo "--------------------------------------"
+  echo "WARNING - STABILITY AND SECURITY RISK!"
+  echo "--------------------------------------"
   echo ""
-  read -p "Would you like to reboot now to finish installation (recommended) [y/N]? " choice
-  case "$choice" in
+  echo "Entware is a third-party binary repository, and the impact of the"
+  echo "packages published by the distributors on your @DISTRONAME@ system,"
+  echo "including stability and security, cannot be guaranteed."
+  echo ""
+  echo "By continuing the installation, you assume the risks described above."
+  echo ""
+  read -p "Do you wish to proceed the Entware installation [y/N]? " firstask
+
+  case "${firstask}" in
     [yY]*)
-      reboot
+      [ ! -d /storage/.opt ] && mkdir -p /storage/.opt
+
+      wget -O - http://bin.entware.net/@ENTWARE_ARCH@/installer/generic.sh | /bin/sh
+
+      echo ""
+      read -p "Would you like to reboot now to finish installation (recommended) [y/N]? " secondask
+
+      case "${secondask}" in
+        [yY]*)
+          reboot
+          ;;
+      esac
       ;;
   esac
 else

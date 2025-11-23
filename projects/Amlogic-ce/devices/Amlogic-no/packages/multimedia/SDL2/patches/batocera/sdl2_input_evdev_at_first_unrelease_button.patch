@@ -1,0 +1,171 @@
+diff --git a/src/joystick/SDL_joystick.c b/src/joystick/SDL_joystick.c
+index cfb8353..832bcd7 100644
+--- a/src/joystick/SDL_joystick.c
++++ b/src/joystick/SDL_joystick.c
+@@ -27,6 +27,8 @@
+ #include "SDL_events.h"
+ #include "SDL_sysjoystick.h"
+ #include "SDL_hints.h"
++#include <sys/stat.h>
++#include <sys/types.h>
+ #include "../SDL_hints_c.h"
+ #include "SDL_steam_virtual_gamepad.h"
+ 
+@@ -144,6 +144,71 @@
+     return SDL_joysticks_quitting;
+ }
+ 
++void custom_restore_initial_state(SDL_Joystick * joystick) {
++  char filename[256];
++  char strguid[64];
++  char buf[64];
++  FILE* fd;
++  int i, n;
++  int val;
++
++  // open
++  SDL_JoystickGetGUIDString(joystick->guid, strguid, 64);
++  sprintf(filename, "/userdata/system/.sdl2/%s_%s.cache", strguid, joystick->name);
++  if( (fd = fopen(filename, "r")) == NULL) {
++    return;
++  }
++
++  // read number of axes
++  if(fgets(buf, 64, fd) == NULL) { return; /* ooops */ }
++  n = atoi(buf);
++  if(n != joystick->naxes) {
++    return; // invalid number of axes found
++  }
++
++  // read axes values
++  for (i = 0; i < n; ++i) {
++    if(fgets(buf, 64, fd) == NULL) { return; /* ooops */ }
++    val = atoi(buf);
++    joystick->axes[i].initial_value = val;
++    joystick->axes[i].value         = val;
++    joystick->axes[i].zero          = val;
++    joystick->axes[i].has_initial_value  = SDL_TRUE;
++  }
++  joystick->initial_state_is_valid    = SDL_TRUE;
++  joystick->initial_state_initialized = SDL_TRUE;
++
++  // close
++  fclose(fd);
++}
++
++void custom_save_initial_state(SDL_Joystick * joystick) {
++  char filename[256];
++  char strguid[64];
++  FILE* fd;
++  int i;
++
++  // dir
++  if(mkdir("/userdata/system/.sdl2", 0700) != 0) { /* ok, maybe already exists, anyway */ }
++
++  // open
++  SDL_JoystickGetGUIDString(joystick->guid, strguid, 64);
++  sprintf(filename, "/userdata/system/.sdl2/%s_%s.cache", strguid, joystick->name);
++  if( (fd = fopen(filename, "w")) == NULL) {
++    return;
++  }
++
++  // writting axes initial values
++  fprintf(fd, "%i\n", joystick->naxes);
++  for (i = 0; i < joystick->naxes; ++i) {
++    fprintf(fd, "%i\n", (int) joystick->axes[i].zero);
++  }
++
++  // close
++  fclose(fd);
++}
++
++
+ void SDL_LockJoysticks(void)
+ {
+     (void)SDL_AtomicIncRef(&SDL_joystick_lock_pending);
+@@ -450,6 +516,9 @@ SDL_JoystickOpen(int device_index)
+     joystick->epowerlevel = SDL_JOYSTICK_POWER_UNKNOWN;
+     joystick->led_expiration = SDL_GetTicks();
+ 
++    joystick->initial_state_is_valid = SDL_FALSE;
++    joystick->initial_state_initialized = SDL_FALSE;
++    
+     if (driver->Open(joystick, device_index) < 0) {
+         SDL_free(joystick);
+         SDL_UnlockJoysticks();
+@@ -942,6 +944,8 @@ SDL_Joystick *SDL_JoystickOpen(int device_index)
+             joystick->axes[i].has_initial_value = SDL_TRUE;
+         }
+     }
++    
++    custom_restore_initial_state(joystick);
+ 
+     joystick->is_game_controller = SDL_IsGameController(device_index);
+ 
+@@ -2000,6 +2004,11 @@ int SDL_PrivateJoystickAxis(SDL_Joystick *joystick, Uint8 axis, Sint16 value)
+     int posted;
+     SDL_JoystickAxisInfo *info;
+ 
++    // ignore axis events until a button is released
++    if (joystick->initial_state_is_valid == SDL_FALSE) {
++      return 0;
++    }
++
+     SDL_AssertJoysticksLocked();
+ 
+     /* Make sure we're not getting garbage or duplicate events */
+@@ -1556,6 +1632,14 @@ SDL_PrivateJoystickHat(SDL_Joystick *joystick, Uint8 hat, Uint8 value)
+         event.jhat.which = joystick->instance_id;
+         event.jhat.hat = hat;
+         event.jhat.value = value;
++
++        if(joystick->initial_state_is_valid == SDL_FALSE) {
++          joystick->initial_state_is_valid = SDL_TRUE;
++          joystick->driver->Update(joystick);
++          custom_save_initial_state(joystick);
++          joystick->initial_state_initialized = SDL_TRUE;
++        }
++
+         posted = SDL_PushEvent(&event) == 1;
+     }
+ #endif /* !SDL_EVENTS_DISABLED */
+@@ -1610,6 +1694,12 @@ SDL_PrivateJoystickButton(SDL_Joystick *joystick, Uint8 button, Uint8 state)
+         event.type = SDL_JOYBUTTONDOWN;
+         break;
+     case SDL_RELEASED:
++        if(joystick->initial_state_is_valid == SDL_FALSE) {
++          joystick->initial_state_is_valid = SDL_TRUE;
++          joystick->driver->Update(joystick);
++          custom_save_initial_state(joystick);
++          joystick->initial_state_initialized = SDL_TRUE;
++        }
+         event.type = SDL_JOYBUTTONUP;
+         break;
+     default:
+diff --git a/src/joystick/SDL_sysjoystick.h b/src/joystick/SDL_sysjoystick.h
+index d673ddd..9c7da51 100644
+--- a/src/joystick/SDL_sysjoystick.h
++++ b/src/joystick/SDL_sysjoystick.h
+@@ -128,6 +128,9 @@
+ 
+     int ref_count _guarded; /* Reference count for multiple opens */
+ 
++    SDL_bool initial_state_is_valid; // true once a first button is released (axis initial values are incorrect on some pad until this happen (ie 8bitdo nes)
++    SDL_bool initial_state_initialized; // true once the initialisation is done
++
+     struct _SDL_Joystick *next _guarded; /* pointer to next joystick we have allocated */
+ };
+ 
+diff --git a/src/joystick/linux/SDL_sysjoystick.c b/src/joystick/linux/SDL_sysjoystick.c
+index 134fa72..0c7f787 100644
+--- a/src/joystick/linux/SDL_sysjoystick.c
++++ b/src/joystick/linux/SDL_sysjoystick.c
+@@ -1971,7 +1971,7 @@ static void HandleInputEvents(SDL_Joystick *joystick)
+ 
+     SDL_AssertJoysticksLocked();
+ 
+-    if (joystick->hwdata->fresh) {
++    if (joystick->hwdata->fresh || (joystick->initial_state_is_valid == SDL_TRUE && joystick->initial_state_initialized == SDL_FALSE)) {
+         PollAllValues(joystick);
+         if (joystick->hwdata->report_sensor) {
+             PollAllSensors(joystick);

@@ -1,0 +1,12 @@
+--- gdb-7.11.1/missing.orig	2017-01-30 19:01:55.652407184 +0900
++++ gdb-7.11.1/missing	2017-01-30 19:02:53.703405905 +0900
+@@ -83,6 +83,9 @@
+ # If it succeeded, we are done.
+ test $st -eq 0 && exit 0
+ 
++# No need for tex monster
++test $1 = makeinfo && exit 0
++
+ # Also exit now if we it failed (or wasn't found), and '--version' was
+ # passed; such an option is passed most likely to detect whether the
+ # program is present and works.

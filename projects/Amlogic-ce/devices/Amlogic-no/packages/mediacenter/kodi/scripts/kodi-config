@@ -25,9 +25,6 @@ if [ ! -f ${KODI_ROOT}/userdata/sources.xml ]; then
   fi
 fi
 
-#choose libCEC version, default is libcec package version
-ln -sf /usr/lib/libcec.so.6.0.2 /var/lib/libcec.so.6
-
 # common setup guisettings
 if [ ! -f ${KODI_ROOT}/userdata/guisettings.xml ] ; then
   if [ -f /usr/share/kodi/config/guisettings.xml ]; then

@@ -4,15 +4,15 @@
 # Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="linux"
-PKG_VERSION="e67465e6f777ebfaee29e3150770f12cbd677819"
-PKG_SHA256="297e9384f4f8d010f6437d8fc62e023092984180ff11afb9a27fc38bb5804c63"
+PKG_VERSION="2c3e329b7dec94edae5e9fb5f33669239c384436"
+PKG_SHA256="0d6256fa1406ab0ac5990d8ae27a15c23ca1cae86f07d3c6dca600a13c7f130e"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
 PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/${PKG_VERSION}.tar.gz"
-PKG_GIT_BRANCH="5.15.153_202501"
+PKG_GIT_BRANCH="5.15.170_202508"
 PKG_BUILD_PERF="no"
 PKG_DEPENDS_HOST="ccache:host rsync:host openssl:host"
-PKG_DEPENDS_TARGET="toolchain linux:host kmod:host xz:host keyutils aml-dtbtools:host aml-dtbtools ${KERNEL_EXTRA_DEPENDS_TARGET}"
+PKG_DEPENDS_TARGET="toolchain linux:host kmod:host keyutils aml-dtbtools:host aml-dtbtools ${KERNEL_EXTRA_DEPENDS_TARGET}"
 PKG_NEED_UNPACK="${LINUX_DEPENDS} $(get_pkg_directory initramfs) $(get_pkg_variable initramfs PKG_NEED_UNPACK)"
 PKG_DEPENDS_UNPACK="bl30 common_drivers"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
@@ -79,10 +79,8 @@ post_patch() {
   else
     cp ${PKG_KERNEL_CFG_FILE} ${PKG_BUILD}/.config
 
-    sed -i -e "s|@INITRAMFS_SOURCE@|$(kernel_initramfs_confs) ${BUILD}/initramfs|" ${PKG_BUILD}/.config
-
     # set default hostname based on ${DISTRONAME}
-      sed -i -e "s|@DISTRONAME@|${DISTRONAME}|g" ${PKG_BUILD}/.config
+    sed -i -e "s|@DISTRONAME@|${DISTRONAME}|g" ${PKG_BUILD}/.config
 
     # disable swap support if not enabled
     if [ ! "${SWAP_SUPPORT}" = yes ]; then
@@ -97,15 +95,6 @@ post_patch() {
     # disable cifs support if not enabled
     if [ ! "${SAMBA_SUPPORT}" = yes ]; then
       sed -i -e "s|^CONFIG_CIFS=.*$|# CONFIG_CIFS is not set|" ${PKG_BUILD}/.config
-    fi
-
-    # disable iscsi support if not enabled
-    if [ ! "${ISCSI_SUPPORT}" = yes ]; then
-      sed -i -e "s|^CONFIG_SCSI_ISCSI_ATTRS=.*$|# CONFIG_SCSI_ISCSI_ATTRS is not set|" ${PKG_BUILD}/.config
-      sed -i -e "s|^CONFIG_ISCSI_TCP=.*$|# CONFIG_ISCSI_TCP is not set|" ${PKG_BUILD}/.config
-      sed -i -e "s|^CONFIG_ISCSI_BOOT_SYSFS=.*$|# CONFIG_ISCSI_BOOT_SYSFS is not set|" ${PKG_BUILD}/.config
-      sed -i -e "s|^CONFIG_ISCSI_IBFT_FIND=.*$|# CONFIG_ISCSI_IBFT_FIND is not set|" ${PKG_BUILD}/.config
-      sed -i -e "s|^CONFIG_ISCSI_IBFT=.*$|# CONFIG_ISCSI_IBFT is not set|" ${PKG_BUILD}/.config
     fi
 
     # disable lima/panfrost if libmali is configured
@@ -149,7 +138,7 @@ makeinstall_host() {
 build_gpio_data() {
   cat << EOF > common_drivers/drivers/bootloader/gpio_data.h
 typedef struct bl30_gpio {
-    char name[16];
+    char *name;
     uint32_t number;
 } bl30_gpio_t;
 
@@ -158,22 +147,23 @@ typedef struct bl30_gpios_soc {
     bl30_gpio_t gpio[256];
 } bl30_gpios_soc_t;
 
-bl30_gpios_soc_t bl30_gpios[3] = {
+bl30_gpios_soc_t bl30_gpios[] = {
 EOF
 
-  for soc_dir in $(get_build_dir bl30)/demos/amlogic/n200/include/*; do
-    if [ -d ${soc_dir} -a -e "${soc_dir}/gpio-data.h" ]; then
-      soc_type="$(basename ${soc_dir})"
-      printf "#ifdef MESON_CPU_MAJOR_ID_${soc_type^^}\n" >>common_drivers/drivers/bootloader/gpio_data.h
-      printf "  /* soc ${soc_type} */\n" >>common_drivers/drivers/bootloader/gpio_data.h
-      printf "  { MESON_CPU_MAJOR_ID_${soc_type^^},\n    {\n" >>common_drivers/drivers/bootloader/gpio_data.h
-
-      cat "${soc_dir}/gpio-data.h" | awk \
-        '/^#define\s*GPIO._/ { printf("    { \"%s\", %d },\n", $2, $3)}' \
-        >>common_drivers/drivers/bootloader/gpio_data.h
-      printf "    }\n  },\n" >>common_drivers/drivers/bootloader/gpio_data.h
-      printf "#endif\n" >>common_drivers/drivers/bootloader/gpio_data.h
-    fi
+  for bl30_folder in "src_ao/demos/amlogic/n200/include" "rtos_sdk/soc/riscv"; do
+    for soc_dir in $(get_build_dir bl30)/${bl30_folder}/*; do
+      if [ -d ${soc_dir} -a -e "${soc_dir}/gpio-data.h" ]; then
+        soc_type="$(basename ${soc_dir})"
+        if grep -q "MESON_CPU_MAJOR_ID_${soc_type^^}" common_drivers/include/linux/amlogic/media/registers/cpu_version.h; then
+          printf "  /* soc ${soc_type} */\n" >>common_drivers/drivers/bootloader/gpio_data.h
+          printf "  { MESON_CPU_MAJOR_ID_${soc_type^^}, {\n" >>common_drivers/drivers/bootloader/gpio_data.h
+          cat "${soc_dir}/gpio-data.h" | awk \
+            '/^#define\s*GPIO._/ { printf("    { \"%s\", %d },\n", $2, $3)}' \
+            >>common_drivers/drivers/bootloader/gpio_data.h
+          printf "  }},\n" >>common_drivers/drivers/bootloader/gpio_data.h
+        fi
+      fi
+    done
   done
 
   printf "};\n" >>common_drivers/drivers/bootloader/gpio_data.h
@@ -289,7 +279,7 @@ make_target() {
   fi
 
   if [ "${BUILD_ANDROID_BOOTIMG}" = "yes" ]; then
-    find_file_path bootloader/mkbootimg && source ${FOUND_PATH}
+    find_file_path bootloader/mkbootimg && source ${FOUND_PATH} initramfs
     mv -f arch/${TARGET_KERNEL_ARCH}/boot/boot.img arch/${TARGET_KERNEL_ARCH}/boot/${KERNEL_TARGET}
   fi
 

@@ -1,0 +1,3 @@
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="pci", ENV{PCI_ID}=="10EC:B852", PROGRAM="/bin/sh -c 'if grep -q \"s6_s905x5_ugoos_am9\" /sys/firmware/devicetree/base/coreelec-dt-id; then echo 1; else echo 0; fi'", RESULT=="1", ATTR{driver_override}="(none)", GOTO="end"
+
+LABEL="end"

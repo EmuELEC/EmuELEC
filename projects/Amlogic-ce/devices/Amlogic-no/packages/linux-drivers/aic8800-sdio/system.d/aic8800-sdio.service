@@ -1,0 +1,11 @@
+[Unit]
+Description=Aicsemi aic8800 Wi-Fi
+Wants=bluetooth.service
+Before=bluetooth.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStartPre=/usr/sbin/rfkill unblock bluetooth
+ExecStart=/bin/sh -c '/usr/bin/hciattach -s 1500000 /dev/ttyS1 any 1500000'
+ExecStopPost=/usr/sbin/rfkill block bluetooth

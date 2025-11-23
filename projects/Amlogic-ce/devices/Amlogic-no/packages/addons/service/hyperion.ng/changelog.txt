@@ -1,3 +1,11 @@
+119
+- Revert back to 2.0.16
+118
+- Update to 2.1.1
+117
+- Drop platform script
+116
+- Fix compiling with toolchain
 115
 - Add support for new fb decoder
 114

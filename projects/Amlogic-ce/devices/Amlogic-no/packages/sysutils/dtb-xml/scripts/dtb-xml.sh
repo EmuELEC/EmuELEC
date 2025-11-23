@@ -122,6 +122,24 @@ function check_linux_version() {
 }
 
 #########################################################
+# check given path
+#########################################################
+function check_path() {
+  res="$1"
+
+  echo "$1" | grep -qF '*'
+  if [ "$?" == 0 ]; then
+    dt_root="/proc/device-tree"
+    property="$(echo ${1##* })"
+    node=$(basename "$(echo ${1%% *})")
+    found_node=$(find ${dt_root}/ -type d -name "${node}")
+    [ -n "${found_node}" ] && res="${found_node#${dt_root}} ${property}"
+  fi
+
+  echo "$res"
+}
+
+#########################################################
 # log
 #########################################################
 function log() {
@@ -149,6 +167,7 @@ function update_migrated_xml() {
     # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
     for cnt in $(seq 1 $cmd_count); do
       cmd_path=$(xmlstarlet sel -t -v "//$update_node/$option/cmd[$cnt]/@path" $xml_file)
+      cmd_path=$(check_path "${cmd_path}")
       fdt_option=$(xmlstarlet sel -t -v "//$update_node/$option/cmd[$cnt]/@option" $xml_file)
       fdt_option=${fdt_option:-"t"}
       cmd_type=$(xmlstarlet sel -t -m "//$update_node/$option/cmd[$cnt]" -v "concat('-$fdt_option ', @type)" $xml_file)
@@ -239,6 +258,7 @@ function migrate_dtb_to_xml() {
       # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
       for cnt in $(seq 1 $cmd_count); do
         cmd_path=$(xmlstarlet sel -t -v "//$node/$option/cmd[$cnt]/@path" $xml_file)
+        cmd_path=$(check_path "${cmd_path}")
         fdt_option=$(xmlstarlet sel -t -v "//$update_node/$option/cmd[$cnt]/@option" $xml_file)
         fdt_option=${fdt_option:-"t"}
         cmd_type=$(xmlstarlet sel -t -m "//$node/$option/cmd[$cnt]" -v "concat('-$fdt_option ', @type)" $xml_file)
@@ -382,6 +402,7 @@ function update_dtb_by_dtb_xml() {
     # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
     for cnt in $(seq 1 $cmd_count); do
       cmd_path=$(xmlstarlet sel -t -v "//$node/node()[@name='$node_status']/cmd[$cnt]/@path" $xml_file)
+      cmd_path=$(check_path "${cmd_path}")
       fdt_option=$(xmlstarlet sel -t -v "//$node/node()[@name='$node_status']/cmd[$cnt]/@option" $xml_file)
       fdt_option=${fdt_option:-"t"}
       cmd_type=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']/cmd[$cnt]" -v "concat('-${fdt_option} ', @type)" $xml_file)
@@ -467,6 +488,7 @@ function update_dtb_xml() {
     # new node in default dtb.xml found, copy whole node
     if [ -z "$node_status" ]; then
       log " node in current dtb.xml not found, get it from default dtb.xml"
+      xmlstarlet ed -L -d "//$default_node" $xml_file
       new_node=$(xmlstarlet sel -t -c "//$default_node" $default_xml_file)
       xmlstarlet ed --subnode "/dtb-settings" -t text -n "" -v "$new_node" $xml_file | \
               xmlstarlet unesc | xmlstarlet format > tmp_file

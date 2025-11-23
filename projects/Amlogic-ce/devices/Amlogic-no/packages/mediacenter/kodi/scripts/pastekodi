@@ -37,7 +37,7 @@ while getopts ":hc" opt; do
 done
 
 source /etc/os-release
-SYSTEM_ARCH="${COREELEC_ARCH#*.}"
+SYSTEM_ARCH="${DISTRO_ARCH#*.}"
 
 # If running in SAFE mode, send FAILED logs
 if [ "$(cat "/storage/.config/boot.status" 2>/dev/null)" = "SAFE" ]; then
@@ -57,52 +57,13 @@ fi
 (
   echo "${LOG_TYPE} log output for: $(lsb_release)"
 
-  if [ "${SYSTEM_ARCH}" = "x86_64" ]; then
-    if [ -d "/sys/firmware/efi" ]; then
-      echo "Firmware Boot Mode: EFI"
-    else
-      echo "Firmware Boot Mode: BIOS"
-    fi
-  fi
-  if [ "${COREELEC_PROJECT}" = "RPi" ]; then
-    echo "RPi Hardware Revision: $(vcgencmd otp_dump | grep 30: | cut -d: -f2)"
-  fi
-
   cat_file "${LOG_FILE}"
 
   journalctl -a -b -0 -o short-precise | cat_data "journalctl -a -b -0"
-
-  if [ "${COREELEC_PROJECT}" = "RPi" ]; then
-    bootloader_version="$(vcgencmd bootloader_version)"
-    if ! echo "${bootloader_version}" | grep -q "Command not registered"; then
-      echo  "${bootloader_version}" | cat_data "Bootloader version"
-    fi
-  fi
-
-  cat_file "/flash/config.txt" # RPi
-  cat_file "/flash/distroconfig.txt" # RPi
-  cat_file "/flash/cmdline.txt" # RPi
-
-  cat_file "/flash/syslinux.cfg" # x86 BIOS
-  cat_file "/flash/EFI/BOOT/syslinux.cfg" # x86 EFI
-  cat_file "/flash/extlinux.conf" # x86 legacy
-
-  cat_file "/flash/extlinux/extlinux.conf" # u-boot
 
   cat_file "${KODI_ROOT}/.smb/smb.conf"
   cat_file "${KODI_ROOT}/.smb/user.conf"
   cat_file "/run/samba/smb.conf"
 
-  pem_sys="$(sha256sum /etc/ssl/cacert.pem.system | cut -d' ' -f1)"
-  pem_run="$(sha256sum /run/libreelec/cacert.pem | cut -d' ' -f1)"
-  if [ "${pem_sys}" = "${pem_run}" ]; then
-    cat_data "/run/libreelec/cacert.pem is default" </dev/null
-  else
-    cat_file /run/libreelec/cacert.pem "/run/libreelec/cacert.pem (modified)"
-  fi
-
-  if [ "${COREELEC_PROJECT}" = "Amlogic-ce" ]; then
-    ce-debug -l | cat_data "ce-debug -l"
-  fi
-
+  ce-debug -l | cat_data "ce-debug -l"
 ) | ${OUTPUT} 2>/dev/null

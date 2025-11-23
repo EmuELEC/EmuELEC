@@ -21,6 +21,13 @@ case ${1} in
     DEVICE_BOOT_INI="${1}_boot.ini"
     [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/sd_fuse/u-boot.bin.sd.bin"
   ;;
+  Odroid_C5)
+    DEVICE_BOOT_LOGO="odroid_boot-logo.bmp.gz"
+    DEVICE_DTB="device_trees/s7d_s905x5m_odroid_c5.dtb"
+    DEVICE_UBOOT="${1}_u-boot"
+    DEVICE_BOOT_INI="${1}_boot.ini"
+    [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/build/u-boot.bin.sd.bin.signed"
+  ;;
   Odroid_N2)
     DEVICE_BOOT_LOGO="odroid_boot-logo.bmp.gz"
     DEVICE_DTB="device_trees/g12b_s922x_odroid_n2.dtb"

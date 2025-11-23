@@ -1,0 +1,45 @@
+diff --git a/src/video/SDL_egl.c b/src/video/SDL_egl.c
+index 87d693e8d..891d588c4 100644
+--- a/src/video/SDL_egl.c
++++ b/src/video/SDL_egl.c
+@@ -1032,7 +1032,7 @@ SDL_EGL_CreateContext(_THIS, EGLSurface egl_surface)
+         return NULL;
+     }
+ 
+-    _this->egl_data->egl_swapinterval = 0;
++    _this->egl_data->egl_swapinterval = 1;
+ 
+     if (SDL_EGL_MakeCurrent(_this, egl_surface, egl_context) < 0) {
+         /* Save the SDL error set by SDL_EGL_MakeCurrent */
+--- a/src/video/kmsdrm/SDL_kmsdrmopengles.c
++++ b/src/video/kmsdrm/SDL_kmsdrmopengles.c
+@@ -41,11 +41,17 @@
+ {
+     /* if SDL was _also_ built with the Raspberry Pi driver (so we're
+        definitely a Pi device), default to GLES2. */
+-#ifdef SDL_VIDEO_DRIVER_RPI
+-    *mask = SDL_GL_CONTEXT_PROFILE_ES;
+-    *major = 2;
+-    *minor = 0;
++    /* JohnnyonFlame: We want to use GLESv2 as a default for compatibility
++       with SDL 2.0.10 builds, but offer the ability to use the OpenGL defaults
++       if ever needed. */
++#ifndef SDL_VIDEO_DRIVER_RPI
++    if (!SDL_getenv("SDL_DEFAULT_CONTEXT_PROFILE"))
+ #endif
++    {
++        *mask = SDL_GL_CONTEXT_PROFILE_ES;
++        *major = 2;
++        *minor = 0;
++    }
+ }
+ 
+ int KMSDRM_GLES_LoadLibrary(_THIS, const char *path)
+@@ -73,6 +79,7 @@
+     int KMSDRM_GLES_SetSwapInterval(_THIS, int interval)
+ {
+ 
++  interval = 1;
+     if (!_this->egl_data) {
+         return SDL_SetError("EGL not initialized");
+     }

@@ -1,0 +1,17 @@
+ath10k/*
+ctefx.bin
+lbtf_usb.bin
+mrvl/sd8897_uapsta.bin
+qca/*00000302.bin
+mediatek/*MT7961*.bin
+mediatek/*MT7922*.bin
+rt2561.bin
+rt2561s.bin
+rt2661.bin
+rt2860.bin
+rt3290.bin
+ar3k/*.dfu
+intel/dsp_fw_{bxtn,cnl,glk,kbl,release}.bin
+intel/fw_sst_*.bin*
+intel/ibt-*.{ddc,sfi,bseq}
+intel/IntcSST2.bin

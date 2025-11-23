@@ -1,0 +1,40 @@
+{
+    "file_format_version": "1.1.2",
+    "layer": {
+        "name": "VK_LAYER_window_system_integration",
+        "type": "GLOBAL",
+        "library_path": "./libVkLayer_window_system_integration.so",
+        "api_version": "1.3.216",
+        "implementation_version": "1",
+        "description": "Window system integration layer",
+        "functions": {
+            "vkNegotiateLoaderLayerInterfaceVersion": "wsi_layer_vkNegotiateLoaderLayerInterfaceVersion"
+        },
+        "instance_extensions": [
+            {"name" : "VK_KHR_wayland_surface", "spec_version" : "6"},
+            {"name" : "VK_KHR_surface", "spec_version" : "25"},
+            {"name" : "VK_KHR_get_surface_capabilities2", "spec_version" : "1"}
+        ],
+        "device_extensions": [
+            {"name": "VK_EXT_image_compression_control_swapchain", "spec_version": "1"},
+            {
+                "name": "VK_KHR_swapchain",
+                "spec_version": "70",
+                "entrypoints": [
+                    "vkAcquireNextImageKHR",
+                    "vkCreateSwapchainKHR",
+                    "vkDestroySwapchainKHR",
+                    "vkGetSwapchainImagesKHR",
+                    "vkQueuePresentKHR",
+                    "vkAcquireNextImage2KHR",
+                    "vkGetDeviceGroupPresentCapabilitiesKHR",
+                    "vkGetDeviceGroupSurfacePresentModesKHR",
+                    "vkGetPhysicalDevicePresentRectanglesKHR"
+                ]
+            }
+        ],
+        "disable_environment": {
+            "DISABLE_WSI_LAYER": "1"
+        }
+    }
+}

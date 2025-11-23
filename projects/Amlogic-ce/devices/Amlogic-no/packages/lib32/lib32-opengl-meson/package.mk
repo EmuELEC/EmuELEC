@@ -20,15 +20,20 @@ makeinstall_target() {
   mkdir -p ${SYSROOT_PREFIX}/usr/lib
   local DIR_MESON="$(get_build_dir opengl-meson)"
   local DIR_ARM=${DIR_MESON}/lib/eabihf
-  local DIR_ARM_local=${PKG_DIR}/src/eabihf
   local SINGLE_LIBMALI='no'
 
-      cp -p ${DIR_ARM_local}/gondul/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.gondul.g12b.so
-      cp -p ${DIR_ARM_local}/dvalin/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.dvalin.g12a.so
-      cp -p ${DIR_ARM}/gondul/r37p0/fbdev/libMali_r1p0.so ${INSTALL}/usr/lib32/libMali.gondul.so
-      cp -p ${DIR_ARM}/dvalin/r37p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.dvalin.so
-      cp -p ${DIR_ARM}/valhall/r41p0/fbdev/libMali.so ${INSTALL}/usr/lib32/libMali.valhall.so
-      cp -p ${DIR_ARM}/gondul/r37p0/fbdev/libMali_r1p0.so ${SYSROOT_PREFIX}/usr/lib/libMali.so
+	# Copy vulkan icd.d
+	mkdir -p ${INSTALL}/usr/share/vulkan32
+	cp -pr ${DIR_ARM}/vulkan/r44p0/icd* ${INSTALL}/usr/share/vulkan32/
+	sed -i "s|\/usr\/lib\/libMali.so|\/usr\/lib32\/libMali.so|" ${INSTALL}/usr/share/vulkan32/icd.d/mali.json 
+
+
+     cp -p ${DIR_ARM}/gondul/r44p0/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib32/libMali.gondul.g12b.so
+     cp -p ${DIR_ARM}/gondul/r44p0/wayland/drm/libMali_r1p0_dmaheap.so ${INSTALL}/usr/lib32/libMali.gondul.so
+
+     cp -p ${DIR_ARM}/dvalin/r44p0/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib32/libMali.dvalin.so
+     cp -p ${DIR_ARM}/valhall/r44p0/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib32/libMali.valhall.g310.so
+     cp -p ${DIR_ARM}/gondul/r44p0/wayland/drm/libMali_dmaheap.so ${SYSROOT_PREFIX}/usr/lib/libMali.so
 
   if [[ "${SINGLE_LIBMALI}" == 'no' ]]; then
     ln -sf /var/lib32/libMali.so ${INSTALL}/usr/lib32/libMali.so
@@ -51,7 +56,9 @@ makeinstall_target() {
                    libGLESv3.so \
                    libGLESv3.so.3 \
                    libGLESv3.so.3.0 \
-                   libGLESv3.so.3.0.0"
+                   libGLESv3.so.3.0.0 \
+                   libgbm.so \
+                   libgbm.so.1"
 
   local LINK_NAME
   for LINK_NAME in ${LINK_LIST}; do
@@ -61,8 +68,12 @@ makeinstall_target() {
 
   # install headers and libraries to TOOLCHAIN
   cp -rf ${DIR_MESON}/include/* ${SYSROOT_PREFIX}/usr/include
-  cp -rf "$(get_build_dir opengl-meson)/lib/pkgconfig/"* ${SYSROOT_PREFIX}/usr/lib/pkgconfig
+  cp -rf "$(get_build_dir opengl-meson)/lib/pkgconfig/egl.pc" ${SYSROOT_PREFIX}/usr/lib/pkgconfig
+  cp -rf "$(get_build_dir opengl-meson)/lib/pkgconfig/glesv2.pc" ${SYSROOT_PREFIX}/usr/lib/pkgconfig
+  cp -rf "$(get_build_dir opengl-meson)/lib/pkgconfig/gbm/"* ${SYSROOT_PREFIX}/usr/lib/pkgconfig
   cp ${SYSROOT_PREFIX}/usr/include/EGL_platform/platform_fbdev/* ${SYSROOT_PREFIX}/usr/include/EGL
-  rm -rf ${SYSROOT_PREFIX}/usr/include/EGL_platform
+  cp ${SYSROOT_PREFIX}/usr/include/EGL_platform/platform_gbm/gbm/* ${SYSROOT_PREFIX}/usr/include
+  
+  #rm -rf ${SYSROOT_PREFIX}/usr/include/EGL_platform
 }
 
