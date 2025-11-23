@@ -96,24 +96,6 @@
 		<image>./setup_images/cheats.png</image>
 	</game>
 	<game>
-		<path>./sselphs_scraper.sh</path>
-		<name>Sselphs scraper</name>
-		<desc>Alternative ROM Scraper. Configuration is required!</desc>
-		<developer>shantigilbert </developer>
-		<publisher>Emuelec</publisher>
-		<genre>script</genre>
-		<image>./setup_images/help.png</image>
-	</game>
-	<game>
-		<path>./skyscraper.sh</path>
-		<name>Skyscraper</name>
-		<desc>Alternative ROM Scraper. Configuration is required!</desc>
-		<developer>shantigilbert </developer>
-		<publisher>Emuelec</publisher>
-		<genre>script</genre>
-		<image>./setup_images/sh.png</image>
-	</game>
-	<game>
 		<path>./send_logs.sh</path>
 		<name>Send logs</name>
 		<desc>Use this to get a URL that you can share when asking for help</desc>

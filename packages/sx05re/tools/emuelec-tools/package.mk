@@ -15,7 +15,6 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       libjpeg-turbo \
                       curl \
                       common-shaders \
-                      Skyscraper \
                       MC \
                       libretro-bash-launcher \
                       SDL_GameControllerDB \
