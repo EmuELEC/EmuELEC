@@ -55,6 +55,7 @@ elif [[ "${DEVICE}" =~ ^(OdroidGoAdvance|GameForce|RK356x|OdroidM1)$ ]]; then
     PKG_PATCH_DIRS+=" ${RA_DIRECTORY}/patches/OdroidGoAdvance"
   fi
 elif [ "${DEVICE}" = "Amlogic-no" ]; then
+  PKG_DEPENDS_TARGET+=" lib32-wayland lib32-vulkan-loader"
   PKG_PATCH_DIRS+=" ${RA_DIRECTORY}/patches/Amlogic"
   PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
                            --enable-opengles3_2 \

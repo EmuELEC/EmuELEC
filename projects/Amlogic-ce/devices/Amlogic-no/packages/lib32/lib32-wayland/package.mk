@@ -8,8 +8,8 @@ PKG_NEED_UNPACK="$(get_pkg_directory ${PKG_64NAME})"
 PKG_LICENSE="OSS"
 PKG_SITE="https://wayland.freedesktop.org/"
 PKG_URL=""
-PKG_DEPENDS_HOST="lib32-libffi:host lib32-expat:host lib32-libxml2:host"
-PKG_DEPENDS_TARGET="lib32-toolchain lib32-libpciaccess lib32-wayland:host lib32-libffi lib32-expat lib32-libxml2"
+PKG_DEPENDS_HOST="toolchain:host lib32-expat:host lib32-libxml2:host"
+PKG_DEPENDS_TARGET="lib32-toolchain lib32-libpciaccess lib32-libffi lib32-expat lib32-libxml2 lib32-wayland:host"
 PKG_PATCH_DIRS+=" $(get_pkg_directory ${PKG_64NAME})/patches"
 PKG_LONGDESC="a display server protocol"
 PKG_BUILD_FLAGS="lib32"
@@ -25,7 +25,7 @@ PKG_MESON_OPTS_TARGET="-Dlibraries=true \
                        -Dtests=false \
                        -Ddocumentation=false \
                        -Ddtd_validation=false
-                       --libdir=/usr/lib32"
+                       --libdir=/usr/lib"
 
 
 unpack() {
