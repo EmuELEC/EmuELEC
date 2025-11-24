@@ -181,6 +181,8 @@ if [[ "${CVER}" != "${NVER}" ]]; then
 
     echo "${NVER}" > /storage/.config/EE_VERSION
 (
+
+ if ! grep -q '<name>nds</name>' "${CFG}"; then
     if grep -q '<name>nds</name>' "${OLDCFG}"; then
         xmlstarlet ed --omit-decl --inplace \
             -s '//systemList' -t elem -n 'system' \
@@ -196,6 +198,7 @@ if [[ "${CVER}" != "${NVER}" ]]; then
             -s '//systemList/system[last()]' -t elem -n 'theme' -v 'nds'\
             ${CFG} 
     fi
+ fi
 ) &
 
 fi
