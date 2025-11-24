@@ -30,6 +30,7 @@ makeinstall_target() {
 
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libmali.so
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libmali.so.0
+    ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libmali.so.1
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libEGL.so
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libEGL.so.1
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libEGL.so.1.0.0

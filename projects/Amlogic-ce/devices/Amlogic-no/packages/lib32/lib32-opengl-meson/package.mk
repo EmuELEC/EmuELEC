@@ -41,6 +41,7 @@ makeinstall_target() {
 
   local LINK_LIST="libmali.so \
                    libmali.so.0 \
+                   libmali.so.1 \
                    libEGL.so \
                    libEGL.so.1 \
                    libEGL.so.1.0.0 \
