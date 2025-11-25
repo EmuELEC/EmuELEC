@@ -50,8 +50,7 @@ if [ "${ARCH}" == "aarch64" ]; then
                         lib32-bennugd-monolithic \
                         lib32-droidports \
                         lib32-box86 \
-                        lib32-libusb \
-                        lib32-wayland"
+                        lib32-libusb"
 
   if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
     PKG_DEPENDS_TARGET+=" dolphinSA"
