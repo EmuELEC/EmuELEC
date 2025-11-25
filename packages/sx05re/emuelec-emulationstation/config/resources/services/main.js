@@ -1144,6 +1144,7 @@ showNotificationBanner: function(message, type) {
 			result.style.display = 'block';
 		}
 	}
+
 };
 
 app.init();
@@ -1154,3 +1155,267 @@ window.onclick = function(event) {
 		app.closeModal();
 	}
 };
+
+// ===================================================================
+// FILE UPLOAD FUNCTIONALITY FOR RETROARCH CORES 
+// ===================================================================
+
+// Global variable to store the selected file
+var selectedCoreFile = null;
+var MAX_CORE_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+
+// Handle file selection from file input
+app.handleCoreFileSelect = function(event) {
+	var file = event.target.files[0];
+	if (file) {
+		this.validateAndSetCoreFile(file);
+	}
+};
+
+// Handle drag and drop
+app.handleCoreDrop = function(event) {
+	event.preventDefault();
+	event.stopPropagation();
+	
+	// Reset drop zone styling
+	var dropZone = document.getElementById('uploadDropZone');
+	dropZone.style.borderColor = '#cbd5e1';
+	dropZone.style.background = '#f8fafc';
+	
+	var files = event.dataTransfer.files;
+	if (files.length > 0) {
+		this.validateAndSetCoreFile(files[0]);
+	}
+};
+
+// Validate file and set it as selected
+app.validateAndSetCoreFile = function(file) {
+	var resultDiv = document.getElementById('uploadCoreResult');
+	
+	// Check file size
+	if (file.size > MAX_CORE_FILE_SIZE) {
+		var sizeMB = (file.size / 1024 / 1024).toFixed(2);
+		resultDiv.textContent = 'Error: File too large (' + sizeMB + ' MB). Maximum size is 100 MB.';
+		resultDiv.style.display = 'block';
+		resultDiv.style.color = '#848484';
+		return;
+	}
+	
+	// Set the file
+	selectedCoreFile = file;
+	
+	// Display file info
+	document.getElementById('uploadFileName').textContent = file.name;
+	document.getElementById('uploadFileSize').textContent = 'Size: ' + this.formatFileSize(file.size);
+	document.getElementById('uploadFileInfo').style.display = 'block';
+	
+	// Enable upload button
+	document.getElementById('uploadCoreBtn').disabled = false;
+	
+	// Hide any previous results
+	resultDiv.style.display = 'none';
+	
+	// Show notification banner if available
+	if (this.showNotificationBanner) {
+		this.showNotificationBanner('File selected: ' + file.name, 'info');
+	}
+};
+
+// Format file size for display
+app.formatFileSize = function(bytes) {
+	if (bytes === 0) return '0 Bytes';
+	var k = 1024;
+	var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+	var i = Math.floor(Math.log(bytes) / Math.log(k));
+	return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+};
+
+// Upload the selected core file
+app.uploadCore = function() {
+	if (!selectedCoreFile) {
+		if (this.showNotificationBanner) {
+			this.showNotificationBanner('Please select a file first', 'error');
+		}
+		return;
+	}
+	
+	var progressDiv = document.getElementById('uploadProgress');
+	var progressBar = document.getElementById('uploadProgressBar');
+	var resultDiv = document.getElementById('uploadCoreResult');
+	var uploadBtn = document.getElementById('uploadCoreBtn');
+	
+	// Show progress bar
+	progressDiv.style.display = 'block';
+	progressBar.style.width = '0%';
+	progressBar.textContent = '0%';
+	
+	// Disable upload button during upload
+	uploadBtn.disabled = true;
+	
+	// Create form data
+	var formData = new FormData();
+	formData.append('file', selectedCoreFile);
+	
+	// Create XMLHttpRequest for progress tracking
+	var xhr = new XMLHttpRequest();
+	var self = this;
+	
+	// Progress handler
+	xhr.upload.addEventListener('progress', function(e) {
+		if (e.lengthComputable) {
+			var percentComplete = Math.round((e.loaded / e.total) * 100);
+			progressBar.style.width = percentComplete + '%';
+			progressBar.textContent = percentComplete + '%';
+		}
+	});
+	
+	// Completion handler
+	xhr.addEventListener('load', function() {
+		if (xhr.status >= 200 && xhr.status < 300) {
+			resultDiv.textContent = 'Success: ' + selectedCoreFile.name + ' uploaded to /tmp/cores/';
+			resultDiv.style.display = 'block';
+			resultDiv.style.color = '#84849f';
+			if (self.showNotificationBanner) {
+				self.showNotificationBanner('Core uploaded successfully!', 'success');
+			}
+			self.clearCoreUpload();
+		} else {
+			var errorMsg = 'Upload failed';
+			try {
+				var response = JSON.parse(xhr.responseText);
+				errorMsg = response.error || errorMsg;
+			} catch (e) {
+				errorMsg = 'Upload failed with status ' + xhr.status;
+			}
+			resultDiv.textContent = 'Error: ' + errorMsg;
+			resultDiv.style.display = 'block';
+			resultDiv.style.color = '#848484';
+			if (self.showNotificationBanner) {
+				self.showNotificationBanner(errorMsg, 'error');
+			}
+			progressDiv.style.display = 'none';
+			uploadBtn.disabled = false;
+		}
+	});
+	
+	// Error handler
+	xhr.addEventListener('error', function() {
+		resultDiv.textContent = 'Error: Network error during upload';
+		resultDiv.style.display = 'block';
+		resultDiv.style.color = '#848484';
+		if (self.showNotificationBanner) {
+			self.showNotificationBanner('Upload failed - network error', 'error');
+		}
+		progressDiv.style.display = 'none';
+		uploadBtn.disabled = false;
+	});
+	
+	// Send request
+	xhr.open('POST', '/upload/core', true);
+	xhr.send(formData);
+};
+
+// Clear the upload form
+app.clearCoreUpload = function() {
+	selectedCoreFile = null;
+	document.getElementById('coreFileInput').value = '';
+	document.getElementById('uploadFileInfo').style.display = 'none';
+	document.getElementById('uploadProgress').style.display = 'none';
+	document.getElementById('uploadCoreBtn').disabled = true;
+	
+	// Reset drop zone
+	var dropZone = document.getElementById('uploadDropZone');
+	dropZone.style.borderColor = '#cbd5e1';
+	dropZone.style.background = '#f8fafc';
+};
+
+// List uploaded cores
+app.listCores = function() {
+	var resultDiv = document.getElementById('uploadCoreResult');
+	resultDiv.textContent = 'Loading...';
+	resultDiv.style.display = 'block';
+	resultDiv.style.color = '#64748b';
+	
+	var xhr = this.request('GET', '/cores/list');
+	var self = this;
+	
+	if (xhr && xhr.status === 200) {
+		try {
+			var cores = JSON.parse(xhr.responseText);
+			
+			if (cores.length === 0) {
+				resultDiv.textContent = 'No cores found in /tmp/cores/';
+				resultDiv.style.color = '#64748b';
+			} else {
+				var html = '<div style="margin-top: 15px;"><strong>Uploaded cores:</strong><ul style="margin: 10px 0; padding-left: 20px;">';
+				for (var i = 0; i < cores.length; i++) {
+					var core = cores[i];
+					html += '<li style="margin: 5px 0; color: #334155;">';
+					html += '<span style="font-weight: 600;">' + core.name + '</span> ';
+					html += '<span style="color: #64748b; font-size: 14px;">(' + self.formatFileSize(core.size) + ')</span>';
+					html += '<button onclick="app.deleteCore(\'' + core.name + '\')" class="btn btn-danger" style="margin-left: 10px; padding: 4px 12px; font-size: 12px;">Delete</button>';
+					html += '</li>';
+				}
+				html += '</ul></div>';
+				resultDiv.innerHTML = html;
+				resultDiv.style.color = '#334155';
+			}
+		} catch (e) {
+			resultDiv.textContent = 'Error: Failed to parse response';
+			resultDiv.style.color = '#848484';
+		}
+	} else {
+		resultDiv.textContent = 'Error loading cores';
+		resultDiv.style.color = '#848484';
+		if (this.showNotificationBanner) {
+			this.showNotificationBanner('Error loading cores', 'error');
+		}
+	}
+};
+
+// Delete a core file
+app.deleteCore = function(filename) {
+	if (!confirm('Delete ' + filename + '?')) return;
+	
+	var xhr = new XMLHttpRequest();
+	var self = this;
+	
+	xhr.addEventListener('load', function() {
+		if (xhr.status >= 200 && xhr.status < 300) {
+			if (self.showNotificationBanner) {
+				self.showNotificationBanner('Deleted ' + filename, 'success');
+			}
+			self.listCores();
+		} else {
+			if (self.showNotificationBanner) {
+				self.showNotificationBanner('Error deleting core', 'error');
+			}
+		}
+	});
+	
+	xhr.addEventListener('error', function() {
+		if (self.showNotificationBanner) {
+			self.showNotificationBanner('Error deleting core', 'error');
+		}
+	});
+	
+	xhr.open('DELETE', '/cores/' + encodeURIComponent(filename), true);
+	xhr.send();
+};
+
+// Optional: Add notification banner function if it doesn't exist
+if (!app.showNotificationBanner) {
+	app.showNotificationBanner = function(message, type) {
+		var banner = document.getElementById('notificationBanner');
+		var text = document.getElementById('notificationText');
+		
+		if (banner && text) {
+			text.textContent = message;
+			banner.style.display = 'block';
+			
+			setTimeout(function() {
+				banner.style.display = 'none';
+			}, 5000);
+		}
+	};
+}

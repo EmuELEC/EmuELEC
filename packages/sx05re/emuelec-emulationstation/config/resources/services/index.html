@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang='fr'>
+<html>
 <head>			
 	<title>EmuELEC-EmulationStation Web services</title>
 	<link rel="shortcut icon" href="favicon.png">
@@ -10,7 +10,7 @@
 	<div class="container">
 		<div id="notificationBanner" class="notification-banner" style="display: none;">
 			<span id="notificationText"></span>
-			<button onclick="document.getElementById('notificationBanner').style.display='none'" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0 10px;">×</button>
+			<button onclick="document.getElementById('notificationBanner').style.display='none'" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0 10px;">&#10005;</button>
 		</div>
 		
 		<div class="header">
@@ -224,6 +224,42 @@
 </gameList>"></textarea>
 							<button class="btn btn-danger" onclick="app.removeGames()">Remove Games (Deletes Files!)</button>
 							<div id="removeGamesResult" class="tool-result"></div>
+						</div>
+
+						<div class="tool-card">
+							<h3>Upload RetroArch Core</h3>
+							<p>Upload RetroArch libretro core files (.so) to /tmp/cores/ (max 100MB per file)</p>
+							
+							<div style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 30px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.3s;" 
+								 id="uploadDropZone"
+								 onclick="document.getElementById('coreFileInput').click()"
+								 ondragover="event.preventDefault(); this.style.borderColor='#667eea'; this.style.background='#eef2ff';"
+								 ondragleave="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';"
+								 ondrop="app.handleCoreDrop(event)">
+								<div style="font-size: 48px; margin-bottom: 10px; font-weight: bold; color: #667eea;">[+]</div>
+								<p style="margin: 0; color: #64748b; font-size: 14px;">Click to browse or drag & drop RetroArch core (.so) here</p>
+								<p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 12px;">Maximum file size: 100 MB</p>
+							</div>
+							
+							<input type="file" id="coreFileInput" style="display: none;" onchange="app.handleCoreFileSelect(event)" accept=".so,.dylib,.dll">
+							
+							<div id="uploadFileInfo" style="display: none; margin: 15px 0; padding: 15px; background: #f1f5f9; border-radius: 8px; border-left: 4px solid #667eea;">
+								<div style="font-weight: 600; color: #334155; margin-bottom: 5px;" id="uploadFileName"></div>
+								<div style="color: #64748b; font-size: 14px;" id="uploadFileSize"></div>
+							</div>
+							
+							<div id="uploadProgress" style="display: none; margin: 15px 0;">
+								<div style="background: #e2e8f0; border-radius: 8px; height: 30px; overflow: hidden;">
+									<div id="uploadProgressBar" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">0%</div>
+								</div>
+							</div>
+							
+							<div style="display: flex; gap: 10px; margin-top: 15px;">
+								<button class="btn btn-primary" id="uploadCoreBtn" onclick="app.uploadCore()" disabled>Upload Core</button>
+								<button class="btn btn-secondary" onclick="app.clearCoreUpload()">Clear</button>
+								<button class="btn btn-secondary" onclick="app.listCores()">List Uploaded Cores</button>
+							</div>
+							<div id="uploadCoreResult" class="tool-result"></div>
 						</div>
 					</div>
 				</div>
