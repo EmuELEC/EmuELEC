@@ -25,7 +25,7 @@ PKG_MESON_OPTS_TARGET="-Dlibraries=true \
                        -Dtests=false \
                        -Ddocumentation=false \
                        -Ddtd_validation=false
-                       --libdir=/usr/lib"
+                       --libdir=/usr/lib32"
 
 
 unpack() {

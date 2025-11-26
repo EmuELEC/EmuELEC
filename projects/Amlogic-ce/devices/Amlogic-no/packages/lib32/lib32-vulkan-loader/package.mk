@@ -36,6 +36,6 @@ pre_configure_target() {
     PKG_CMAKE_OPTS_TARGET+=" -DBUILD_WSI_XCB_SUPPORT=OFF \
                              -DBUILD_WSI_XLIB_SUPPORT=OFF \
                              -DBUILD_WSI_WAYLAND_SUPPORT=ON \
-                             -DCMAKE_INSTALL_LIBDIR=lib"
+                             -DCMAKE_INSTALL_LIBDIR=lib32"
 
 }
