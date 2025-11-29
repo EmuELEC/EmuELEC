@@ -249,7 +249,7 @@ if [ -f ${BOOT_ROOT}/boot.ini ]; then
   fi
 fi
 
-[ "$(stat -c %d ${BOOT_ROOT})" != "$(stat -c %d /storage)" ] && mount -o ro,remount ${BOOT_ROOT}
+[ "$(stat -t ${BOOT_ROOT} | cut -d: -f5)" != "$(stat -t /storage | cut -d: -f5)" ] && mount -o ro,remount ${BOOT_ROOT} 
 
 # Leave a hint that we just did an update
 echo "UPDATE" > /storage/.config/boot.hint
