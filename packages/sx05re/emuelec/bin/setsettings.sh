@@ -88,12 +88,12 @@ case "${EE_LANG}" in
     it_IT)       LANGEMUELEC="5" ;;
     eu_ES)       LANGEMUELEC="21" ;;
     tr_TR)       LANGEMUELEC="17" ;;
-    zh_CN)       LANGEMUELEC="11" ;;
-    zh_TW)       LANGEMUELEC="12" ;;
-    ko_KR)       LANGEMUELEC="8" ;;
+    zh_CN)       LANGEMUELEC="12" ;;
+    zh_TW)       LANGEMUELEC="11" ;;
+    ko_KR)       LANGEMUELEC="10" ;;
     ja_JP)       LANGEMUELEC="9" ;;
     ru_RU)       LANGEMUELEC="14" ;;
-    nl_NL)       LANGEMUELEC="10" ;;
+    nl_NL)       LANGEMUELEC="8" ;;
     pl_PL)       LANGEMUELEC="15" ;;
     sv_SE)       LANGEMUELEC="16" ;;
     hu_HU)       LANGEMUELEC="19" ;;
