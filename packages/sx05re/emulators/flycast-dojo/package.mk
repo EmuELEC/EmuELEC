@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2025-present DiegroSan (https://github.com/Diegrosan)
->>>>>>> 5a3e0877546318dd70cd001563e57bfb78328a6b:packages/sx05re/emulators/flycast-dojo/package.mk
 
 PKG_NAME="flycast-dojo"
 PKG_VERSION="d0e47e572b1e7b355e88bda8308c89d0c5156cbf" #6.53+
@@ -12,21 +11,17 @@ PKG_LONGDESC="flycast-dojo is a multiplatform Sega Dreamcast, Naomi and Atomiswa
 PKG_TOOLCHAIN="cmake"
 PKG_GIT_CLONE_BRANCH="master"
 
+PKG_CMAKE_OPTS_TARGET+=" -DTHREAD_SANITIZER_AVAILABLE_EXITCODE=1"
+PKG_CMAKE_OPTS_TARGET+=" -DADDRESS_SANITIZER_AVAILABLE_EXITCODE=1"
+PKG_CMAKE_OPTS_TARGET+=" -DALL_SANITIZERS_AVAILABLE_EXITCODE=1"
+PKG_CMAKE_OPTS_TARGET+=" -DUSE_GLES=ON -DUSE_VULKAN=OFF -DUSE_HOST_SDL=ON -DENABLE_CTEST=OFF -DTEST_AUTOMATION=OFF -DASAN=OFF "
 
 if [ "${ARCH}" == "arm" ]; then
     PKG_PATCH_DIRS="arm"
 fi
 
-post_unpack() {
-  ( cd "${PKG_BUILD}" && git submodule update --init --recursive )
-}
-
 pre_configure_target() {
   export CXXFLAGS="${CXXFLAGS} -Wno-error=array-bounds -Wswitch -Wsign-compare -I$(get_install_dir asio)/usr/include"
-  PKG_CMAKE_OPTS_TARGET+=" -DUSE_GLES=ON -DUSE_VULKAN=OFF -DUSE_HOST_SDL=ON -DENABLE_CTEST=OFF -DTEST_AUTOMATION=OFF -DASAN=OFF "
-  PKG_CMAKE_OPTS_TARGET+=" -DTHREAD_SANITIZER_AVAILABLE_EXITCODE=1"
-PKG_CMAKE_OPTS_TARGET+=" -DADDRESS_SANITIZER_AVAILABLE_EXITCODE=1"
-PKG_CMAKE_OPTS_TARGET+=" -DALL_SANITIZERS_AVAILABLE_EXITCODE=1"
 }
 
 makeinstall_target() {

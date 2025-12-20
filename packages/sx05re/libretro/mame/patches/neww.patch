@@ -1,0 +1,22 @@
+--- a/scripts/toolchain.lua	2025-04-26 06:49:26.434764500 +0200
++++ b/scripts/toolchain.lua	2025-04-26 06:50:20.330044973 +0200
+@@ -335,9 +335,6 @@
+ 
+ 	configuration { "linux-gcc", "x32" }
+ 		objdir (_buildDir .. "linux_gcc" .. "/obj")
+-		buildoptions {
+-			"-m32",
+-		}
+ 
+ 	configuration { "linux-gcc", "x32", "Release" }
+ 		targetdir (_buildDir .. "linux_gcc" .. "/bin/x32/Release")
+@@ -347,9 +344,6 @@
+ 
+ 	configuration { "linux-gcc", "x64" }
+ 		objdir (_buildDir .. "linux_gcc" .. "/obj")
+-		buildoptions {
+-			"-m64",
+-		}
+ 
+ 	configuration { "linux-gcc", "x64", "Release" }
+ 		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Release")

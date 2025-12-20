@@ -156,7 +156,7 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices #Khadas_VIM4 Khadas_VIM1S Odroid_C4 Odroid_N2 Radxa_Zero Radxa_Zero2 Alta Solitude
-    SUBDEVICES="Khadas_VIM4 Khadas_VIM1S Odroid_C4 Odroid_N2 Radxa_Zero Radxa_Zero2 Alta Solitude"
+    #SUBDEVICES="Odroid_N2"
 
   # TEE supported SoC
-    TEE_SOC="S928X A311D2 S905W2 S905X4 S905Y4"
+    TEE_SOC="S905X4"

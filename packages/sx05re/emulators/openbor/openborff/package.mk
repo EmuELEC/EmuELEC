@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="openborff"
-PKG_VERSION="63c1aa6053d28862704015a3d0a0d204478a1533"
-PKG_SHA256="ae05634fdc30eb902277182779cdc5b28ef1bb74e2ee154b59571c88e39676a7"
+PKG_VERSION="3c14ffc37c984a5aebc7a3fb6133b47484d43bd2"
+PKG_SHA256="275ba0593027053cfd9df0586868e1471b71153858dc0b42429938db07eba74c"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/gonzalomvp/openbor"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
