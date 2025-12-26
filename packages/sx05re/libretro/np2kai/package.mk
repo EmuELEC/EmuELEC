@@ -19,11 +19,11 @@
 ################################################################################
 
 PKG_NAME="np2kai"
-PKG_VERSION="02b08deb3833305251fb3ee6c5d59b0efb5b52ff"
+PKG_VERSION="3ccfef9d7a4779591f72ff5ea7db13a1e7f3b137"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
-PKG_SITE="https://github.com/AZO234/NP2kai"
+PKG_SITE="https://github.com/libretro/NP2kai"
 PKG_URL="${PKG_SITE}.git"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
