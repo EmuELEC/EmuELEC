@@ -83,21 +83,20 @@ case "${EE_LANG}" in
     pt_BR|pt_PT) LANGEMUELEC="7" ;;
     en_US|en_GB) LANGEMUELEC="0" ;;
     fr_FR)       LANGEMUELEC="2" ;;
-    es_ES|es_MX) LANGEMUELEC="3" ;;
+    es_ES|es_MX|eu_ES) LANGEMUELEC="3" ;;
     de_DE)       LANGEMUELEC="4" ;;
     it_IT)       LANGEMUELEC="5" ;;
-    eu_ES)       LANGEMUELEC="21" ;;
-    tr_TR)       LANGEMUELEC="17" ;;
+    tr_TR)       LANGEMUELEC="18" ;;
     zh_CN)       LANGEMUELEC="12" ;;
     zh_TW)       LANGEMUELEC="11" ;;
     ko_KR)       LANGEMUELEC="10" ;;
-    ja_JP)       LANGEMUELEC="9" ;;
-    ru_RU)       LANGEMUELEC="14" ;;
-    nl_NL)       LANGEMUELEC="8" ;;
-    pl_PL)       LANGEMUELEC="15" ;;
-    sv_SE)       LANGEMUELEC="16" ;;
-    hu_HU)       LANGEMUELEC="19" ;;
-    cs_CZ)       LANGEMUELEC="20" ;;
+    ja_JP)       LANGEMUELEC="1" ;;
+    ru_RU)       LANGEMUELEC="9" ;;
+    nl_NL)       LANGEMUELEC="6" ;;
+    pl_PL)       LANGEMUELEC="14" ;;
+    sv_SE)       LANGEMUELEC="25" ;;
+    hu_HU)       LANGEMUELEC="31" ;;
+    cs_CZ)       LANGEMUELEC="27" ;;
     *)           LANGEMUELEC="0" ;;
 esac
 
