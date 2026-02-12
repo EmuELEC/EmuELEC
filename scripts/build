@@ -194,7 +194,8 @@ HOST_CONFIGURE_OPTS="--host=${HOST_NAME} \
 HOST_CMAKE_OPTS="${CMAKE_GENERATOR} \
                  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CONF} \
                  -DCMAKE_INSTALL_PREFIX=${TOOLCHAIN} \
-                 -DCMAKE_BUILD_TYPE=Release"
+                 -DCMAKE_BUILD_TYPE=Release \
+                 -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
 
 HOST_MESON_OPTS="--prefix=${TOOLCHAIN} \
                  --bindir=${TOOLCHAIN}/bin \

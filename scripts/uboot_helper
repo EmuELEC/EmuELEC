@@ -312,7 +312,7 @@ devices = \
     'X96X6': {
       'X96X6': {
 	      'dtb': 'rk3566-x96-x6.dtb',
-	         'config': 'firefly-rk3568_defconfig',
+	         'config': 'odroid_rk3568_defconfig',
 	      },
     },
     'RK3288': {

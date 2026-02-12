@@ -241,11 +241,14 @@ if [ -f ${INSTALL}/usr/bin/install2emmc ]; then
 fi
 
 # Run depmod for base overlay modules
-MODVER=$(basename $(ls -d ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/*))
-find ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/ -name *.ko | \
-  sed -e "s,${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/,," \
-    > ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/modules.order
-${TOOLCHAIN}/bin/depmod -b ${INSTALL}/usr/lib/kernel-overlays/base -a -e -F "$(get_install_dir linux)/.image/System.map" ${MODVER} 2>&1
+# Use overlay base directory directly - ${INSTALL}/lib is a symlink to /usr/lib
+# which resolves to the HOST path, not the target overlay path
+OVERLAY_BASE="${INSTALL}/$(get_kernel_overlay_dir)"
+MODVER=$(basename $(ls -d ${OVERLAY_BASE}/lib/modules/*))
+find ${OVERLAY_BASE}/lib/modules/${MODVER}/ -name "*.ko" | \
+  sed -e "s,${OVERLAY_BASE}/lib/modules/${MODVER}/,," \
+    > ${OVERLAY_BASE}/lib/modules/${MODVER}/modules.order
+${TOOLCHAIN}/bin/depmod -b ${OVERLAY_BASE} -a -e -F "$(get_install_dir linux)/.image/System.map" ${MODVER} 2>&1
 
 # Strip kernel modules
 for MOD in $(find ${INSTALL}/usr/lib/kernel-overlays/ -type f -name *.ko); do
