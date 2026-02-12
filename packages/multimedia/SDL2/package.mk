@@ -9,7 +9,7 @@ PKG_VERSION="2.32.10"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL="https://www.libsdl.org/release/SDL2-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus ${OPENGLES} pulseaudio"
+PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus ${OPENGLES} pulseaudio wayland wayland-protocols libxkbcommon"
 PKG_LONGDESC="Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware."
 PKG_DEPENDS_HOST="toolchain:host distutilscross:host"
 PKG_CMAKE_OPTS_HOST="-DSDL_MALI=OFF -DSDL_KMSDRM=OFF -DSDL_X11=OFF"
@@ -35,9 +35,9 @@ PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
                        -DSDL_DISKAUDIO=OFF \
                        -DSDL_DUMMYAUDIO=OFF \
                        -DSDL_DUMMYVIDEO=OFF \
-                       -DSDL_WAYLAND=OFF \
+                       -DSDL_WAYLAND=ON \
                        -DSDL_WAYLAND_QT_TOUCH=ON \
-                       -DSDL_WAYLAND_SHARED=OFF \
+                       -DSDL_WAYLAND_SHARED=ON \
                        -DSDL_COCOA=OFF \
                        -DSDL_DIRECTFB=OFF \
                        -DSDL_VIVANTE=OFF \
