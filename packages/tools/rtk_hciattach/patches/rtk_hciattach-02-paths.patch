@@ -1,0 +1,16 @@
+--- a/rtk_hciattach/rtb_fwc.c
++++ b/rtk_hciattach/rtb_fwc.c
+@@ -36,10 +36,10 @@
+ #include "rtb_fwc.h"
+ #include "hciattach.h"
+ 
+-#define FIRMWARE_DIRECTORY	"/lib/firmware/rtlbt/"
+-#define BT_CONFIG_DIRECTORY	"/lib/firmware/rtlbt/"
++#define FIRMWARE_DIRECTORY	"/usr/lib/firmware/rtlbt/"
++#define BT_CONFIG_DIRECTORY	"/usr/lib/firmware/rtlbt/"
+ #define EXTRA_CONFIG_FILE	"/opt/rtk_btconfig.txt"
+-#define BT_ADDR_FILE		"/opt/bdaddr"
++#define BT_ADDR_FILE		"/storage/.config/btaddr"
+ #define BDADDR_STRING_LEN	17
+ 
+ struct list_head {

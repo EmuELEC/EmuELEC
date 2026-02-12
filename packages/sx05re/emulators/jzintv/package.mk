@@ -12,6 +12,8 @@ PKG_TOOLCHAIN="make"
 
 pre_configure_target() {
 sed -i "s|sdl2-config|${SYSROOT_PREFIX}/usr/bin/sdl2-config|g" src/Makefile
+# Force SDL2 linking since Makefile doesn't use sdl2-config --libs properly
+export LDFLAGS="${LDFLAGS} $(${SYSROOT_PREFIX}/usr/bin/sdl2-config --libs)"
 PKG_MAKE_OPTS_TARGET="-C src/ -f Makefile GNU_READLINE=0 "
 }
 

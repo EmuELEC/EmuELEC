@@ -28,10 +28,14 @@ else
 PKG_CMAKE_OPTS_TARGET+=" -DARMV7=ON"
 fi
 
+post_unpack() {
+  cd ${PKG_BUILD}
+  git submodule update --init --recursive
+}
 
 pre_configure_target() {
 if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
-	sed -i "s|include_directories(/usr/include/drm)|include_directories(${SYSROOT_PREFIX}/usr/include/drm)|" ${PKG_BUILD}/CMakeLists.txt
+    sed -i "s|include_directories(/usr/include/drm)|include_directories(${SYSROOT_PREFIX}/usr/include/drm)|" ${PKG_BUILD}/CMakeLists.txt
 fi
 }
 
@@ -59,6 +63,6 @@ makeinstall_target() {
    mkdir -p "${INSTALL}/usr/config/ppsspp/PSP"    
    
 for dir in Cheats PPSSPP_STATE SAVEDATA TEXTURES; do
-		ln -sf "/storage/roms/savestates/PPSSPPSDL/PSP/${dir}" "${INSTALL}/usr/config/ppsspp/PSP/${dir}"
+        ln -sf "/storage/roms/savestates/PPSSPPSDL/PSP/${dir}" "${INSTALL}/usr/config/ppsspp/PSP/${dir}"
 done
-} 
+}

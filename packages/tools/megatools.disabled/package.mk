@@ -2,7 +2,6 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="megatools"
-# Using archive.org - original megatools.megous.com is dead
 PKG_VERSION="1.11.0"
 PKG_SHA256="d27c36f3c94b4d24a4a63b2a2b57a8e67a0a78f79821aeab2f4cf2b6e7df8cb1"
 PKG_LICENSE="GPL"

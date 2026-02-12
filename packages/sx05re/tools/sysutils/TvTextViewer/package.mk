@@ -10,8 +10,10 @@ PKG_DEPENDS_TARGET="toolchain SDL2"
 PKG_SHORTDESC="Full-screen text viewer tool with gamepad controls"
 PKG_TOOLCHAIN="make"
 
-pre_configure_target() {
-sed -i "s|\`sdl2-config|\`${SYSROOT_PREFIX}/usr/bin/sdl2-config|g" Makefile
+post_unpack() {
+# Initialize git submodules
+cd ${PKG_BUILD}
+git submodule update --init --recursive 2>/dev/null || true
 }
 
 makeinstall_target(){
