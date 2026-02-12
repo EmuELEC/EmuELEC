@@ -22,7 +22,7 @@ PKG_BUILD_FLAGS="lib32 -lto"
 
 if [ "${PROJECT}" = "Amlogic-ce" ]; then
   PKG_MAKE_OPTS_TARGET="platform=odroid BOARD=c2"
-elif [[ "${DEVICE}" =~ ^(OdroidGoAdvance|GameForce|RK356x|OdroidM1)$ ]]; then
+elif [[ "${DEVICE}" =~ ^(OdroidGoAdvance|GameForce|RK356x|OdroidM1|X96X6)$ ]]; then
   PKG_MAKE_OPTS_TARGET="platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
 fi
 

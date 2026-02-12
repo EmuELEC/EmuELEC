@@ -3,10 +3,10 @@
 
 PKG_NAME="edid-decode"
 PKG_VERSION="9ba4e90f3c0705351d32f526653e3e765fa2cf64" # 2022-09-23
-PKG_SHA256="8b55a1c09a32c4c39ea0092e1f468f545a535323eb36016e042e0bf156833a1b"
+#PKG_SHA256="8b55a1c09a32c4c39ea0092e1f468f545a535323eb36016e042e0bf156833a1b"
 PKG_LICENSE="None"
 PKG_SITE="https://git.linuxtv.org/edid-decode.git/"
-PKG_URL="https://repo.or.cz/edid-decode.git/snapshot/${PKG_VERSION}.tar.gz"
+PKG_URL="https://git.linuxtv.org/edid-decode.git"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Decode EDID data in human-readable format"
 
