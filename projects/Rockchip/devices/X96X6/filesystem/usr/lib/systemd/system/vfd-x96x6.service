@@ -1,0 +1,15 @@
+[Unit]
+Description=X96X6 VFD Clock and Status Display
+DefaultDependencies=no
+After=systemd-modules-load.service
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/emuelec/vfd-clock-daemon.sh
+TimeoutStopSec=5
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=sysinit.target fs-resize.target
+

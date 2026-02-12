@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+
+#if [ -f "$RELEASE_DIR/3rdparty/bootloader/idbloader.img" ]; then
+#  echo "image: burn X96X6 idblock.bin to image..."
+#  dd if="$RELEASE_DIR/3rdparty/bootloader/idbloader.img" of="$DISK" bs=32k seek=1 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
+#fi
+
+if [ -f "$RELEASE_DIR/3rdparty/bootloader/uboot.img" ]; then
+  echo "image: burn X96X6 uboot.img to image..."
+  dd if="$RELEASE_DIR/3rdparty/bootloader/uboot.img" of="$DISK" bs=64k seek=128 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
+fi
+
+#if [ -f "$RELEASE_DIR/3rdparty/bootloader/trust.img" ]; then
+#  echo "image: burn X96X6 trust.img to image..."
+#  dd if="$RELEASE_DIR/3rdparty/bootloader/trust.img" of="$DISK" bs=64k seek=192 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
+#fi
+
+if [ -f "$RELEASE_DIR/3rdparty/bootloader/boot.ini" ]; then
+echo "image: copying boot.ini to root"
+mcopy "$RELEASE_DIR/3rdparty/bootloader/boot.ini" ::
+fi
+
+mkdir -p "${LE_TMP}/extlinux"
+
+# copy device trees to part1
+for dtb in $RELEASE_DIR/3rdparty/bootloader/*.dtb; do
+
+if [ ! -f $dtb ]; then
+ continue
+fi
+
+cat << EOF > "${LE_TMP}/extlinux/$(basename ${dtb}).conf"
+LABEL ${DISTRO}
+  LINUX /${KERNEL_NAME}
+  FDT /$(basename ${dtb})
+  APPEND boot=UUID=${UUID_SYSTEM} disk=UUID=${UUID_STORAGE} quiet ${EXTRA_CMDLINE}
+EOF
+
+  [ -e "$dtb" ] && mcopy -o "$dtb" ::
+done
+
+cat << EOF > "${LE_TMP}/boot.cmd"
+setenv bootlabel "${DISTRO}"
+
+load \${devtype} \${devnum}:\${partition} \${loadaddr} \${prefix}config.ini && ini generic \${loadaddr}
+
+setenv bootargs "boot=UUID=\${boot_uuid} disk=UUID=\${disk_uuid} \${extra_cmds}"
+
+load \${devtype} \${devnum}:\${partition} \${kernel_addr_r} \${prefix}KERNEL
+load \${devtype} \${devnum}:\${partition} \${fdt_addr_r} \${prefix}\${dtb_file}
+booti \${kernel_addr_r} - \${fdt_addr_r}
+EOF
+
+${TOOLCHAIN}/bin/mkimage -C none -T script -A arm64 -d ${LE_TMP}/boot.cmd ${LE_TMP}/boot.scr
+
+cat << EOF > "${LE_TMP}/config.ini"
+[generic]
+boot_uuid="${UUID_SYSTEM}"
+disk_uuid="${UUID_STORAGE}"
+extra_cmds="${EXTRA_CMDLINE}"
+dtb_file="rk3566-x96-x6.dtb"
+EOF
+
+mcopy -so "${LE_TMP}/extlinux" ::
+mcopy -so "${LE_TMP}/boot.scr" ::
+mcopy -so "${LE_TMP}/config.ini" ::
+
+
+
+

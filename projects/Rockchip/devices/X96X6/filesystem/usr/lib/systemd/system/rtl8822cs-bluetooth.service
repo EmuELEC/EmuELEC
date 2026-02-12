@@ -1,0 +1,15 @@
+[Unit]
+Description=RTL8822CS Bluetooth HCI attach
+After=dev-ttyS1.device
+Before=bluetooth.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/sh -c 'rfkill unblock bluetooth || true'
+ExecStartPre=/usr/bin/sh -c 'modprobe hci_uart || true'
+ExecStart=/usr/bin/rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5 1500000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

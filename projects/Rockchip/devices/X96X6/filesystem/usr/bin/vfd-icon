@@ -1,0 +1,22 @@
+#!/bin/sh
+# VFD Icon Control Helper
+# Sends icon commands to the VFD daemon via control file.
+# The daemon reads /tmp/vfd-icon-cmd each iteration and applies changes.
+
+usage() {
+    cat << EOF
+Usage: $0 <icon> <on|off>
+
+Icons: apps, setup, usb, card, colon, wifi, data
+
+Examples:
+  $0 wifi on
+  $0 setup on
+  $0 usb off
+EOF
+    exit 1
+}
+
+[ $# -ne 2 ] && usage
+
+echo "$1 $2" >> /tmp/vfd-icon-cmd
