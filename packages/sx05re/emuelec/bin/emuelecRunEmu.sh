@@ -373,8 +373,13 @@ else
     ROMNAME_SHADER=${ROMNAME}
 fi
 
+
+RA_ARGS=""
 if [ -s "/emuelec/configs/RA_ARGS" ]; then
-	RA_ARGS = $(cat "/emuelec/configs/RA_ARGS")
+    RA_ARGS=$(tr '\n' ' ' < "/emuelec/configs/RA_ARGS")
+    # Prevent external arguments from overriding the selected libretro core path.
+    # The launcher always sets its own: -L /tmp/cores/${EMU}.so
+    RA_ARGS=$(echo " ${RA_ARGS} " | sed -E 's#[[:space:]](-L|--libretro)[[:space:]]+[^[:space:]]+([[:space:]]|$)# #g; s#[[:space:]]+/usr/bin/retroarch(32)?([[:space:]]|$)# #g; s#^[[:space:]]+##; s#[[:space:]]+$##')
 fi
 
 RUNTHIS='${RABIN} ${VERBOSE} ${RA_ARGS} -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
