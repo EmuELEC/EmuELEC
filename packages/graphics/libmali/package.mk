@@ -34,15 +34,6 @@ post_makeinstall_target() {
   if [ $(ls -1q ${INSTALL}/usr/lib/libmali-*.so | wc -l) -gt 1 ]; then
     ln -sfv /var/lib/libmali/libmali.so ${INSTALL}/usr/lib/libmali.so
   fi
-
-  # Create libmali.so.1 symlink — needed because SONAME in the binary is libmali.so.1
-  # and lib32-mali-bifrost puts a 32-bit libmali.so.1 in /usr/lib32/libmali/ which
-  # gets picked up via LD_LIBRARY_PATH if no 64-bit version exists here.
-  # Probably gotta remove 32-bit version at all
-  ln -sfv libmali.so ${INSTALL}/usr/lib/libmali.so.1
-
-  # Create libGLESv3.so symlink - GLES3 functions are in libGLESv2.so
-  ln -sfv libGLESv2.so.2 ${INSTALL}/usr/lib/libGLESv3.so
 }
 
 post_install() {

@@ -36,8 +36,8 @@ makeinstall_target() {
     local BLOB="lib/arm-linux-gnueabihf/libmali-bifrost-g52-g2p0-gbm.so"
     local LIBDIR=${INSTALL}/usr/lib32/libmali
     mkdir -p ${INSTALL}/etc/profile.d
-    # Prepend /usr/lib so 64-bit libmali.so.1 is found before the 32-bit one
-    echo 'export LD_LIBRARY_PATH="/usr/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}:/usr/lib32/libmali"' > ${INSTALL}/etc/profile.d/99-rk-mali-workaround.conf
+    # Add it after the existing LD_LIBRARY_PATH, to make sure /emuelec/libs are read before it
+    echo 'export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/lib32/libmali"' > ${INSTALL}/etc/profile.d/99-rk-mali-workaround.conf
   fi
 
   mkdir -p ${LIBDIR} \

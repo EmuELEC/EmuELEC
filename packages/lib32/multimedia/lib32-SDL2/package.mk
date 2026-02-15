@@ -5,6 +5,7 @@
 
 PKG_NAME="lib32-SDL2"
 PKG_VERSION="$(get_pkg_version SDL2)"
+PKG_REV="1"
 PKG_NEED_UNPACK="$(get_pkg_directory SDL2)"
 PKG_ARCH="aarch64"
 PKG_LICENSE="GPL"
@@ -36,7 +37,7 @@ PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
                        -DSDL_DUMMYAUDIO=OFF \
                        -DSDL_DUMMYVIDEO=OFF \
                        -DSDL_WAYLAND=OFF \
-                       -DSDL_WAYLAND_QT_TOUCH=ON \
+                       -DSDL_WAYLAND_QT_TOUCH=OFF \
                        -DSDL_WAYLAND_SHARED=OFF \
                        -DSDL_COCOA=OFF \
                        -DSDL_DIRECTFB=OFF \
@@ -63,7 +64,7 @@ case "${DEVICE}" in
     PKG_PATCH_DIRS+=" ${SDL2_DIRECTORY}/patches/Amlogic"
     PKG_CMAKE_OPTS_TARGET+=" -DSDL_MALI=ON -DSDL_KMSDRM=OFF"
   ;;
-  'OdroidGoAdvance'|'GameForce'|'RK356x'|'OdroidM1')
+  'OdroidGoAdvance'|'GameForce'|'RK356x'|'OdroidM1'|'X96X6')
     PKG_PATCH_DIRS+=" ${SDL2_DIRECTORY}/patches/Rockchip"
     PKG_CMAKE_OPTS_TARGET+=" -DSDL_KMSDRM=ON"
     PKG_DEPENDS_TARGET+=" lib32-libdrm lib32-mali-bifrost"

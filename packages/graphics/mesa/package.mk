@@ -7,12 +7,12 @@ if [ "${DEVICE}" = "RPi5" ]; then
   PKG_VERSION="23.2.1"
   PKG_SHA256="64de0616fc2d801f929ab1ac2a4f16b3e2783c4309a724c8a259b20df8bbc1cc"
 else
-  PKG_VERSION="23.3.6"
-  PKG_SHA256="cd3d6c60121dea73abbae99d399dc2facaecde1a8c6bd647e6d85410ff4b577b"
+  PKG_VERSION="22.3.7"
+  PKG_SHA256="894ce2f4a1c2e76177cdd2284620192d0da3066b243eec2fbb1d7cf37f13042c"
 fi
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
-PKG_URL="https://archive.mesa3d.org/mesa-${PKG_VERSION}.tar.xz"
+PKG_URL="https://mesa.freedesktop.org/archive/mesa-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 
@@ -37,6 +37,8 @@ PKG_MESON_OPTS_TARGET="-Dgallium-drivers=${GALLIUM_DRIVERS// /,} \
 
 if [ "${DEVICE}" = "RPi5" ]; then
   PKG_MESON_OPTS_TARGET+=" -Ddraw-use-llvm=false"
+else
+  PKG_MESON_OPTS_TARGET+=" -Ddri-drivers="
 fi
 
 if [ "${DISPLAYSERVER}" = "x11" ]; then
