@@ -16,7 +16,7 @@ PKG_DEPENDS_TARGET+=" emuelec-tools ${PKG_EMUS} ${PKG_EXPERIMENTAL}"
 
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
-if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "X96X6" ]; then
 	PKG_DEPENDS_TARGET+=" ${LIBRETRO_S922X_CORES}"
 fi
 
@@ -52,7 +52,7 @@ if [ "${ARCH}" == "aarch64" ]; then
                         lib32-box86 \
                         lib32-libusb"
 
-  if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+  if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "X96X6" ]; then
     PKG_DEPENDS_TARGET+=" dolphinSA"
   fi
 
@@ -65,15 +65,20 @@ if [ "${ARCH}" == "aarch64" ]; then
 fi
 
 # We make sure MAME is the last package from EE to be built.
-if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "${DEVICE}" == "Amlogic-no" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "X96X6" ]; then
 	PKG_DEPENDS_TARGET+=" mame"
 fi
 
 # These packages do not yet compile for OdroidM1
-if [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+if [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "X96X6" ]; then
  for discore in flycast-dojo; do
 		PKG_DEPENDS_TARGET=$(echo ${PKG_DEPENDS_TARGET} | sed "s|${discore}| |")
 	done
+fi
+
+# lib32-flycast submodule cloning fails; X96X6 doesn't need 32-bit flycast
+if [ "${DEVICE}" == "X96X6" ]; then
+	PKG_DEPENDS_TARGET=$(echo ${PKG_DEPENDS_TARGET} | sed "s|lib32-flycast| |")
 fi
 
 makeinstall_target() {
