@@ -51,6 +51,14 @@
 		<image>./setup_images/macrorun.png</image>
 	</game>
 	<game>
+		<path>./cmdmaker.sh</path>
+		<name>.cmd maker for MAME systems</name>
+		<desc>This script automates the creation of .cmd files for MAME ROMs in EmuELEC. What it does: - Reads MAME's listmedia.txt to detect available systems and their media types (floppy, cartridge, CD-ROM, etc.) - Lets you browse and select a MAME system (e.g., apple2gs, fmtownsux) - Choose the media type with correct extensions - Select your ROM directory - Generates .cmd files for each ROM with the proper MAME command line - Optionally updates gamelist.xml to point to the new .cmd files instead of original ROMs.</desc>
+		<developer>worstcase_scenario </developer>
+		<genre>script</genre>
+		<image>./setup_images/cmdmaker.png</image>
+	</game>
+	<game>
 		<path>./file_manager.sh</path>
 		<name>File Manager</name>
 		<desc>MC File Manager. NO keyboard required</desc>

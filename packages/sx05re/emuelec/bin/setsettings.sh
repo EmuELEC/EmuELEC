@@ -621,3 +621,12 @@ cat "${RACONF}" >> "${LOG}"
 fi
  
 rm ${RACONF}
+
+RA_CONF_OVERRIDES="/storage/.config/retroarch/retroarch_overrides.cfg"
+if [[ -f "${RA_CONF_OVERRIDES}" ]]; then
+	ees -i ${RA_CONF_OVERRIDES}
+	if [[ "${LOGGING}" == "1" ]]; then
+		write_log "- merged ${RA_CONF_OVERRIDES} settings to retroarch.cfg -"
+		cat "${RA_CONF_OVERRIDES}" >> "${LOG}"
+	fi
+fi
