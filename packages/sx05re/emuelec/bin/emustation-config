@@ -65,6 +65,14 @@ case "$line" in
     TZ=*)
         if [[ ! -z "${FIRST}" ]]; then
         set_ee_setting system.timezone "${FIRST}"
+        
+        # Apply timezone immediately (don't wait for ES restart)
+        # Freezes interface for a short period so far
+        if [ -f "/usr/share/zoneinfo/${FIRST}" ]; then
+            ln -sf "/usr/share/zoneinfo/${FIRST}" /var/run/localtime
+            echo "TIMEZONE=${FIRST}" > /storage/.cache/timezone
+            systemctl restart tz-data.service 2>/dev/null &
+        fi
         fi
     ;;
 esac
