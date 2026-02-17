@@ -67,7 +67,7 @@ while true; do
     GAME_PREV=$GAME_NOW
 
     # Icon detection each 30s
-    if [ $((TICK % 15)) -eq 0 ]; then
+    if [ $((TICK % 5)) -eq 0 ]; then
         # WiFi icon ON only if default route goes through wlan0.
         # This avoids false ON when wlan0 exists but wifi is disabled.
         WIFI_ON=0
@@ -80,11 +80,12 @@ while true; do
         done
         [ "$USB_FOUND" = 1 ] && echo "icon usb on" > "$FIFO" || echo "icon usb off" > "$FIFO"
 
-        CARD_FOUND=0
-        for mmc in /sys/class/block/mmcblk[0-9]; do
-            [ -d "$mmc" ] && [ "$(cat "${mmc}/removable" 2>/dev/null)" = "1" ] && CARD_FOUND=1 && break
-        done
-        [ "$CARD_FOUND" = 1 ] && echo "icon card on" > "$FIFO" || echo "icon card off" > "$FIFO"
+        # Makes no sense, because EmuELEC is booted from SD/eMMC
+        #CARD_FOUND=0
+        #for mmc in /sys/class/block/mmcblk[0-9]; do
+        #    [ -d "$mmc" ] && [ "$(cat "${mmc}/removable" 2>/dev/null)" = "1" ] && CARD_FOUND=1 && break
+        #done
+        #[ "$CARD_FOUND" = 1 ] && echo "icon card on" > "$FIFO" || echo "icon card off" > "$FIFO"        
     fi
 
     # Data icon every 2s: traffic > 1KB/2s

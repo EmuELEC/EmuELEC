@@ -15,17 +15,27 @@ while [ ! -p "$FIFO" ]; do
 done
 
 SYNCED=0
+FAST_TICKS=0
 
 while true; do
     # Check sync state once per second until synced
     if [ "$SYNCED" = 0 ]; then
         YEAR=$(date +%Y 2>/dev/null || echo 1970)
-        if [ "$YEAR" -ge 2025 ] && [ "$YEAR" -le 2035 ]; then
+        if ip route 2>/dev/null | grep -q '^default' && [ "$YEAR" -ge 2025 ]; then
             SYNCED=1
+            FAST_TICKS=24
             echo "clock_start $(date +%H) $(date +%M)" > "$FIFO"
             continue
         fi
         sleep 1
+        continue
+    fi
+
+    # First ~2 minutes after sync: refresh every 5s to quickly converge
+    if [ "$FAST_TICKS" -gt 0 ]; then
+        echo "clock $(date +%H) $(date +%M)" > "$FIFO"
+        FAST_TICKS=$((FAST_TICKS - 1))
+        sleep 5
         continue
     fi
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Auto-detect and set timezone based on IP geolocation.
-# Called in background by state monitor. Must be fast and non-blocking.
+# Called in background by state monitor. Should be fast and non-blocking.
 
 MARKER="/storage/.cache/.timezone_autodetected"
 LOCKDIR="/tmp/.tz_detect.lock"
@@ -22,7 +22,17 @@ rmdir "$LOCKDIR" 2>/dev/null
 ln -sf "/usr/share/zoneinfo/$TZ" /var/run/localtime 2>/dev/null
 
 echo "TIMEZONE=$TZ" > /storage/.cache/timezone 2>/dev/null
+
+# Apply timezone through tz-data service immediately
 systemctl restart tz-data.service >/dev/null 2>&1
+
+# Update VFD clock immediately (don't wait for next minute tick)
+if [ -p /tmp/vfd.fifo ]; then
+    echo "clock_start $(date +%H) $(date +%M)" > /tmp/vfd.fifo 2>/dev/null
+    # Push a couple more updates to catch post-NTP adjustment quickly
+    ( sleep 2; [ -p /tmp/vfd.fifo ] && echo "clock_start $(date +%H) $(date +%M)" > /tmp/vfd.fifo ) >/dev/null 2>&1 &
+    ( sleep 5; [ -p /tmp/vfd.fifo ] && echo "clock_start $(date +%H) $(date +%M)" > /tmp/vfd.fifo ) >/dev/null 2>&1 &
+fi
 
 EE_CONF="/storage/.config/emuelec/configs/emuelec.conf"
 if [ -f "$EE_CONF" ]; then
