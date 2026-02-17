@@ -259,7 +259,19 @@ case ${PLATFORM} in
         "solarus")
                 set_kill_keys "solarus-run"
                 RUNTHIS='${TBASH} solarus.sh "${ROMNAME}"'
-                        ;;
+                ;;
+		"ti99")
+                if [ "${EMU}" = "ti99sim" ]; then
+				set_kill_keys "ti99sim-sdl"
+				RUNTHIS='${TBASH} ti99sdlstart.sh "${ROMNAME}"'
+                fi
+                ;;	
+		"samcoupe")
+                if [ "${EMU}" = "simcoupe" ]; then
+				set_kill_keys "simcoupe"
+				RUNTHIS='${TBASH} simcoupestart.sh "${ROMNAME}"'
+                fi
+                ;;	
         "daphne")
                 if [ "${EMU}" = "HYPSEUS" ]; then
             set_kill_keys "hypseus"
@@ -338,8 +350,44 @@ case ${PLATFORM} in
             set_kill_keys "jzintv"
             RUNTHIS='jzintv.sh "${ROMNAME}"'
         fi
-        ;;
-        "saturn")
+		;;
+		"x16")
+        if [ "${EMU}" = "x16emu" ]; then
+            set_kill_keys "x16emu"
+            RUNTHIS='${TBASH} x16emustart.sh "${ROMNAME}"'
+        fi
+		;;
+		"oricutron")
+        if [ "${EMU}" = "oricutron" ]; then
+            set_kill_keys "oricutron"
+            RUNTHIS='${TBASH} oricutronstart.sh "${ROMNAME}"'
+        fi
+		;;	
+        "dragon32"|"dragon64")
+			if [ "${EMU}" = "xroar" ]; then
+			set_kill_keys "xroar.aarch64"
+			RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
+		fi
+		;;
+		"coco")
+			if [ "${EMU}" = "xroar" ]; then
+			set_kill_keys "xroar.aarch64"
+            RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
+		fi
+		;;
+		"coco3")
+			if [ "${EMU}" = "xroar" ]; then
+			set_kill_keys "xroar.aarch64"
+		    RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
+		fi
+		;;
+		"mc10")
+			if [ "${EMU}" = "xroar" ]; then
+			set_kill_keys "xroar.aarch64"
+            RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
+		fi
+		;;
+		"saturn")
         if [ "${EMU}" = "yabasanshiroSA" ]; then
             set_kill_keys "yabasanshiro"
             RUNTHIS='yabasanshiro.sh "${ROMNAME}"'

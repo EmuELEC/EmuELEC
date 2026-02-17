@@ -1,0 +1,55 @@
+# Oricutron gptokeyb configuration.
+
+# I N S T R U C T I O N S :
+#
+# If you have a game with special keys (for example A for UP, Z for down etc.), change the mapping table beneath accordingly
+# 
+# Then SAVE this file under the game's name. For Example: Mr. Wimpy (Europe).gptk
+#
+# The correct filepath for the game-gptk file is: /storage/.config/emuelec/configs/gptokeyb/oric
+#
+# For example: /storage/.config/emuelec/configs/gptokeyb/oric/Mr. Wimpy (Europe).gptk
+#
+# Oricutron will automatically load the respective gptk file when starting the game. 
+# If no gptk file is found, the emulator will always use "oricutron.gptk" in /storage/.config/emuelec/configs/gptokeyb/
+#----------------------------------------------------------------------------------------------------------------------------
+
+# D-Pad mapping to cursor keys
+up = up
+down = down
+left = left
+right = right
+
+# Left analog stick mapping to cursor keys
+
+left_analog_left = left
+left_analog_right = right
+left_analog_up = up
+left_analog_down = down
+
+
+#Alternative D-Pad mapping
+#up = A
+#down = Z
+#left = <
+#right = >
+
+# Alternative D-Pad mapping
+#up = w
+#down = s
+#left = a  
+#right = d
+
+# Button mappings
+a = space
+b = enter
+x = y
+y = n
+select = esc
+start = 1
+
+# Shoulder buttons for common Oric F-keys
+l1 = f1
+r1 = f2
+l2 = f3
+r2 = f4

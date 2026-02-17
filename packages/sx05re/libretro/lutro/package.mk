@@ -36,6 +36,12 @@ PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
+pre_make_target() {
+  # Fix luajit cross-compilation issue
+  # This replaces the need for the broken patch file
+  sed -i '/deps\/luajit\/src\/libluajit.a:/,/^$/s|^\t\$(MAKE) -C deps/luajit/src BUILDMODE=static|\t$(MAKE) -C deps/luajit/src HOST_CC="$(HOST_CC) $(PTR_SIZE)" CROSS="$(CROSS)" BUILDMODE=static|' Makefile
+}
+
 make_target() {
   PTR_SIZE="-m32"
   if [ "${ARCH}" == "x86_64" ]; then
