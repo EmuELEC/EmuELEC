@@ -384,7 +384,7 @@ function current_timezone() {
 
 function timezones() {
 # Returns comma-separated timezones alphabetically sorted
-# Cache is pre-warmed by vfd-clock-daemon.sh at boot for instant access.
+# Cache is pre-warmed by vfd-service.sh at boot for instant access.
 	local CACHE="/tmp/.tz_sorted"
 	if [ -f "$CACHE" ]; then
 		cat "$CACHE"

@@ -1,0 +1,35 @@
+#!/bin/sh
+# VFD Command Sender for X96X6
+# Sends commands to VFD service via FIFO (non-blocking, returns instantly).
+#
+# Usage: vfd-send <command> [args...]
+#
+# Commands:
+#   vfd-send clock [HH MM]     Show time (args or current system time)
+#   vfd-send text XXXX         Show 4-character text
+#   vfd-send icon NAME on|off  Set icon (apps/setup/usb/card/colon/wifi/data)
+#   vfd-send anim start|stop   Control loading animation
+#   vfd-send brightness N      Set brightness (0-7)
+#   vfd-send clear             Clear display
+#   vfd-send bye               Shutdown display
+#
+# Examples:
+#   vfd-send icon wifi on
+#   vfd-send clock 12 30
+#   vfd-send text GAME
+#   vfd-send anim start
+
+FIFO="/tmp/vfd.fifo"
+
+if [ ! -p "$FIFO" ]; then
+    echo "VFD service not running (FIFO not found)" >&2
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $(basename "$0") <command> [args...]" >&2
+    echo "Commands: clock, text, icon, anim, brightness, clear, bye" >&2
+    exit 1
+fi
+
+echo "$*" > "$FIFO"

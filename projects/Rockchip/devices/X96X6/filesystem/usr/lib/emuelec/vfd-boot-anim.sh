@@ -1,6 +1,6 @@
 #!/bin/sh
 # Loading animation for X96X6 VFD — circular segment sweep
-# Pure animation loop — started/stopped by vfd-clock-daemon.sh
+# Pure animation loop — started/stopped by vfd-service.sh
 # Used for: boot loading, ES restart, game loading
 
 . /usr/lib/emuelec/vfd-fd628.sh
