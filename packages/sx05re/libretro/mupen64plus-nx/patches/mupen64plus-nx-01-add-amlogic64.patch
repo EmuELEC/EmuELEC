@@ -16,7 +16,7 @@
 -   WITH_DYNAREC=arm
 +  ifneq (,$(findstring NG,$(BOARD)))
 +    WITH_DYNAREC=aarch64
-+    GL_LIB := -lGLESv3
++    GL_LIB := -lGLESv2
 +    GLES = 0
 +    GLES3= 1
 +  endif
@@ -28,7 +28,7 @@
 +    CPUFLAGS += -mcpu=cortex-a35
 +   endif
 +  ifneq (,$(findstring RK,$(BOARD)))
-+    CPUFLAGS += -mcpu=cortex-a53
++    CPUFLAGS += -mcpu=cortex-a55
 +   endif
 +  ifneq (,$(findstring 32BIT,$(BOARD)))
 +	CPUFLAGS += -marm -mfloat-abi=hard -mfpu=neon
