@@ -8,11 +8,13 @@ Conflicts=shutdown.target reboot.target halt.target poweroff.target
 [Service]
 Type=simple
 ExecStart=/usr/lib/emuelec/vfd-service.sh
+# Device-specific shutdown hook: request BYE before SIGTERM path
+ExecStop=-/bin/sh -c "[ -p /tmp/vfd.fifo ] && echo bye > /tmp/vfd.fifo; sleep 1"
 # Send SIGTERM to main process — cleanup handler stops children gracefully
 KillMode=control-group
 # BYE fade takes ~3s, total cleanup ~5s max
-TimeoutStopSec=8
-Restart=on-failure
+TimeoutStopSec=6
+Restart=no
 RestartSec=5
 # Cleanup any leftover temp files if service crashes
 ExecStopPost=-/bin/rm -f /tmp/vfd.fifo /tmp/.tz_sorted /tmp/.tz_sorted.tmp

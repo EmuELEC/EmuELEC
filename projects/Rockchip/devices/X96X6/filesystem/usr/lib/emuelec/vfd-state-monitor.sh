@@ -68,19 +68,10 @@ while true; do
 
     # Icon detection each 30s
     if [ $((TICK % 15)) -eq 0 ]; then
-        # WiFi icon ON only with active wifi connection:
-        # 1) interface exists
-        # 2) operstate up
-        # 3) carrier present
-        # 4) has IPv4 address
+        # WiFi icon ON only if default route goes through wlan0.
+        # This avoids false ON when wlan0 exists but wifi is disabled.
         WIFI_ON=0
-        if [ -d /sys/class/net/wlan0 ]; then
-            WSTATE=$(cat /sys/class/net/wlan0/operstate 2>/dev/null)
-            WCARRIER=$(cat /sys/class/net/wlan0/carrier 2>/dev/null)
-            if [ "$WSTATE" = "up" ] && [ "$WCARRIER" = "1" ]; then
-                ip -4 addr show dev wlan0 2>/dev/null | grep -q "inet " && WIFI_ON=1
-            fi
-        fi
+        ip route 2>/dev/null | grep -q '^default .* dev wlan0\b' && WIFI_ON=1
         [ "$WIFI_ON" = 1 ] && echo "icon wifi on" > "$FIFO" || echo "icon wifi off" > "$FIFO"
 
         USB_FOUND=0
