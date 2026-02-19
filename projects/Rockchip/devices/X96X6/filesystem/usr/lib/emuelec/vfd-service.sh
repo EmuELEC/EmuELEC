@@ -146,10 +146,15 @@ while true; do
                         echo 1 > "/sys/class/gpio/gpio${VFD_STB}/value" 2>/dev/null
                         echo 1 > "/sys/class/gpio/gpio${VFD_CLK}/value" 2>/dev/null
                     fi
-                    # After ES appears: show placeholder with colon until sync
+                    # Do not re-lock clock mode here.
+                    # If still locked from boot phase, keep placeholder;
+                    # otherwise immediately restore clock display.
                     ICON_COLON=1
-                    TEXT_LOCK=1
-                    vfd_text "----"
+                    if [ "$TEXT_LOCK" = 1 ]; then
+                        vfd_text "----"
+                    else
+                        vfd_clock
+                    fi
                     ;;
             esac
             ;;

@@ -16,6 +16,7 @@ done
 
 SYNCED=0
 FAST_TICKS=0
+LAST_MIN=""
 
 while true; do
     # Check sync state once per second until synced
@@ -33,18 +34,27 @@ while true; do
 
     # First ~2 minutes after sync: refresh every 5s to quickly converge
     if [ "$FAST_TICKS" -gt 0 ]; then
-        echo "clock $(date +%H) $(date +%M)" > "$FIFO"
+        echo "clock_start $(date +%H) $(date +%M)" > "$FIFO"
         FAST_TICKS=$((FAST_TICKS - 1))
         sleep 5
         continue
     fi
 
-    # Synced: sleep until next minute boundary
-    NOW_SEC=$(date +%S)
-    NOW_SEC=${NOW_SEC#0}
-    WAIT=$((60 - NOW_SEC))
-    [ "$WAIT" -le 0 ] && WAIT=60
-    sleep "$WAIT"
+    # Synced: update exactly when minute changes
+    CUR_MIN=$(date +%M)
+    if [ "$CUR_MIN" != "$LAST_MIN" ]; then
+        echo "clock_start $(date +%H) $CUR_MIN" > "$FIFO"
+        LAST_MIN="$CUR_MIN"
+    fi
 
-    echo "clock $(date +%H) $(date +%M)" > "$FIFO"
+    # Poll faster around second 58-01 for near-instant minute rollover update,
+    # otherwise keep low CPU usage.
+    CUR_SEC=$(date +%S)
+    CUR_SEC=${CUR_SEC#0}
+    [ -z "$CUR_SEC" ] && CUR_SEC=0
+    if [ "$CUR_SEC" -ge 58 ] || [ "$CUR_SEC" -le 1 ]; then
+        sleep 0.2
+    else
+        sleep 1
+    fi
 done

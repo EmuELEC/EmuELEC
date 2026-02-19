@@ -12,7 +12,7 @@ ExecStart=/usr/lib/emuelec/vfd-service.sh
 KillMode=process
 # BYE fade takes ~3s, total cleanup ~5s max
 TimeoutStopSec=8
-Restart=no
+Restart=always
 RestartSec=5
 # Cleanup any leftover temp files if service crashes
 ExecStopPost=-/bin/rm -f /tmp/vfd.fifo /tmp/.tz_sorted /tmp/.tz_sorted.tmp
