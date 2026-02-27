@@ -5,6 +5,9 @@
 OUTPUT_FILE="/emuelec/configs/duckstation/settings.ini"
 LAST_GUIDE_BUTTON=""
 
+CONTROLLERS_PRIORITY_DATA=
+[[ -f "/tmp/controllerconfig.txt" ]] && CONTROLLERS_PRIORITY_DATA=$(cat "/tmp/controllerconfig.txt")
+
 # SDL_GameControllerButton enum values
 declare -A SDL_BUTTON_ENUM=(
     [a]=0 [b]=1 [x]=2 [y]=3
@@ -44,6 +47,7 @@ declare -A DUCKSTATION_AXES=(
 # Generate DuckStation config for one controller
 generate_config() {
     local controller_num="$1"
+    local controller_order="$3"
     local mapping="$2"
     LAST_GUIDE_BUTTON=""
     
@@ -57,8 +61,8 @@ generate_config() {
     local -n BUTTON_MAP
         BUTTON_MAP=NINTENDO_LAYOUT_BUTTONS
 #        BUTTON_MAP=DUCKSTATION_BUTTONS
-    
-    echo "[Controller$((controller_num + 1))]"
+
+    echo "[Controller$((controller_order))]"
     echo "Type = AnalogController"
     echo "AnalogDPadInDigitalMode = true"
     
@@ -72,6 +76,7 @@ generate_config() {
         [[ "$part" =~ ^(platform|crc|sdk): ]] && continue
         
         IFS=':' read -r key value <<< "$part"
+		
         
         # Handle buttons
         if [[ "$value" =~ ^b([0-9]+)$ ]]; then
@@ -89,10 +94,10 @@ generate_config() {
                 fi
                 
                 # Track guide/back button for hotkeys (prefer back)
-                if [ "$key" = "back" ] || [ "$key" = "select" ]; then
+                if [ "$key" = "guide" ]; then
                     guide_button="$enum_value"
                     LAST_GUIDE_BUTTON="$enum_value"
-                elif [ "$key" = "guide" ] && [ -z "$guide_button" ]; then
+                elif ([ "$key" = "back" ] || [ "$key" = "select" ]) && [ -z "$guide_button" ]; then
                     guide_button="$enum_value"
                     LAST_GUIDE_BUTTON="$enum_value"
                 fi
@@ -121,10 +126,24 @@ generate_config() {
             fi
         fi
     done
+	
+    echo "Rumble = Controller${controller_num}"
 }
 
 # Merge controller configs into existing settings.ini
 merge_controller_configs() {
+
+    # Extract total indexes (before the -- separator)
+    local totalindexes=()
+    while [ "$1" != "--" ]; do
+        totalindexes+=("$1")
+        shift
+    done
+    shift
+
+    local maincontroller="$1"
+    shift
+
     local settings_file="$1"
     shift
     
@@ -144,7 +163,7 @@ merge_controller_configs() {
     # Build list of controller sections we're replacing
     local controller_sections=()
     for i in "${!temp_configs[@]}"; do
-        controller_sections+=("[Controller$((i + 1))]")
+        controller_sections+=("[Controller${totalindexes[$i]}]")
     done
     
     # Read existing settings.ini, skip controller and hotkey sections we're replacing
@@ -168,15 +187,18 @@ merge_controller_configs() {
     done < "$settings_file"
     
     # Append new controller configurations
-    for temp_file in "${temp_configs[@]}"; do
-        echo "" >> "$temp_output"
-        cat "$temp_file" >> "$temp_output"
+    for i in "${!temp_configs[@]}"; do
+        if (( i != 0 )); then
+            echo -e "\n" >> "$temp_output"
+        fi
+        cat "${temp_configs[$i]}" >> "$temp_output"
     done
+
     
     # Add single [Hotkeys] section
-    echo "" >> "$temp_output"
+    echo -e "\n" >> "$temp_output"
     echo "[Hotkeys]" >> "$temp_output"
-    [ -n "${guide_buttons[0]}" ] && echo "OpenQuickMenu = Controller0/Button${guide_buttons[0]}" >> "$temp_output"
+    [ -n "${guide_buttons[0]}" ] && echo "OpenQuickMenu = Controller${maincontroller}/Button${guide_buttons[0]}" >> "$temp_output"
     
     mv "$temp_output" "$settings_file"
 }
@@ -198,24 +220,45 @@ main() {
     # Generate controller configs
     local temp_configs=()
     local guide_buttons=()
-    
+	
+	local maincontroller="0"
+	declare totalindexes
+	
     for i in "${!guids[@]}"; do
         local guid="${guids[$i]}"
+
         local mapping=$(gamepad_info 2>/dev/null | grep "^$guid" | head -n1)
         
         if [ -z "$mapping" ]; then
             echo "Warning: No mapping found for GUID: $guid" >&2
             continue
         fi
+			
+        PINDEX=$(echo "${CONTROLLERS_PRIORITY_DATA}" | grep -o "\-p[1-4]guid ${guid}" | head -n1 | cut -c3)
+		
+        # 2. If it does not exist on the priority settings, assign default one but respecting reserved joypad slots
+        if [[ ! -n "${PINDEX}" ]]; then
+            for pi in {1..4}; do
+                PINDEX=$pi
+                [[ ! " ${player_order[@]} " =~ " ${PINDEX} " ]] && break
+            done
+        fi
+		
+		totalindexes+=("${PINDEX}")
+		
+		if [ "$PINDEX" = "1" ]; then
+			maincontroller="$i"
+		fi
         
         local temp_file=$(mktemp)
-        generate_config "$i" "$mapping" > "$temp_file"
+        generate_config "$i" "$mapping" "${PINDEX}" > "$temp_file"
         temp_configs+=("$temp_file")
         guide_buttons+=("$LAST_GUIDE_BUTTON")
     done
+	
     
     [ ${#temp_configs[@]} -eq 0 ] && echo "Error: No valid configurations generated" >&2 && exit 1
-    merge_controller_configs "$settings_file" "${guide_buttons[@]}" -- "${temp_configs[@]}"
+    merge_controller_configs "${totalindexes[@]}" -- "$maincontroller" "$settings_file" "${guide_buttons[@]}" -- "${temp_configs[@]}"
     
     # Cleanup
     rm -f "${temp_configs[@]}"
