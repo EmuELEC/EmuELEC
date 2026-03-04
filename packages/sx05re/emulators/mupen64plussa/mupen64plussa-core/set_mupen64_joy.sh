@@ -38,6 +38,7 @@ declare -A GC_MUPEN64_VALUES=(
     [b13]="button(13)"
     [b14]="button(14)"
     [b15]="button(15)"
+    [b16]="button(16)"
 )
 
 declare -A GC_MUPEN64_BUTTONS=(
@@ -103,6 +104,7 @@ clean_pad() {
 }
 
 set_pad() {
+    local PLAYER=${1}
     local JSI=${2}
     local DEVICE_GUID=${3}
     local JOY_NAME="${4}"
@@ -148,7 +150,7 @@ set_pad() {
         printf "[Input-SDL-Control%s]\n" "${1}"
         echo "version = 2.000000"
         echo "mode = 0"
-        echo "device = ${JSI:2:1}"
+        echo "device = $(( PLAYER - 1 ))"
         echo "name = \"${JOY_NAME}\""
         echo "plugged = True"
         echo "plugin = 5"
