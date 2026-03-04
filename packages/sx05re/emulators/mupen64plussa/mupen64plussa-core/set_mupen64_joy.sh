@@ -92,7 +92,7 @@ clean_pad() {
                 in_section=0
             fi
         fi
-        
+    
         if (( !in_section )); then
             echo "$line" >> "$temp_file"
         fi
@@ -106,6 +106,7 @@ set_pad() {
     local JSI=${2}
     local DEVICE_GUID=${3}
     local JOY_NAME="${4}"
+    local RUMBLEPAK_SWITCH="\"\""
 
     local GC_CONFIG="${5}"
     [[ -z ${GC_CONFIG} ]] && return
@@ -122,6 +123,9 @@ set_pad() {
         local VAL="${GC_MUPEN64_VALUES[${TVAL}]}"
 
         case ${BUTTON_INDEX} in
+            rightstick)
+                RUMBLEPAK_SWITCH="\"button(${BUTTON_VAL})\""
+                ;;
             leftx|lefty)
                 printf "%s = axis(%d-,%d+)\n" "${GC_INDEX}" "${BUTTON_VAL}" "${BUTTON_VAL}" >> "${CONFIG_TMP}"
                 ;;
@@ -141,16 +145,16 @@ set_pad() {
     done
 
     {
-        printf "\n\n[Input-SDL-Control%s]\n" "${1}"
+        printf "[Input-SDL-Control%s]\n" "${1}"
         echo "version = 2.000000"
         echo "mode = 0"
         echo "device = ${JSI:2:1}"
         echo "name = \"${JOY_NAME}\""
         echo "plugged = True"
-        echo "plugin = 2"
+        echo "plugin = 5"
         echo "mouse = False"
         echo "Mempak switch = \"\""
-        echo "Rumblepak switch = \"\""
+        echo "Rumblepak switch = ${RUMBLEPAK_SWITCH}"
     } >> "${CONFIG}"
 
     # Add default values if they don't exist
@@ -158,6 +162,7 @@ set_pad() {
     grep -q "^AnalogDeadzone" "${CONFIG_TMP}" || echo "AnalogDeadzone = \"4096,4096\"" >> "${CONFIG_TMP}"
 
     sort "${CONFIG_TMP}" >> "${CONFIG}"
+	printf "\n\n" >> "${CONFIG}"
     rm -f "${CONFIG_TMP}"
 }
 
