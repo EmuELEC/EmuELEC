@@ -33,20 +33,18 @@ makeinstall_target() {
 post_makeinstall_target() {
 
 if [[ "${ARCH}" == "arm" ]]; then
-	libname="arm-linux-gnueabihf.so"
+    libname="arm-linux-gnueabihf.so"
 else
-	libname="aarch64-linux-gnu.so"
+    libname="aarch64-linux-gnu.so"
 fi
 
-  # Seems like there's an issue in the build system.
-  # C Modules get built using the correct target toolchain but the generated *.so
-  # file names use the arch from the host system
-  # tried to solve it but couldn't so I move them to the correct names for python
-  # to grab them
-  mv ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_ecodes.cpython-311-* \
-    ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_ecodes.cpython-311-${libname}
-  mv ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_input.cpython-311-* \
-    ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_input.cpython-311-${libname}
-  mv ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_uinput.cpython-311-* \
-    ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_uinput.cpython-311-${libname}
+  for mod in _ecodes _input _uinput; do
+    src_file=$(ls ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/${mod}.cpython-311-* 2>/dev/null | head -1)
+    if [[ -f "${src_file}" ]]; then
+      dst_file="${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/${mod}.cpython-311-${libname}"
+      if [[ "${src_file}" != "${dst_file}" ]]; then
+        mv "${src_file}" "${dst_file}"
+      fi
+    fi
+  done
 }

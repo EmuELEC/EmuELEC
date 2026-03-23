@@ -1,0 +1,15 @@
+--- a/src/duckstation-nogui/CMakeLists.txt
++++ b/src/duckstation-nogui/CMakeLists.txt
+@@ -29,9 +29,8 @@ if(LINUX)
+   target_compile_definitions(duckstation-nogui PRIVATE "-DUSE_LIBEVDEV=1")
+   target_include_directories(duckstation-nogui PRIVATE ${LIBEVDEV_INCLUDE_DIRS})
+   target_link_libraries(duckstation-nogui PRIVATE ${LIBEVDEV_LIBRARIES})
+-if (USE_MALI)
+-  target_link_libraries(duckstation-nogui PRIVATE ${MALI_LIBRARY})
+-endif()
+-
++  if (USE_MALI)
++    # mali is linked via LDFLAGS from package.mk to avoid CMake file existence check
++  endif()
+ endif()
+ 

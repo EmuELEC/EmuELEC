@@ -1,0 +1,56 @@
+#!/bin/bash
+# batocera-timezone — timezone management for EmulationStation
+# Called by ES: batocera-timezone [get|set <tz>|detect]
+
+. /etc/profile.d/001-functions 2>/dev/null || true
+
+EE_CONF="/storage/.config/emuelec/configs/emuelec.conf"
+TZ_CACHE="/storage/.cache/timezone"
+
+case "$1" in
+    get)
+        # Return current timezone
+        TZ=$(readlink -f /var/run/localtime 2>/dev/null | sed 's|/usr/share/zoneinfo/||')
+        [ -z "$TZ" ] && TZ="UTC"
+        echo "$TZ"
+        ;;
+    set)
+        TZ="$2"
+        [ -z "$TZ" ] && exit 1
+        [ ! -f "/usr/share/zoneinfo/$TZ" ] && exit 1
+
+        # Apply immediately
+        ln -sf "/usr/share/zoneinfo/$TZ" /var/run/localtime
+
+        # Persist to emuelec.conf
+        if [ -f "$EE_CONF" ]; then
+            if grep -q '^system.timezone=' "$EE_CONF"; then
+                sed -i "s|^system.timezone=.*|system.timezone=$TZ|" "$EE_CONF"
+            else
+                echo "system.timezone=$TZ" >> "$EE_CONF"
+            fi
+        fi
+
+        # Persist for tz-data.service
+        echo "TIMEZONE=$TZ" > "$TZ_CACHE"
+
+        # Restart service (fast — just a symlink)
+        systemctl restart tz-data.service 2>/dev/null
+        ;;
+    detect)
+        # Auto-detect via IP geolocation (fast, non-blocking)
+        TZ=$(curl -s --connect-timeout 2 --max-time 3 "http://ip-api.com/line/?fields=timezone" 2>/dev/null | tr -d '\r\n ')
+        if [ -n "$TZ" ] && [ -f "/usr/share/zoneinfo/$TZ" ]; then
+            echo "$TZ"
+        else
+            # Fallback: return current
+            readlink -f /var/run/localtime 2>/dev/null | sed 's|/usr/share/zoneinfo/||'
+        fi
+        ;;
+    *)
+        echo "Usage: batocera-timezone [get|set <timezone>|detect]"
+        exit 1
+        ;;
+esac
+
+exit 0

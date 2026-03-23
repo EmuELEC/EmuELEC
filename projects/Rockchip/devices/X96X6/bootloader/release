@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+
+mkdir -p $RELEASE_DIR/3rdparty/bootloader
+  if [ -n "$UBOOT_SYSTEM" ]; then
+    BOOTLOADER_DIR=$(get_build_dir $BOOTLOADER)
+    if [ -f $BOOTLOADER_DIR/idbloader.img ]; then
+      cp -a $BOOTLOADER_DIR/idbloader.img $RELEASE_DIR/3rdparty/bootloader
+    fi
+    if [ -f $BOOTLOADER_DIR/uboot.img ]; then
+      cp -a $BOOTLOADER_DIR/uboot.img $RELEASE_DIR/3rdparty/bootloader
+    fi
+    if [ -f $BOOTLOADER_DIR/trust.img ]; then
+      cp -a $BOOTLOADER_DIR/trust.img $RELEASE_DIR/3rdparty/bootloader
+    fi
+  fi
+  
+  if [ -f $INSTALL/usr/share/bootloader/boot.ini ]; then
+  cp -a $INSTALL/usr/share/bootloader/boot.ini $RELEASE_DIR/3rdparty/bootloader
+  fi
+ 
+  LINUX_DTS_DIR=$(get_build_dir linux)/arch/$TARGET_KERNEL_ARCH/boot/dts
+  for dtb in $LINUX_DTS_DIR/*.dtb $LINUX_DTS_DIR/*/*.dtb; do
+    if [ -f $dtb ]; then
+      cp -a $dtb $RELEASE_DIR/3rdparty/bootloader
+    fi
+  done
+  
+LE_TMP=$(mktemp -d)
+mkdir -p "${LE_TMP}/extlinux" 
+mkdir -p $RELEASE_DIR/3rdparty/bootloader
+
+LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
+  for dtb in $RELEASE_DIR/3rdparty/bootloader/*.dtb; do
+
+if [ ! -f $dtb ]; then
+ continue
+fi
+
+cat << EOF > "${LE_TMP}/extlinux/$(basename ${dtb}).conf"
+LABEL ${DISTRO}
+  LINUX /${KERNEL_NAME}
+  FDT /$(basename ${dtb})
+  APPEND boot=UUID=@BOOT_UUID@ disk=UUID=@DISK_UUID@ quiet ${EXTRA_CMDLINE}
+EOF
+
+cp -a "${LE_TMP}/extlinux/$(basename ${dtb}).conf" $RELEASE_DIR/3rdparty/bootloader
+done
+
+cat << EOF > "${LE_TMP}/config.ini"
+[generic]
+boot_uuid="@BOOT_UUID@"
+disk_uuid="@DISK_UUID@"
+extra_cmds="${EXTRA_CMDLINE}"
+dtb_file="rk3566-x96-x6.dtb"
+EOF
+
+cp -a "${LE_TMP}/config.ini" $RELEASE_DIR/3rdparty/bootloader

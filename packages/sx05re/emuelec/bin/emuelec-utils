@@ -383,8 +383,15 @@ function current_timezone() {
 }
 
 function timezones() {
-# Returns a list of timezones, used in ES
-	cat /usr/share/zoneinfo/zone1970.tab | grep -v "^#" | awk '{ print $3"," }' | sort -u
+# Returns comma-separated timezones alphabetically sorted
+# Cache is pre-warmed by vfd-service.sh at boot for instant access.
+	local CACHE="/tmp/.tz_sorted"
+	if [ -f "$CACHE" ]; then
+		cat "$CACHE"
+	else
+		# Fast fallback: plain alphabetical list (no date spawning)
+		grep -v "^#" /usr/share/zoneinfo/zone1970.tab 2>/dev/null | awk 'NF>=3{print $3}' | sort -u | tr '\n' ','
+	fi
 }
 
 function small-cores() {

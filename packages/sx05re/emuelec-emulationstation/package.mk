@@ -20,7 +20,7 @@ if [[ ${DEVICE} == "OdroidGoAdvance"  ]] || [[ ${DEVICE} == "GameForce"  ]]; the
 	PKG_PATCH_DIRS="Rockchip/HH"
 fi
 
-if [[ ${DEVICE} == "OdroidM1"  ]] || [[ ${DEVICE} == "RK356x"  ]]; then 
+if [[ ${DEVICE} == "OdroidM1"  ]] || [[ ${DEVICE} == "RK356x"  ]] || [[ ${DEVICE} == "X96X6"  ]]; then 
 	PKG_PATCH_DIRS="Rockchip"
 fi
 
@@ -110,6 +110,11 @@ makeinstall_target() {
     	mkdir -p ${INSTALL}/usr/config/emulationstation/themesettings
         sed -i "s|<\/config>|	<string name=\"subset.ratio\" value=\"43\" />\n<\/config>|g" "${INSTALL}/usr/config/emulationstation/es_settings.cfg"
         echo "subset.ratio=43" > ${INSTALL}/usr/config/emulationstation/themesettings/Crystal.cfg
+    fi
+
+    # Add default keyboard/remote mapping for X96X6
+    if [[ "${DEVICE}" == "X96X6" ]]; then
+        sed -i 's|</inputList>|\t<inputConfig type="keyboard" deviceName="Keyboard" deviceGUID="-1">\n\t\t<input name="a" type="key" id="13" value="1" />\n\t\t<input name="b" type="key" id="1073742094" value="1" />\n\t\t<input name="down" type="key" id="1073741905" value="1" />\n\t\t<input name="hotkeyenable" type="key" id="53" value="1" />\n\t\t<input name="left" type="key" id="1073741904" value="1" />\n\t\t<input name="leftshoulder" type="key" id="55" value="1" />\n\t\t<input name="lefttrigger" type="key" id="49" value="1" />\n\t\t<input name="right" type="key" id="1073741903" value="1" />\n\t\t<input name="rightshoulder" type="key" id="57" value="1" />\n\t\t<input name="righttrigger" type="key" id="51" value="1" />\n\t\t<input name="select" type="key" id="32" value="1" />\n\t\t<input name="start" type="key" id="8" value="1" />\n\t\t<input name="up" type="key" id="1073741906" value="1" />\n\t\t<input name="x" type="key" id="1073741942" value="1" />\n\t\t<input name="y" type="key" id="1073741898" value="1" />\n\t</inputConfig>\n</inputList>|' "${INSTALL}/usr/config/emulationstation/es_input.cfg"
     fi
 
 # Remove unused cores

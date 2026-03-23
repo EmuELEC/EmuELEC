@@ -35,7 +35,7 @@ elif [[ "${DEVICE}" == "Amlogic-no" ]]; then
 elif [[ "${DEVICE}" == "Amlogic-old" ]]; then
 	cp -rf ${PKG_BUILD}/Amlogic-old/* ${INSTALL}/
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so
-elif [[ "${DEVICE}" == "RK356x" ]] || [[ "${DEVICE}" == "OdroidM1" ]]; then
+elif [[ "${DEVICE}" == "RK356x" ]] || [[ "${DEVICE}" == "OdroidM1" ]] || [[ "${DEVICE}" == "X96X6" ]]; then
 	cp -rf ${PKG_BUILD}/RK356x/* ${INSTALL}/
     cp -rfp --remove-destination "$(get_build_dir mali-bifrost)/lib/arm-linux-gnueabihf/libmali-bifrost-g52-g2p0-gbm.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.so
 fi

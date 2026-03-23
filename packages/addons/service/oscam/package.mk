@@ -3,13 +3,13 @@
 
 PKG_NAME="oscam"
 PKG_VERSION="db7c4cbdbd34a9b0464070b1a46e146e6029a2cb" # 2022-10-22
-PKG_SHA256="b5dd1d0dc71553c8504d6982b6bae437d6bef17c6cd8a38ac4710a38300018cf"
+#PKG_SHA256="b5dd1d0dc71553c8504d6982b6bae437d6bef17c6cd8a38ac4710a38300018cf"
 PKG_VERSION_NUMBER="11715"
 PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.streamboard.tv/oscam/wiki"
-PKG_URL="https://repo.or.cz/oscam.git/snapshot/${PKG_VERSION}.tar.gz"
+PKG_URL="https://git.streamboard.tv/common/oscam.git"
 PKG_DEPENDS_TARGET="toolchain openssl pcsc-lite"
 PKG_SECTION="service.softcam"
 PKG_SHORTDESC="OSCam: an Open Source Conditional Access Modul"

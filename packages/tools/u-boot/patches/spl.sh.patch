@@ -1,0 +1,11 @@
+--- a/scripts/spl.sh
++++ b/scripts/spl.sh
+@@ -100,7 +100,7 @@ else
+     sed -i "s/FlashBoot=.*$/FlashBoot=.\/tmp\/u-boot-spl.bin/" ${TMP_INI}
+     LABEL="SPL"
+ fi
+-./tools/boot_merger ${TMP_INI}
++cd "$(dirname "$0")/.." && ./tools/boot_merger ${TMP_INI}
+ rm tmp/ -rf
+ 
+ echo "pack loader(${LABEL}) okay! Input: ${INI}"

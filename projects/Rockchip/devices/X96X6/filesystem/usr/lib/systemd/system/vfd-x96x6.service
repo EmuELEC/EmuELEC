@@ -1,0 +1,23 @@
+[Unit]
+Description=X96X6 VFD Display Service
+DefaultDependencies=no
+After=local-fs.target
+Before=shutdown.target umount.target
+Conflicts=shutdown.target reboot.target halt.target poweroff.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/emuelec/vfd-service.sh
+# Send SIGTERM to main process — cleanup handler stops children gracefully
+KillMode=process
+# BYE fade takes ~3s, total cleanup ~5s max
+TimeoutStopSec=8
+Restart=always
+RestartSec=5
+# Cleanup any leftover temp files if service crashes
+ExecStopPost=-/bin/rm -f /tmp/vfd.fifo /tmp/.tz_sorted /tmp/.tz_sorted.tmp
+ExecStopPost=-/bin/rmdir /tmp/.tz_detect.lock
+
+[Install]
+WantedBy=sysinit.target fs-resize.target
+

@@ -5,6 +5,7 @@
 
 PKG_NAME="SDL2"
 PKG_VERSION="2.32.10"
+PKG_REV="1"
 #PKG_SHA256="332cb37d0be20cb9541739c61f79bae5a477427d79ae85e352089afdaf6666e4"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
@@ -36,7 +37,7 @@ PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
                        -DSDL_DUMMYAUDIO=OFF \
                        -DSDL_DUMMYVIDEO=OFF \
                        -DSDL_WAYLAND=OFF \
-                       -DSDL_WAYLAND_QT_TOUCH=ON \
+                       -DSDL_WAYLAND_QT_TOUCH=OFF \
                        -DSDL_WAYLAND_SHARED=OFF \
                        -DSDL_COCOA=OFF \
                        -DSDL_DIRECTFB=OFF \
@@ -61,7 +62,7 @@ case "${DEVICE}" in
     PKG_PATCH_DIRS="Amlogic"
     PKG_CMAKE_OPTS_TARGET+=" -DSDL_MALI=ON -DSDL_KMSDRM=OFF"
   ;;
-  'OdroidGoAdvance'|'GameForce'|'RK356x'|'OdroidM1')
+  'OdroidGoAdvance'|'GameForce'|'RK356x'|'OdroidM1'|'X96X6')
     PKG_PATCH_DIRS="Rockchip"
     PKG_CMAKE_OPTS_TARGET+=" -DSDL_KMSDRM=ON"
     PKG_DEPENDS_TARGET+=" libdrm mali-bifrost"

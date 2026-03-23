@@ -13,10 +13,16 @@ PKG_SECTION="libretro"
 PKG_SHORTDESC="Fast PlayStation 1 emulator for x86-64/AArch32/AArch64 "
 PKG_TOOLCHAIN="cmake"
 
-if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
+if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "X96X6" ]; then
+	# RK3566 uses DRM/KMS with Mali-G52 (OpenGL ES only)
+	EXTRA_OPTS+=" -DUSE_DRMKMS=ON -DUSE_FBDEV=OFF -DUSE_MALI=ON"
+	export LDFLAGS="${LDFLAGS} -lmali"
+elif [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
 	EXTRA_OPTS+=" -DUSE_DRMKMS=ON -DUSE_FBDEV=OFF -DUSE_MALI=OFF"
 else
 	EXTRA_OPTS+=" -DUSE_DRMKMS=OFF -DUSE_FBDEV=ON -DUSE_MALI=ON"
+	# Pass mali as a linker flag instead of as a library path to avoid CMake checking for file existence
+	export LDFLAGS="${LDFLAGS} -lmali"
 fi
 
 pre_configure_target() {

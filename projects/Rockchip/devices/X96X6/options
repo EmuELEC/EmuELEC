@@ -1,0 +1,154 @@
+################################################################################
+# setup device defaults
+################################################################################
+
+  # The TARGET_CPU variable controls which processor should be targeted for
+  # generated code.
+    case $TARGET_ARCH in
+      aarch64)
+        TARGET_KERNEL_ARCH="arm64"
+        TARGET_PATCH_ARCH="aarch64"
+        TARGET_FLOAT="hard"
+        TARGET_CPU="cortex-a55"
+		TARGET_CPU_FLAGS="+crc+crypto+fp+simd"
+        TARGET_FPU="fp-armv8"
+        TARGET_FEATURES="64bit"
+        ;;
+      arm)
+        TARGET_KERNEL_ARCH="arm64"
+        TARGET_PATCH_ARCH="aarch64"
+        TARGET_FLOAT="hard"
+        TARGET_CPU="cortex-a53"
+        TARGET_CPU_FLAGS="+crc"
+        TARGET_FPU="crypto-neon-fp-armv8"
+        TARGET_FEATURES="32bit"
+        ;;
+    esac
+
+  # Kernel target
+    KERNEL_TARGET="Image"
+
+  # Additional kernel make parameters (for example to specify the u-boot loadaddress)
+    KERNEL_MAKE_EXTRACMD=""
+    KERNEL_MAKE_EXTRACMD+=" rockchip/rk3566-x96-x6.dtb"
+
+    
+  # Mali GPU family
+    MALI_FAMILY="g52"
+    OPENGLES="mali-bifrost"
+
+  # kernel serial console
+    EXTRA_CMDLINE="quiet console=ttyFIQ0,1500000 console=tty0 ssh pci=nomsi"
+    
+    LINUX="X96X6-4.19"
+	UBOOT_SYSTEM="X96X6"
+    
+  # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
+  # Space separated list is supported,
+  # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
+    FIRMWARE="wlan-firmware misc-firmware" #rockchip-firmware dvb-firmware" # rtl8822cs? 
+    
+  # additional drivers to install:
+  # for a list of additional drivers see packages/linux-drivers
+  # Space separated list is supported,
+  # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
+  # RTL8822CS vendor driver for WiFi
+  ADDITIONAL_DRIVERS="RTL8822CS rtk_hciattach"
+  
+  # driver addons to install:
+  # for a list of additinoal drivers see packages/linux-driver-addons
+  # Space separated list is supported,
+    DRIVER_ADDONS="" #dvb-latest"
+
+  # additional packages to install
+    ADDITIONAL_PACKAGES="dtc u-boot-tools:host"
+    
+  # VLC fixed - glspectrum plugin disabled in package.mk
+    ADDITIONAL_PACKAGES_EXCLUDE=""
+
+  # debug tty path
+    DEBUG_TTY="/dev/ttyFIQ0"
+
+  # SquashFS compression method (gzip / lzo / xz / zstd)
+    SQUASHFS_COMPRESSION="lzo" 
+    
+  # build and install PulseAudio support (yes / no)
+  PULSEAUDIO_SUPPORT="yes"
+
+  # build and install espeak support (yes / no)
+  ESPEAK_SUPPORT="no"
+
+  # build and install bluetooth support (yes / no)
+  BLUETOOTH_SUPPORT="yes"
+
+  # build and install Avahi (Zeroconf) daemon (yes / no)
+  AVAHI_DAEMON="no"
+
+  # build with UPnP support (yes / no)
+  KODI_UPNP_SUPPORT="no"
+
+  # build with NFS support (mounting nfs shares via the OS) (yes / no)
+  NFS_SUPPORT="no"
+
+  # build with Samba Client support (mounting samba shares via the OS) (yes / no)
+  SAMBA_SUPPORT="yes"
+
+  # build and install Samba Server (yes / no)
+  SAMBA_SERVER="yes"
+
+  # build and install SFTP Server (yes / no)
+  SFTP_SERVER="yes"
+
+  # build and install OpenVPN support (yes / no)
+  OPENVPN_SUPPORT="yes"
+
+  # build and install diskmounter support (udevil)
+  # this service provide auto mounting support for external drives in the
+  # mediacenter also automount internally drives at boottime via udev (yes / no)
+  UDEVIL="yes"
+
+  # build and install exFAT fuse support (yes / no)
+  EXFAT="yes"
+
+  # build and install NTFS-3G fuse support (yes / no)
+  NTFS3G="yes"
+
+  # build and install hfs filesystem utilities (yes / no)
+  HFSTOOLS="yes"
+
+  # build and install remote support (yes / no)
+  REMOTE_SUPPORT="yes"
+
+  # build and install CEC adapter support (yes / no)
+  CEC_SUPPORT="yes"
+
+  # build and install CEC framework support (yes / no)
+  CEC_FRAMEWORK_SUPPORT="no"
+
+  # build and install iSCSI support - iscsistart (yes / no)
+  ISCSI_SUPPORT="no"
+
+  # build with swap support (yes / no)
+  SWAP_SUPPORT="yes"
+
+  # swap support enabled per default (yes / no)
+  SWAP_ENABLED_DEFAULT="no"
+
+  # swapfile size if SWAP_SUPPORT=yes in MB
+  SWAPFILESIZE="300"
+
+  # cron support (yes / no)
+  CRON_SUPPORT="yes"
+
+  # Distribution Specific source location
+  DISTRO_MIRROR="http://sources.libreelec.tv/mirror"
+  DISTRO_SRC="http://sources.libreelec.tv/$LIBREELEC_VERSION"
+
+  # Settings package name - blank if not required
+  DISTRO_PKG_SETTINGS=""
+
+  # IR remote protocols supported in default config
+  IR_REMOTE_PROTOCOLS=""
+
+  # IR remote keymaps supported in default config
+  IR_REMOTE_KEYMAPS=""

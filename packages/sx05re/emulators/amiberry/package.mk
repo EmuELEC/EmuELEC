@@ -7,7 +7,7 @@ PKG_ARCH="aarch64 arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/BlitterStudio/amiberry"
 PKG_URL="https://github.com/BlitterStudio/amiberry.git"
-PKG_DEPENDS_TARGET="toolchain linux libpcap libenet glibc bzip2 zlib SDL2 SDL2_image SDL2_ttf capsimg freetype libxml2 flac libogg mpg123-compat libpng libmpeg2 libportmidi libserialport"
+PKG_DEPENDS_TARGET="toolchain linux libpcap libenet glibc bzip2 zlib zstd SDL2 SDL2_image SDL2_ttf capsimg freetype libxml2 flac libogg mpg123-compat libpng libmpeg2 libportmidi libserialport"
 PKG_LONGDESC="Amiberry is an optimized Amiga emulator for ARM-based boards."
 GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="cmake"
@@ -17,6 +17,12 @@ PKG_BUILD_FLAGS="-O3 -fno-strict-aliasing -fomit-frame-pointer -ffast-math"
 
 pre_configure_target() {
   PKG_CMAKE_OPTS_TARGET="-DUSE_OPENGL=OFF -DCMAKE_BUILD_TYPE=Release -DUSE_UAENET_PCAP=ON"
+  PKG_CMAKE_OPTS_TARGET+=" -DCMAKE_PREFIX_PATH=${SYSROOT_PREFIX}"
+  # Explicitly provide zstd paths since find_package(ZSTD) doesn't work reliably in cross-compile
+  PKG_CMAKE_OPTS_TARGET+=" -DZSTD_INCLUDE_DIR=${SYSROOT_PREFIX}/usr/include"
+  PKG_CMAKE_OPTS_TARGET+=" -DZSTD_LIBRARY=${SYSROOT_PREFIX}/usr/lib/libzstd.so"
+  # Help CMake find other cross-compile libraries via pkg-config
+  export PKG_CONFIG_PATH="${SYSROOT_PREFIX}/lib/pkgconfig:${SYSROOT_PREFIX}/share/pkgconfig"
 }
 
 makeinstall_target() {

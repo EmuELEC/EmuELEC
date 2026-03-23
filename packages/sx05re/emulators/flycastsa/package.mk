@@ -13,8 +13,13 @@ PKG_GIT_CLONE_BRANCH="master"
 
 
 if [ "${ARCH}" == "arm" ]; then
-	PKG_PATCH_DIRS="arm"
+    PKG_PATCH_DIRS="arm"
 fi
+
+post_unpack() {
+  cd ${PKG_BUILD}
+  git submodule update --init --recursive
+}
 
 pre_configure_target() {
 export CXXFLAGS="${CXXFLAGS} -Wno-error=array-bounds"

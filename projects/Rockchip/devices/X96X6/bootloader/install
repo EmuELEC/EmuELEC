@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+
+#cp -av idblock.bin $INSTALL/usr/share/bootloader/idbloader.img
+#mv idblock.bin idbloader.img
+cp -av uboot.img $INSTALL/usr/share/bootloader
+#cp -av trust.img $INSTALL/usr/share/bootloader
+
+LE_TMP=$(mktemp -d)
+mkdir -p "${LE_TMP}/extlinux" 
+mkdir -p $INSTALL/usr/share/bootloader/extlinux
+
+LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
+  for dtb in $LINUX_DTS_DIR/*.dtb; do
+  
+if [ ! -f $dtb ]; then
+ continue
+fi
+  
+cat << EOF > "${LE_TMP}/extlinux/$(basename ${dtb}).conf"
+LABEL ${DISTRO}
+  LINUX /${KERNEL_NAME}
+  FDT /$(basename ${dtb})
+  APPEND boot=UUID=@BOOT_UUID@ disk=UUID=@DISK_UUID@ quiet ${EXTRA_CMDLINE}
+EOF
+
+cp -a "${LE_TMP}/extlinux/$(basename ${dtb}).conf" $INSTALL/usr/share/bootloader/extlinux
+done

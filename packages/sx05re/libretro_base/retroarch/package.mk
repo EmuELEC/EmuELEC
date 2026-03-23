@@ -20,6 +20,8 @@
 
 PKG_NAME="retroarch"
 PKG_VERSION="850cc561968846b08a268421bf904d680724f303"
+
+PKG_REV="2"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="${PKG_SITE}.git"
 PKG_LICENSE="GPLv3"
@@ -31,7 +33,7 @@ if [ "${DEVICE}" = "Amlogic-ng" ] || [ "${DEVICE}" = "Amlogic-no" ] || [ "${DEVI
   PKG_PATCH_DIRS="${DEVICE}"
 fi
 
-if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "X96X6" ]; then
 PKG_DEPENDS_TARGET+=" libdrm librga"
 PKG_PATCH_DIRS="OdroidGoAdvance"
 fi
@@ -44,6 +46,9 @@ fi
 pre_configure_target() {
 # Retroarch does not like -O3 for CHD loading with cheevos
 export CFLAGS="${CFLAGS} -O3 -fno-tree-vectorize"
+
+# Prevent xkbcommon auto-detection from leftover files in sysroot
+export HAVE_XKBCOMMON=no
 
 TARGET_CONFIGURE_OPTS=""
 PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
@@ -63,7 +68,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
                            --enable-sdl2 \
                            --enable-ffmpeg"
 
-if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
+if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "X96X6" ]; then
 PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
                            --enable-opengles3_2 \
                            --enable-kms \

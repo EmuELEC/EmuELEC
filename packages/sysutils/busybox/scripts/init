@@ -1367,7 +1367,9 @@ SILENT_OUT=3
 
 # If the network is up (due to the use of the "ip" kernel parameter) and a DNS
 # server is known, allow the libc resolver to use it
-grep '^\(nameserver\|domain\) ' /proc/net/pnp | grep -v '^nameserver 0\.0\.0\.0$' > /etc/resolv.conf
+if [ -f /proc/net/pnp ]; then
+  grep '^\(nameserver\|domain\) ' /proc/net/pnp | grep -v '^nameserver 0\.0\.0\.0$' > /etc/resolv.conf
+fi
 
 if [ "${boot%%=*}" = "FILE" ]; then
   error "check arguments" "boot argument can't be FILE type..."

@@ -1,0 +1,10 @@
+diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
+index 1111111..2222222 100644
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -1,4 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3566-x96-x6.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += px30-ad-d6-anx6345.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += px30-ad-r35-mb-rk618-dual-lvds.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += px30-ad-r35-mb-rk618-hdmi.dtb

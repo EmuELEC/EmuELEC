@@ -1,52 +1,42 @@
-################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
-#
-#  This Program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2, or (at your option)
-#  any later version.
-#
-#  This Program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.tv; see the file COPYING.  If not, write to
-#  the Free Software Foundation, 51 Franklin Street, Suite 500, Boston, MA 02110, USA.
-#  http://www.gnu.org/copyleft/gpl.html
-################################################################################
-
 PKG_NAME="flycast"
-PKG_VERSION="$(get_pkg_version flycastsa)"
-PKG_NEED_UNPACK="$(get_pkg_directory flycastsa)"
-PKG_ARCH="any"
+PKG_VERSION="bf2bd7efed41e9f3367a764c2d90fcaa9c38a1f9"
+PKG_SHA256="c0e6d86e99e59071f5eb2d42f1e727d4e862a4e79d919fe62c5b0c3cbcff8d11"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/flyinghead/flycast"
 PKG_URL="${PKG_SITE}.git"
-PKG_DEPENDS_TARGET="toolchain ${OPENGLES}"
+PKG_DEPENDS_TARGET="toolchain:host ${OPENGLES}:host libzip:host zstd:host"
 PKG_SHORTDESC="Flycast is a multiplatform Sega Dreamcast emulator"
 PKG_BUILD_FLAGS="-lto"
 PKG_TOOLCHAIN="cmake"
 
+post_unpack() {
+  cd ${PKG_BUILD}
+  git submodule update --init --recursive 2>&1 | grep -v "^fatal:" || true
+  # Удаляем bundled зависимости
+  sed -i '/add_subdirectory("core\/deps\/libchdr\/deps\/zlib-1.3.1"/d' CMakeLists.txt
+  sed -i '/add_subdirectory("core\/deps\/libchdr\/deps\/zstd-1.5.2"/d' CMakeLists.txt
+  sed -i '/add_subdirectory(zlib-ng)/d' CMakeLists.txt
+  # Удаляем попытки установить свойства удаленным target'ам
+  sed -i '/set_target_properties(zlibstatic/,/)/d' CMakeLists.txt
+  sed -i '/set_target_properties(zstd/,/)/d' CMakeLists.txt
+}
+
+pre_configure_target() {
+  rm -f ${PKG_BUILD}/CMakeCache.txt
+}
+
 PKG_CMAKE_OPTS_TARGET="-DLIBRETRO=ON \
-                        -DUSE_OPENMP=OFF \ 
+                        -DUSE_OPENMP=OFF \
                         -DCMAKE_BUILD_TYPE=Release \
                         -DUSE_GLES2=OFF \
                         -DUSE_GLES=ON \
-                        -DUSE_VULKAN=OFF"
-
-pre_make_target() {
-  find ${PKG_BUILD} -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
-  find ${PKG_BUILD} -name build.ninja -exec sed -i "s:isystem :I:g" \{} \;
-}
+                        -DUSE_VULKAN=OFF \
+                        -DZLIB_LIBRARY=${SYSROOT_PREFIX}/usr/lib/libz.so \
+                        -DZLIB_INCLUDE_DIR=${SYSROOT_PREFIX}/usr/include \
+                        -DZstd_LIBRARY=${SYSROOT_PREFIX}/usr/lib/libzstd.so \
+                        -DZstd_INCLUDE_DIR=${SYSROOT_PREFIX}/usr/include"
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib/libretro
-  if [ "${ARCH}" == "arm" ]; then
-	cp flycast_libretro.so ${INSTALL}/usr/lib/libretro/flycast_32b_libretro.so
-  else
-	cp flycast_libretro.so ${INSTALL}/usr/lib/libretro/
-  fi
+  cp flycast_libretro.so ${INSTALL}/usr/lib/libretro/flycast_libretro.so
 }

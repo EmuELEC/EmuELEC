@@ -35,6 +35,13 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="RK356x"
     ;;
+  X96X6-4.19)
+    PKG_VERSION="e45b118834e1395eeacbed77e8b8f35e8105663e"
+    PKG_SHA256="3c4f1bea0b8c26d9951c8b46c6c93127fc0929ff9947c5eb8e479fbaf05fa1f4"
+    PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="X96X6"
+    ;;
   odroid-go-a-4.4)
     PKG_VERSION="faeb665a41b53ebb386e69fe737ccf0707aaf07b"
     PKG_SHA256="bef15386f296b282e1e75ed78f14c7c0762058806da37854d09af642a15594ae"
@@ -71,7 +78,10 @@ if [ -n "${KERNEL_TOOLCHAIN}" ]; then
   HEADERS_ARCH=${TARGET_ARCH}
 fi
 
-if [ "${PKG_BUILD_PERF}" != "no" ] && grep -q ^CONFIG_PERF_EVENTS= ${PKG_KERNEL_CFG_FILE}; then
+# Disable perf for X96X6 and OdroidM1 - has build issues with this kernel
+if [ "${DEVICE}" = "X96X6" ] || [ "${DEVICE}" = "OdroidM1" ]; then
+  PKG_BUILD_PERF="no"
+elif [ "${PKG_BUILD_PERF}" != "no" ] && grep -q ^CONFIG_PERF_EVENTS= ${PKG_KERNEL_CFG_FILE}; then
   PKG_BUILD_PERF="yes"
   PKG_DEPENDS_TARGET+=" binutils elfutils libunwind zlib openssl"
 fi
@@ -95,6 +105,12 @@ for pkg in $(get_pkg_variable initramfs PKG_DEPENDS_TARGET); do
 done
 
 post_patch() {
+  # Copy X96 X6 device tree if exists
+  if [ -f ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/patches/linux/rk3566-x96-x6.dts ]; then
+    cp -v ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/patches/linux/rk3566-x96-x6.dts \
+         ${PKG_BUILD}/arch/arm64/boot/dts/rockchip/
+  fi
+
   # linux was already built and its build dir autoremoved - prepare it again for kernel packages
   if [ -d ${PKG_INSTALL}/.image ]; then
     cp -p ${PKG_INSTALL}/.image/.config ${PKG_BUILD}

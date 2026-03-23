@@ -15,10 +15,46 @@ then
 fi
 ###
 
-V_ARCH=EmuELEC
+# Get actual architecture
+V_ARCH=$(uname -m)
 V_CPUNB=$(grep -E $'^processor\t:' /proc/cpuinfo | wc -l)
 V_CPUMODEL1=$(grep -E $'^model name\t:' /proc/cpuinfo | head -1 | sed -e s+'^model name\t: '++)
-V_SYSTEM=$(uname -rs)
+
+# For ARM: detect CPU model from CPU part code
+if test -z "${V_CPUMODEL1}"; then
+    CPU_IMPL=$(grep -E $'^CPU implementer\t:' /proc/cpuinfo | head -1 | awk -F': ' '{print $2}')
+    CPU_PART=$(grep -E $'^CPU part\t:' /proc/cpuinfo | head -1 | awk -F': ' '{print $2}')
+    
+    if test "$CPU_IMPL" = "0x41"; then  # ARM Ltd
+        case "$CPU_PART" in
+            0xd03) V_CPUMODEL1="ARM Cortex-A53" ;;
+            0xd05) V_CPUMODEL1="ARM Cortex-A55" ;;
+            0xd07) V_CPUMODEL1="ARM Cortex-A57" ;;
+            0xd08) V_CPUMODEL1="ARM Cortex-A72" ;;
+            0xd09) V_CPUMODEL1="ARM Cortex-A73" ;;
+            0xd0a) V_CPUMODEL1="ARM Cortex-A75" ;;
+            0xd0b) V_CPUMODEL1="ARM Cortex-A76" ;;
+            0xd0d) V_CPUMODEL1="ARM Cortex-A77" ;;
+            0xd41) V_CPUMODEL1="ARM Cortex-A78" ;;
+            0xd44) V_CPUMODEL1="ARM Cortex-X1" ;;
+            0xd46) V_CPUMODEL1="ARM Cortex-A510" ;;
+            0xd47) V_CPUMODEL1="ARM Cortex-A710" ;;
+            0xd48) V_CPUMODEL1="ARM Cortex-X2" ;;
+            0xd4d) V_CPUMODEL1="ARM Cortex-A715" ;;
+            0xd4e) V_CPUMODEL1="ARM Cortex-X3" ;;
+            *) V_CPUMODEL1="ARM CPU ($CPU_PART)" ;;
+        esac
+    fi
+fi
+
+# Get chipset/board info
+V_HARDWARE=$(grep -E $'^Hardware\t:' /proc/cpuinfo | head -1 | sed -e s+'^Hardware\t: '++)
+# Fallback for aarch64 where /proc/cpuinfo has no Hardware field
+if test -z "${V_HARDWARE}"; then
+    V_HARDWARE=$(cat /proc/device-tree/model 2>/dev/null | tr -d '\0')
+fi
+
+V_SYSTEM=EmuELEC
 
 # battery
 BATT=$(cat /sys/class/power_supply/{BAT,bat}*/uevent 2>/dev/null | grep -E "^POWER_SUPPLY_CAPACITY=" | sed -e s+'^POWER_SUPPLY_CAPACITY='++ | sort -rn | head -1)
@@ -51,6 +87,9 @@ then
 fi
 
 echo "Architecture: ${V_ARCH}"
+if test -n "${V_HARDWARE}"; then
+    echo "Chipset: ${V_HARDWARE}"
+fi
 echo "System: ${V_SYSTEM}"
 if test "${V_ARCH}" = "x86" -o "${V_ARCH}" = "x86_64"
 then

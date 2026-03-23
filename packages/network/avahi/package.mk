@@ -57,7 +57,12 @@ PKG_CONFIGURE_OPTS_TARGET="py_cv_mod_gtk_=yes \
                            --disable-nls"
 
 pre_configure_target() {
-  NOCONFIGURE=1 ./autogen.sh
+  cd ${PKG_BUILD}
+  if [ -f autogen.sh ]; then
+    NOCONFIGURE=1 ./autogen.sh
+  elif [ -f configure.ac ]; then
+    autoreconf -vif
+  fi
 }
 
 post_configure_target() {

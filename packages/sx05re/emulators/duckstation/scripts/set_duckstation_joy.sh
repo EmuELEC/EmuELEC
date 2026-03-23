@@ -147,7 +147,9 @@ merge_controller_configs() {
         controller_sections+=("[Controller$((i + 1))]")
     done
     
-    # Read existing settings.ini, skip controller and hotkey sections we're replacing
+    # Read existing settings.ini, skip controller sections we're replacing
+    # but preserve [Hotkeys] entries
+    local -A hotkey_entries
     while IFS= read -r line || [ -n "$line" ]; do
         if [[ "$line" =~ ^\[.*\]$ ]]; then
             current_section="$line"
@@ -158,10 +160,14 @@ merge_controller_configs() {
                 [ "$current_section" = "$section" ] && skip_section=true && break
             done
             
-            # Skip old [Hotkeys] section
+            # Save [Hotkeys] entries but don't write them yet
             [ "$current_section" = "[Hotkeys]" ] && skip_section=true
             
             [ "$skip_section" = false ] && echo "$line" >> "$temp_output"
+        elif [ "$current_section" = "[Hotkeys]" ] && [[ "$line" =~ ^[[:space:]]*([A-Za-z]+)[[:space:]]*= ]]; then
+            # Save existing hotkey entries
+            local key="${BASH_REMATCH[1]}"
+            hotkey_entries["$key"]="$line"
         elif [ "$skip_section" = false ]; then
             echo "$line" >> "$temp_output"
         fi
@@ -173,10 +179,17 @@ merge_controller_configs() {
         cat "$temp_file" >> "$temp_output"
     done
     
-    # Add single [Hotkeys] section
+    # Update/add controller hotkey entries
+    if [ -n "${guide_buttons[0]}" ]; then
+        hotkey_entries["OpenQuickMenu"]="OpenQuickMenu = Controller0/Button${guide_buttons[0]}"
+    fi
+    
+    # Write [Hotkeys] section with preserved + updated entries
     echo "" >> "$temp_output"
     echo "[Hotkeys]" >> "$temp_output"
-    [ -n "${guide_buttons[0]}" ] && echo "OpenQuickMenu = Controller0/Button${guide_buttons[0]}" >> "$temp_output"
+    for key in "${!hotkey_entries[@]}"; do
+        echo "${hotkey_entries[$key]}" >> "$temp_output"
+    done
     
     mv "$temp_output" "$settings_file"
 }

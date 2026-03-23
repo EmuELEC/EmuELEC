@@ -309,6 +309,12 @@ devices = \
          'config' : 'odroid_rk3568_defconfig' 
          },
     },
+    'X96X6': {
+      'X96X6': {
+	      'dtb': 'rk3566-x96-x6.dtb',
+	         'config': 'odroid_rk3568_defconfig',
+	      },
+    },
     'RK3288': {
       'miqi': {
         'dtb': 'rk3288-miqi.dtb',

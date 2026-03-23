@@ -62,7 +62,7 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-dvbpsi \
             --disable-screen \
             --disable-ogg \
-            --disable-shout\
+            --disable-shout \
             --disable-mod \
             --disable-gme \
             --disable-wma-fixed \
@@ -124,50 +124,27 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-x26410b \
             --disable-chromecast \
             --disable-static \
-            --disable-a52 \
             --disable-addonmanagermodules \
             --disable-aom \
             --disable-aribb25 \
             --disable-aribsub \
             --disable-asdcp \
             --disable-bpg \
-            --disable-caca \
             --disable-chromaprint \
-            --disable-chromecast \
-            --disable-crystalhd \
-            --disable-dc1394 \
-            --disable-dca \
-            --disable-decklink \
             --disable-dsm \
             --disable-dv1394 \
             --disable-fluidlite \
-            --disable-gme \
-            --disable-goom \
-            --disable-jack \
-            --disable-kai \
-            --disable-kate \
-            --disable-kva \
             --disable-libplacebo \
             --disable-linsys \
             --disable-mfx \
             --disable-microdns \
             --disable-mmal \
-            --disable-mtp \
-            --disable-notify \
-            --disable-projectm \
-            --disable-shine \
-            --disable-shout \
             --disable-sndio \
             --disable-spatialaudio \
             --disable-srt \
-            --disable-telx \
-            --disable-tiger \
-            --disable-twolame \
-            --disable-vdpau \
             --disable-vsxu \
             --disable-wasapi \
-            --disable-x262 \
-            --disable-zvbi"
+            --disable-x262"
 
 	if [ "${DEVICE}" == "Amlogic-old" ]; then 
 		ENABLED_FEATURES+=" --enable-pulse"
@@ -177,8 +154,12 @@ DISABLED_FEATURES="--disable-dependency-tracking \
 
 PKG_CONFIGURE_OPTS_TARGET="${ENABLED_FEATURES} ${DISABLED_FEATURES}"
 
-
   export LDFLAGS="${LDFLAGS} -lresolv -fopenmp"
+
+  # Remove glspectrum plugin - it requires desktop OpenGL (libGL) which is not available
+  # Only GLES is present on this embedded platform
+  sed -i '/if HAVE_GL/,/endif/d' ${PKG_BUILD}/modules/visualization/Makefile.am
+  sed -i '/libglspectrum_plugin/d' ${PKG_BUILD}/modules/visualization/Makefile.am
 }
 
 post_makeinstall_target() {

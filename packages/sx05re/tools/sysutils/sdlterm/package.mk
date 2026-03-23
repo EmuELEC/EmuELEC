@@ -9,7 +9,10 @@ PKG_SHORTDESC="simple SDL2 program to read output of bash scripts"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-    ${CXX} sdlterm.cpp -o sdlterm `sdl2-config --cflags --libs` -lSDL2_ttf -pthread
+    SDL_CFLAGS=$($TOOLCHAIN/bin/pkg-config --cflags sdl2)
+    SDL_LIBS=$($TOOLCHAIN/bin/pkg-config --libs sdl2)
+    SDL_TTF_LIBS=$($TOOLCHAIN/bin/pkg-config --libs SDL2_ttf)
+    ${CXX} ${TARGET_CXXFLAGS} sdlterm.cpp -o sdlterm ${SDL_CFLAGS} ${SDL_LIBS} ${SDL_TTF_LIBS} -pthread ${TARGET_LDFLAGS}
 }
 
 makeinstall_target() {

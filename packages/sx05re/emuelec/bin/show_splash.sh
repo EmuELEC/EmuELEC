@@ -244,8 +244,17 @@ MPV_VF="${FILTER_FILL}"
 is_video() { case "${1,,}" in *.mp4|*.mkv|*.webm|*.avi|*.mov|*.mpg|*.mpeg) return 0;; *) return 1;; esac; }
 is_image() { case "${1,,}" in *.png|*.jpg|*.jpeg|*.bmp|*.gif) return 0;; *) return 1;; esac; }
 
+# Send command to VFD display via FIFO (synchronous — completes instantly
+# because vfd-service.sh keeps the read end open)
+vfd_signal() {
+	[ -p /tmp/vfd.fifo ] && echo "$*" > /tmp/vfd.fifo
+}
+
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
- if [ "${ACTION_TYPE}" != "intro" ]; then
+ if [ "${ACTION_TYPE}" = "intro" ]; then
+   # Signal VFD: start boot animation (ES is loading)
+   vfd_signal anim start
+ elif [ "${ACTION_TYPE}" != "intro" ]; then
    DURATION="$(get_ee_setting ee_splash_loading_duration)"
    FALLBACK_SPLASH="${GAMELOADINGSPLASH}"
 
@@ -312,11 +321,20 @@ else
 
   set_audio alsa
 
+  # Signal VFD: video is starting
+  vfd_signal text HEY
+
   if [ ${SS_DEVICE} -eq 1 ]; then
     ${PLAYER_VID} --fullscreen --no-keepaspect --vf="${MPV_VF}" "${SPLASH}" >/dev/null 2>&1
   else
     ${PLAYER_VID} -fs -autoexit -vf "${FILTER_FILL}" -i "${SPLASH}" >/dev/null 2>&1
   fi
+
+  # Signal VFD: video ended, boot text, then start animation
+  vfd_signal text boot
+  # Small delay so "boot" is visible before animation starts
+  sleep 1
+  vfd_signal anim start
 
   touch "/storage/.config/emuelec/configs/novideo"
 fi

@@ -6,7 +6,7 @@ PKG_NAME="u-boot"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_DEPENDS_TARGET="toolchain swig:host dtc:host"
+PKG_DEPENDS_TARGET="toolchain swig:host dtc:host zlib"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
 PKG_IS_KERNEL_PKG="yes"
@@ -35,7 +35,11 @@ case "$PROJECT" in
 	PKG_VERSION="0677e140ba015b95ccd6d762ce51a4c6860a49ca"
 	PKG_SHA256="210b3c0f0e27a72be1aeff860a712bd2fc694c015f835ffd75dea6531502521a"
 	PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
-	PKG_PATCH_DIRS="OdroidM1"
+  elif [ "$DEVICE" == "X96X6" ]; then
+	# X96X6 uses hardkernel U-Boot like OdroidM1, not firefly
+	PKG_VERSION="0677e140ba015b95ccd6d762ce51a4c6860a49ca"
+	PKG_SHA256="210b3c0f0e27a72be1aeff860a712bd2fc694c015f835ffd75dea6531502521a"
+	PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
   elif [ "$DEVICE" == "RK356x" ]; then
     PKG_VERSION="fc354ea827411c1cc35ddf76162aed02f7a9c7d5"
     PKG_SHA256="eefe0b87e40d801a649a4ea6e062ed239aa08be1cbf81fa4e6a13e9344bf556d"
@@ -82,23 +86,60 @@ export KCFLAGS="-Wno-error=address-of-packed-member -Wno-error=maybe-uninitializ
 			sed -i "s|\.\./rkbin|$(get_build_dir rkbin)|" make.sh
 			sed -i "s|\.\./rkbin|$(get_build_dir rkbin)|" scripts/fit.sh
 			cd $PKG_BUILD
-			./make.sh $($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM config | sed "s|_defconfig||") --spl-new --burn-key-hash
+			./make.sh $($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM config | sed "s|_defconfig||") --spl-new
 			./make.sh --idblock
-		elif [ "$DEVICE" == "OdroidM1" ]; then
+		elif [ "$DEVICE" == "X96X6" ]; then
 			sed -i "s|CROSS_COMPILE_ARM64=.*|CROSS_COMPILE_ARM64=${TOOLCHAIN}/bin/${TARGET_NAME}-|" make.sh
 			sed -i "s|aarch64-linux-gnu|${TARGET_NAME}|g" make.sh
-			sed -i "s|FlashBoot=../spl/u-boot-spl.bin|FlashBoot=${PKG_BUILD}/spl/u-boot-spl.bin|g" $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini 
+			sed -i "s|FlashBoot=../spl/u-boot-spl.bin|FlashBoot=${PKG_BUILD}/spl/u-boot-spl.bin|g" $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini
+			# Remove [SYSTEM] and [FLAG] sections entirely from INI.
+			# Compiled boot_merger doesn't understand them and crashes on unknown sections.
+			# spl.sh (which reads NEWIDB) is never called in our flow
+			# (only triggered by --spl/--tpl args, which package.mk doesn't use).
+			sed -i '/^\[SYSTEM\]/,$d' $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini
 			sed -i "s|python2|python3|g" arch/arm/mach-rockchip/decode_bl31.py
 			sed -i "s|python2|python3|g" make.sh
 			sed -i "s|RKBIN_TOOLS=.*|RKBIN_TOOLS=$(get_build_dir rkbin)/tools|" make.sh
 			sed -i "s|RK_SIGN_TOOL=\"rkbin/tools|RK_SIGN_TOOL=\"$(get_build_dir rkbin)/tools|" scripts/fit.sh
+			# Point rkbin scripts at host-compiled tools instead of x86-64 prebuilts
+			sed -i "s|./tools/boot_merger|${PKG_BUILD}/tools/boot_merger|g" scripts/loader.sh scripts/spl.sh
+			sed -i "s|./tools/trust_merger|${PKG_BUILD}/tools/trust_merger|g" scripts/atf.sh
+			sed -i "s|./tools/loaderimage|${PKG_BUILD}/tools/loaderimage|g" scripts/loader.sh scripts/spl.sh
+
 			cd ${PKG_BUILD}
 			sed -i "s|PATH=$(get_build_dir rkbin)/bin/rk35/|PATH\=bin/rk35/|g" $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
 			./make.sh $($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM config | sed "s|_defconfig||")
 			sed -i "s|SPL_BIN=\${RKBIN}.*|SPL_BIN=${PKG_BUILD}/spl/u-boot-spl.bin|g" make.sh
 			./make.sh --idblock
 			sed -i "s|PATH=bin/rk35/|PATH\=$(get_build_dir rkbin)/bin/rk35/|g" $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
-			$(get_build_dir rkbin)/tools/trust_merger --verbose $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
+			${PKG_BUILD}/tools/trust_merger --verbose $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
+			./make.sh loader $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini
+		elif [ "$DEVICE" == "OdroidM1" ]; then
+			sed -i "s|CROSS_COMPILE_ARM64=.*|CROSS_COMPILE_ARM64=${TOOLCHAIN}/bin/${TARGET_NAME}-|" make.sh
+			sed -i "s|aarch64-linux-gnu|${TARGET_NAME}|g" make.sh
+			sed -i "s|FlashBoot=../spl/u-boot-spl.bin|FlashBoot=${PKG_BUILD}/spl/u-boot-spl.bin|g" $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini 
+			# Remove [SYSTEM] and [FLAG] sections entirely from INI.
+			# Compiled boot_merger doesn't understand them and crashes on unknown sections.
+			# spl.sh (which reads NEWIDB) is never called in our flow
+			# (only triggered by --spl/--tpl args, which package.mk doesn't use).
+			sed -i '/^\[SYSTEM\]/,$d' $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini
+			sed -i "s|python2|python3|g" arch/arm/mach-rockchip/decode_bl31.py
+			sed -i "s|python2|python3|g" make.sh
+			sed -i "s|RKBIN_TOOLS=.*|RKBIN_TOOLS=$(get_build_dir rkbin)/tools|" make.sh
+			sed -i "s|RK_SIGN_TOOL=\"rkbin/tools|RK_SIGN_TOOL=\"$(get_build_dir rkbin)/tools|" scripts/fit.sh
+			# Point rkbin scripts at host-compiled tools instead of x86-64 prebuilts
+			sed -i "s|./tools/boot_merger|${PKG_BUILD}/tools/boot_merger|g" scripts/loader.sh scripts/spl.sh
+			sed -i "s|./tools/trust_merger|${PKG_BUILD}/tools/trust_merger|g" scripts/atf.sh
+			sed -i "s|./tools/loaderimage|${PKG_BUILD}/tools/loaderimage|g" scripts/loader.sh scripts/spl.sh
+
+			cd ${PKG_BUILD}
+			sed -i "s|PATH=$(get_build_dir rkbin)/bin/rk35/|PATH\=bin/rk35/|g" $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
+			./make.sh $($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM config | sed "s|_defconfig||")
+
+			sed -i "s|SPL_BIN=\${RKBIN}.*|SPL_BIN=${PKG_BUILD}/spl/u-boot-spl.bin|g" make.sh
+			./make.sh --idblock
+			sed -i "s|PATH=bin/rk35/|PATH\=$(get_build_dir rkbin)/bin/rk35/|g" $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
+			${PKG_BUILD}/tools/trust_merger --verbose $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
 			./make.sh loader $(get_build_dir rkbin)/RKBOOT/RK3568-ODROIDM1.ini 
 		else
 			[ "${BUILD_WITH_DEBUG}" = "yes" ] && PKG_DEBUG=1 || PKG_DEBUG=0
