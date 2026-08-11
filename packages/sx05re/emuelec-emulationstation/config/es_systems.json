@@ -246,7 +246,7 @@
       "hardware": "arcade",
       "path": "/storage/roms/pgm2",
       "platform": "pgm2",
-      "theme": "pgm2",
+      "theme": "pgm",
       "command": "default",
       "extensions": [
         ".zip"
@@ -2390,7 +2390,7 @@
       "hardware": "console",
       "path": "/storage/roms/snesmsu1",
       "platform": "snes",
-      "theme": "snesmsu1",
+      "theme": "snes-msu1",
       "command": "default",
       "extensions": [
         ".7z",
@@ -3274,7 +3274,7 @@
       "hardware": "console",
       "path": "/storage/roms/megadrivemsu",
       "platform": "megadrive",
-      "theme": "megadrivemsu",
+      "theme": "megadrive-msu",
       "command": "default",
       "extensions": [
         ".7z",
@@ -3626,7 +3626,7 @@
       "hardware": "computer",
       "path": "/storage/roms/x1",
       "platform": "x1",
-      "theme": "sharpx1",
+      "theme": "x1",
       "command": "default",
       "extensions": [
         ".2d",
@@ -4026,7 +4026,7 @@
       "hardware": "console",
       "path": "/storage/roms/tic-80",
       "platform": "tic80",
-      "theme": "tic-80",
+      "theme": "tic80",
       "command": "default",
       "extensions": [
         ".tic"
