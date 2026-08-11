@@ -217,7 +217,10 @@ fi
 
   mkdir -p ${INSTALL}/usr/config/retroarch/
   mv ${INSTALL}/etc/retroarch.cfg ${INSTALL}/usr/config/retroarch/
-  
+
+  mkdir -p "${INSTALL}/usr/config/emuelec/configs"
+  ln -sf "/storage/.config/retroarch" "${INSTALL}/usr/config/emuelec/configs/retroarch"
+
 }
 
 post_install() {  

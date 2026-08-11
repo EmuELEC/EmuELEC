@@ -28,4 +28,7 @@ makeinstall_target() {
 
 	chmod +x ${INSTALL}/usr/bin/flycast.sh
 	chmod +x ${INSTALL}/usr/bin/set_flycast_joy.sh
+
+	mkdir -p "${INSTALL}/usr/config/emuelec/configs"
+	ln -sf "/storage/.config/flycast" "${INSTALL}/usr/config/emuelec/configs/flycast"
 }
