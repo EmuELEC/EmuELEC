@@ -18,7 +18,7 @@ import sys
 import os
 from multiprocessing import Process
 
-DEBUG = False
+DEBUG = True
 
 
 @dataclass
@@ -69,6 +69,7 @@ class BluetoothCTL:
 
     def __init__(self):
         self.async_bluetooth_process = None
+        self._agent_type = None
 
     def _parse_device_info(self, mac: str):
         info = ShellIO.execute(["bluetoothctl", "info", mac], debug=False)
@@ -112,7 +113,7 @@ class BluetoothCTL:
             if i.startswith("LegacyPairing:"):
                 dev.legacy_pairing = i.split(":")[1].strip() == "yes"
             if i.startswith("RSSI:"):
-# Following code tested on bluez 5.66, and should work with 5.72 too.				
+# Following code tested on bluez 5.66, and should work with 5.72 too.
                 dev.rssi = int(i.split(" ")[-1].replace("(","").replace(")","").strip())
         return dev
 
@@ -144,15 +145,27 @@ class BluetoothCTL:
     def agent(self, value):
         ShellIO.execute(["bluetoothctl", "agent", "on" if value else "off"])
 
+    @property
+    def agent_type(self) -> "str | None":
+        return self._agent_type
+
+    @agent_type.setter
+    def agent_type(self, value: "str | None"):
+        self._agent_type = value
+
     def scan(self, timeout=10):
-        ShellIO.execute(["bluetoothctl", "--timeout", str(timeout), "scan", "on"])
+        cmd = ["bluetoothctl"]
+        if self.agent_type:
+            cmd += ["--agent", self.agent_type]
+        cmd += ["--timeout", str(timeout), "scan", "on"]
+        ShellIO.execute(cmd)
 
     def scan_async(self, timeout=10):
-        # using stdbuf to flush buffer and get output immediately (bluetoothctl issue)
+        agent_arg = "--agent " + self.agent_type + " " if self.agent_type else ""
         cmd = (
-            "stdbuf -oL bluetoothctl --timeout " + str(timeout) + " scan on"
+            "stdbuf -oL bluetoothctl " + agent_arg + "--timeout " + str(timeout) + " scan on"
             if timeout > 0
-            else "stdbuf -oL bluetoothctl -- scan on"
+            else "stdbuf -oL bluetoothctl " + agent_arg + "-- scan on"
         )
         process = Popen(cmd.split(), stdout=PIPE, universal_newlines=True)
         while True:
@@ -252,7 +265,7 @@ def on_device_discovered(dev: BluetoothDevice) -> bool:
         print(dev)
     if dev.blocked:
         return True
-    
+
 
     if (dev.trusted and dev.paired and not dev.connected and bt.connect(dev)):
         return True
@@ -323,6 +336,7 @@ if __name__ == "__main__":
     bt.agent = True
     bt.discoverable = True
     bt.pairable = True
+    bt.agent_type = "NoInputNoOutput"
 
     start_time = time.perf_counter()
     while True:
