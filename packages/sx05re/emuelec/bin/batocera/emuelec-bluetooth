@@ -142,9 +142,11 @@ class BluetoothCTL:
 
     @pairable.setter
     def agent(self, value):
-        ShellIO.execute(["bluetoothctl", "agent", "off"])
+        ShellIO.execute(["bluetoothctl", "agent", "on" if value else "off"])
+
+    @pairable.setter
+    def agentType(self, value):
         ShellIO.execute(["bluetoothctl", "agent", value])
-        ShellIO.execute(["bluetoothctl", "agent", "on"])
 
     def scan(self, timeout=10):
         ShellIO.execute(["bluetoothctl", "--timeout", str(timeout), "scan", "on"])
@@ -322,7 +324,9 @@ if __name__ == "__main__":
         exit()
 
     bt.power = True
-    bt.agent = "NoInputNoOutput"
+    bt.agent = False
+    bt.agentType = "NoInputNoOutput"
+    bt.agent = True
     bt.discoverable = True
     bt.pairable = True
 
