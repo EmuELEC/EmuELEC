@@ -112,7 +112,7 @@ class BluetoothCTL:
             if i.startswith("LegacyPairing:"):
                 dev.legacy_pairing = i.split(":")[1].strip() == "yes"
             if i.startswith("RSSI:"):
-# Following code tested on bluez 5.66, and should work with 5.72 too.				
+# Following code tested on bluez 5.66, and should work with 5.72 too.
                 dev.rssi = int(i.split(" ")[-1].replace("(","").replace(")","").strip())
         return dev
 
@@ -142,7 +142,9 @@ class BluetoothCTL:
 
     @pairable.setter
     def agent(self, value):
-        ShellIO.execute(["bluetoothctl", "agent", "on" if value else "off"])
+        ShellIO.execute(["bluetoothctl", "agent", "off"])
+        ShellIO.execute(["bluetoothctl", "agent", value])
+        ShellIO.execute(["bluetoothctl", "agent", "on"])
 
     def scan(self, timeout=10):
         ShellIO.execute(["bluetoothctl", "--timeout", str(timeout), "scan", "on"])
@@ -252,7 +254,7 @@ def on_device_discovered(dev: BluetoothDevice) -> bool:
         print(dev)
     if dev.blocked:
         return True
-    
+
 
     if (dev.trusted and dev.paired and not dev.connected and bt.connect(dev)):
         return True
@@ -320,7 +322,7 @@ if __name__ == "__main__":
         exit()
 
     bt.power = True
-    bt.agent = True
+    bt.agent = "NoInputNoOutput"
     bt.discoverable = True
     bt.pairable = True
 
