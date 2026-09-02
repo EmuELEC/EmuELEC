@@ -144,19 +144,23 @@ class BluetoothCTL:
     def agent(self, value):
         ShellIO.execute(["bluetoothctl", "agent", "on" if value else "off"])
 
-    @pairable.setter
-    def agentType(self, value):
-        ShellIO.execute(["bluetoothctl", "agent", value])
+    def scan(self, timeout=10, agentType="NoInputNoOutput"):
+        cmd = ["bluetoothctl"]
+        if agentType:
+            cmd += ["--agent", agentType]
+        cmd += ["--timeout", str(timeout), "scan", "on"]
+        ShellIO.execute(cmd)
 
-    def scan(self, timeout=10):
-        ShellIO.execute(["bluetoothctl", "--timeout", str(timeout), "scan", "on"])
-
-    def scan_async(self, timeout=10):
+    def scan_async(self, timeout=10, agentType="NoInputNoOutput"):
         # using stdbuf to flush buffer and get output immediately (bluetoothctl issue)
+        # --agent registers this process as the default agent for as long as
+        # the scan runs, so incoming pairing requests (e.g. from a controller)
+        # are auto-accepted without needing a PIN/passkey prompt.
+        agent_arg = "--agent " + agentType + " " if agentType else ""
         cmd = (
-            "stdbuf -oL bluetoothctl --timeout " + str(timeout) + " scan on"
+            "stdbuf -oL bluetoothctl " + agent_arg + "--timeout " + str(timeout) + " scan on"
             if timeout > 0
-            else "stdbuf -oL bluetoothctl -- scan on"
+            else "stdbuf -oL bluetoothctl " + agent_arg + "-- scan on"
         )
         process = Popen(cmd.split(), stdout=PIPE, universal_newlines=True)
         while True:
@@ -324,8 +328,6 @@ if __name__ == "__main__":
         exit()
 
     bt.power = True
-    bt.agent = False
-    bt.agentType = "NoInputNoOutput"
     bt.agent = True
     bt.discoverable = True
     bt.pairable = True
