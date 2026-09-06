@@ -13,7 +13,7 @@ from evdev import InputDevice, list_devices, ecodes as e
 DREAMM_EXE   = "/usr/bin/dreamm"
 DREAMM_ROMS  = "/storage/roms/dreamm"
 DREAMM_INST  = os.path.join(DREAMM_ROMS, "install")
-DREAMM_LOG   = "/emuelec/logs/dreamm-install.log"
+DREAMM_LOG   = "/emuelec/logs/dreamm-commander.log"
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
@@ -171,7 +171,7 @@ _FONT_PATHS = [
     '/usr/bin/resources/Rubik-Regular.ttf',
     '/usr/share/kodi/media/Fonts/DejaVuSans.ttf',
 ]
-_FONT_SIZE_PX = 28   
+_FONT_SIZE_PX = 30   
 
 class _FTGeneric(ctypes.Structure):
     _fields_ = [('data', ctypes.c_void_p), ('finalizer', ctypes.c_void_p)]
@@ -352,6 +352,21 @@ def unblank_framebuffer():
         try:
             with open(p, "w") as f: f.write("0")
         except Exception: pass
+
+def fb_reclaim():
+    """Re-attach to the framebuffer after another program used the screen.
+
+    Unlike eka2l1, DREAMM opens an SDL window even for its command line
+    modes and takes over the OSD planes. Once it exits our mapping can be
+    stale, so drop it and map again instead of merely redrawing."""
+    try:
+        fb_close()
+    except Exception:
+        pass
+    fb_open()
+    unblank_framebuffer()
+    fb_fill(COL_BG)
+    fb_flip()
 
 def progress_screen(title: str, message: str = ""):
     """Show a status screen during long operations."""
@@ -644,9 +659,9 @@ def log(msg: str):
 def run_dreamm(args: List[str], timeout: int = 900) -> Tuple[int, str]:
     """Run DREAMM with our userpath, capturing output.
 
-    DREAMM takes over the framebuffer while it runs (installers and
-    -makedreamm actually start the game), so the screen is reclaimed
-    afterwards by the caller redrawing over it."""
+    DREAMM takes over the framebuffer while it runs; the dialog shown
+    afterwards repaints it. Do not re-enable the OSD layers here --
+    switching osd1 back on puts an empty plane over our output."""
     cmd = [DREAMM_EXE, "-userpath", DREAMM_ROMS] + args
     log("Running: " + " ".join(cmd))
     try:
@@ -666,9 +681,13 @@ def run_dreamm(args: List[str], timeout: int = 900) -> Tuple[int, str]:
         log(f"Exception: {ex}")
         return 1, ""
     finally:
-        unblank_framebuffer()
-        fb_fill(COL_BG)
-        fb_flip()
+        # -makedreamm writes the template and then launches the game, and the
+        # process it spawns outlives the one we waited for. Left alone it sits
+        # on top of our framebuffer, which looks like a black screen.
+        subprocess.run(["killall", "-9", "dreamm"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(0.3)
+        fb_reclaim()
 
 
 def list_installed_games() -> List[str]:
@@ -851,9 +870,9 @@ def make_dreamm_file():
 
     if not confirm_dialog(
             "Create .dreamm File",
-            f"DREAMM will analyse this program and write a launch\n"
-            f"template for it:\n\n{exe}\n\n"
-            "The game itself is not started here.\n\nContinue?"):
+            f"DREAMM writes a launch template for:\n\n{exe}\n\n"
+            "It then starts the game to do so. The game is closed\n"
+            "again once the file has been written.\n\nContinue?"):
         raise GoBack()
 
     # -makedreamm names the file to write; everything after -launch is treated
@@ -913,7 +932,7 @@ def main():
 
     try:
         with open(DREAMM_LOG, "w") as f:
-            f.write("EmuELEC DREAMM Installer Log\n")
+            f.write("EmuELEC DREAMM Commander Log\n")
     except Exception:
         pass
 

@@ -7,13 +7,13 @@
 
 DREAMM_INSTALL_SCRIPT="/usr/bin/scripts/setup/DREAMM_INSTALL.py"
 
-function dreamminstall_confirm() {
-    text_viewer -y -w -t "D R E A M M   I N S T A L L E R" -f 24 -m "Welcome to the DREAMM Installer.\n\nUse this tool to install LucasArts games into DREAMM from folders or disk images, to turn installed games into .dreamm entries so EmulationStation lists them, and to build .dreamm launcher files by hand for titles DREAMM does not recognise.\n\nController Navigation:\n\n- D-Pad: Navigate menus\n- A / Start: Confirm selection\n- B: Go back\n- Select: Exit program\n\nContinue?"
+function dreammcommander_confirm() {
+    text_viewer -y -w -t "D R E A M M   C O M M A N D E R" -f 24 -m "Welcome to DREAMM Commander.\n\nUse this tool to install LucasArts games into DREAMM from folders or disk images, to turn installed games into .dreamm entries so EmulationStation lists them, and to build .dreamm launcher files by hand for titles DREAMM does not recognise.\n\nController Navigation:\n\n- D-Pad: Navigate menus\n- A / Start: Confirm selection\n- B: Go back\n- Select: Exit program\n\nContinue?"
     if [[ $? == 21 ]]; then
-        if dreamminstall_start; then
-            text_viewer -w -t "DREAMM INSTALLER" -f 24 -m "\n\nLaunch DREAMM via EmulationStation."
+        if dreammcommander_start; then
+            text_viewer -w -t "DREAMM COMMANDER" -f 24 -m "\n\nLaunch DREAMM via EmulationStation."
         else
-            text_viewer -e -w -t "DREAMM INSTALLER FAILED" -f 24 -m "There has been an error!\n\nCheck /emuelec/logs/dreamm-install.log for details."
+            text_viewer -e -w -t "DREAMM COMMANDER FAILED" -f 24 -m "There has been an error!\n\nCheck /emuelec/logs/dreamm-commander.log for details."
         fi
     fi
     ee_console disable
