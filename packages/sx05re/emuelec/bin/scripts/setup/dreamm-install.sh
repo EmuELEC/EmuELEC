@@ -5,7 +5,7 @@
 
 . /etc/profile
 
-DREAMM_INSTALL_SCRIPT="/usr/bin/scripts/setup/DREAMM_INSTALL.py"
+DREAMM_COMMANDER_SCRIPT="/usr/bin/scripts/setup/DREAMM_INSTALL.py"
 
 function dreammcommander_confirm() {
     text_viewer -y -w -t "D R E A M M   C O M M A N D E R" -f 24 -m "Welcome to DREAMM Commander.\n\nUse this tool to install LucasArts games into DREAMM from folders or disk images, to turn installed games into .dreamm entries so EmulationStation lists them, and to build .dreamm launcher files by hand for titles DREAMM does not recognise.\n\nController Navigation:\n\n- D-Pad: Navigate menus\n- A / Start: Confirm selection\n- B: Go back\n- Select: Exit program\n\nContinue?"
@@ -19,7 +19,7 @@ function dreammcommander_confirm() {
     ee_console disable
 }
 
-function dreamminstall_start() {
+function dreammcommander_start() {
     ee_console enable
 
     local timeout=10
@@ -30,7 +30,7 @@ function dreamminstall_start() {
 
     killall -STOP emulationstation 2>/dev/null || true
 
-    /usr/bin/python3 -u "$DREAMM_INSTALL_SCRIPT" 2>&1 | tee /emuelec/logs/dreamm-install.log
+    /usr/bin/python3 -u "$DREAMM_COMMANDER_SCRIPT" 2>&1 | tee /emuelec/logs/dreamm-commander.log
     setup_result=${PIPESTATUS[0]}
 
     killall -CONT emulationstation 2>/dev/null || true
@@ -39,4 +39,4 @@ function dreamminstall_start() {
     [[ $setup_result == 0 ]]
 }
 
-dreamminstall_confirm
+dreammcommander_confirm

@@ -14,6 +14,13 @@ DREAMM_EXE   = "/usr/bin/dreamm"
 DREAMM_ROMS  = "/storage/roms/dreamm"
 DREAMM_INST  = os.path.join(DREAMM_ROMS, "install")
 DREAMM_LOG   = "/emuelec/logs/dreamm-commander.log"
+
+# Containers DREAMM can scan. Archives and CD/floppy images; for the paired
+# formats it is the control file that identifies the image, so CUE, MDS and
+# CCD are listed while their BIN/MDF companions are not. IMG is both a raw
+# floppy format and the data half of a CCD pair, so it stays in the list.
+CONTAINERS = (".zip", ".7z", ".iso", ".cue", ".mds", ".ccd",
+              ".ima", ".img", ".vfd")
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
@@ -171,7 +178,7 @@ _FONT_PATHS = [
     '/usr/bin/resources/Rubik-Regular.ttf',
     '/usr/share/kodi/media/Fonts/DejaVuSans.ttf',
 ]
-_FONT_SIZE_PX = 30   
+_FONT_SIZE_PX = 28
 
 class _FTGeneric(ctypes.Structure):
     _fields_ = [('data', ctypes.c_void_p), ('finalizer', ctypes.c_void_p)]
@@ -353,21 +360,6 @@ def unblank_framebuffer():
             with open(p, "w") as f: f.write("0")
         except Exception: pass
 
-def fb_reclaim():
-    """Re-attach to the framebuffer after another program used the screen.
-
-    Unlike eka2l1, DREAMM opens an SDL window even for its command line
-    modes and takes over the OSD planes. Once it exits our mapping can be
-    stale, so drop it and map again instead of merely redrawing."""
-    try:
-        fb_close()
-    except Exception:
-        pass
-    fb_open()
-    unblank_framebuffer()
-    fb_fill(COL_BG)
-    fb_flip()
-
 def progress_screen(title: str, message: str = ""):
     """Show a status screen during long operations."""
     fb_fill(COL_BG)
@@ -383,6 +375,7 @@ def progress_screen(title: str, message: str = ""):
 def fb_flip():
     """Blit back-buffer to framebuffer in one write — eliminates flicker."""
     _fb_map[0:FB_W * FB_H * FB_BPP] = _bb
+
 
 def fb_fill(color: bytes):
     """Fill back-buffer with one colour."""
@@ -660,8 +653,7 @@ def run_dreamm(args: List[str], timeout: int = 900) -> Tuple[int, str]:
     """Run DREAMM with our userpath, capturing output.
 
     DREAMM takes over the framebuffer while it runs; the dialog shown
-    afterwards repaints it. Do not re-enable the OSD layers here --
-    switching osd1 back on puts an empty plane over our output."""
+    afterwards repaints it."""
     cmd = [DREAMM_EXE, "-userpath", DREAMM_ROMS] + args
     log("Running: " + " ".join(cmd))
     try:
@@ -680,14 +672,6 @@ def run_dreamm(args: List[str], timeout: int = 900) -> Tuple[int, str]:
     except Exception as ex:
         log(f"Exception: {ex}")
         return 1, ""
-    finally:
-        # -makedreamm writes the template and then launches the game, and the
-        # process it spawns outlives the one we waited for. Left alone it sits
-        # on top of our framebuffer, which looks like a black screen.
-        subprocess.run(["killall", "-9", "dreamm"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(0.3)
-        fb_reclaim()
 
 
 def list_installed_games() -> List[str]:
@@ -746,11 +730,28 @@ def install_games():
     while True:
         folder = choose_directory_interactive(
             "Select Game Folder / Disk Images", '/storage/roms')
-        paths.append(folder)
+
+        images = sorted(f for f in os.listdir(folder)
+                        if f.lower().endswith(CONTAINERS)
+                        and os.path.isfile(os.path.join(folder, f)))
+
+        if images and confirm_dialog(
+                "Disk Images Found",
+                f"{len(images)} image file(s) in this folder.\n\n"
+                "Pick individual images instead of the whole folder?\n"
+                "(Select several at once for a multi-disk game.)"):
+            picks = select_multiple_from_list(
+                "Select Disk Images", images,
+                "ZIP, 7z, ISO, CUE, MDS, CCD, IMA, IMG, VFD.\n"
+                "For CUE/BIN, MDS/MDF and CCD/IMG pick the control file.")
+            if not picks:
+                continue
+            paths.extend(os.path.join(folder, images[i]) for i in picks)
+        else:
+            paths.append(folder)
 
         if not confirm_dialog(
                 "Multi-Disk Install",
-                f"Added:\n\n{folder}\n\n"
                 f"Paths so far: {len(paths)}\n\n"
                 "Add another disk or folder?\n"
                 "(Choose No to start the installation.)",
