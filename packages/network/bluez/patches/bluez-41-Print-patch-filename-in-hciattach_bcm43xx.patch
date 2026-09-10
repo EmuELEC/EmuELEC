@@ -1,0 +1,18 @@
+print patch filename in hciattach_bcm43xx
+
+--- a/tools/hciattach_bcm43xx.c	2025-01-19 10:43:15.502466425 +0100
++++ b/tools/hciattach_bcm43xx.c	2025-01-19 10:43:21.302174154 +0100
+@@ -360,9 +360,13 @@ int bcm43xx_init(int fd, int def_speed,
+ 	if (bcm43xx_read_local_name(fd, chip_name, sizeof(chip_name)))
+ 		return -1;
+ 
++	fprintf(stderr, "Searching for patch: %s.hcd\n", chip_name);
++
+ 	if (bcm43xx_locate_patch(FIRMWARE_DIR, chip_name, fw_path)) {
+ 		fprintf(stderr, "Patch not found, continue anyway\n");
+ 	} else {
++		fprintf(stderr, "Patch found: %s\n", fw_path);
++
+ 		if (bcm43xx_set_speed(fd, ti, speed))
+ 			return -1;
+ 

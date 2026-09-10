@@ -14,10 +14,10 @@ Navigation Controller is using PID 0x042f over USB but PID 0x0268
  2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index 939fed7..f6baea7 100644
+index a04a76d..3e2890e 100644
 --- a/plugins/sixaxis.c
 +++ b/plugins/sixaxis.c
-@@ -364,7 +364,13 @@ static bool setup_device(int fd, const char *sysfs_path,
+@@ -363,7 +363,13 @@ static bool setup_device(int fd, const char *sysfs_path,
  	info("sixaxis: setting up new device");
  
  	btd_device_device_set_name(device, cp->name);
@@ -33,10 +33,10 @@ index 939fed7..f6baea7 100644
  
  	closure = g_new0(struct authentication_closure, 1);
 diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
-index 8e6f3cc..321a918 100644
+index 44e43b4..de8ec33 100644
 --- a/profiles/input/sixaxis.h
 +++ b/profiles/input/sixaxis.h
-@@ -38,6 +38,7 @@ struct cable_pairing {
+@@ -25,6 +25,7 @@ struct cable_pairing {
  	uint16_t vid;
  	uint16_t pid;
  	uint16_t version;
@@ -44,7 +44,7 @@ index 8e6f3cc..321a918 100644
  	CablePairingType type;
  };
  
-@@ -59,6 +60,7 @@ get_pairing(uint16_t vid, uint16_t pid)
+@@ -54,6 +55,7 @@ get_pairing(uint16_t vid, uint16_t pid, const char *name)
  			.vid = 0x054c,
  			.pid = 0x042f,
  			.version = 0x0000,
@@ -53,5 +53,5 @@ index 8e6f3cc..321a918 100644
  		},
  		{
 -- 
-2.7.4
+2.53.0
 

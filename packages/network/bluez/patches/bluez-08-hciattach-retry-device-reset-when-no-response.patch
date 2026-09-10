@@ -15,15 +15,15 @@ diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
 index bb24483..ad89161 100644
 --- a/tools/hciattach_bcm43xx.c
 +++ b/tools/hciattach_bcm43xx.c
-@@ -24,6 +24,7 @@
+@@ -23,6 +23,7 @@
+ #include <dirent.h>
  #include <time.h>
  #include <limits.h>
- #include <sys/stat.h>
 +#include <signal.h>
 
  #include "lib/bluetooth.h"
  #include "lib/hci.h"
-@@ -82,21 +83,31 @@ fail:
+@@ -81,21 +82,31 @@ fail:
  	return -1;
  }
 

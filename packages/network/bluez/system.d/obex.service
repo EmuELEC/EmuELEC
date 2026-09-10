@@ -10,7 +10,7 @@ ConditionPathExists=/storage/.cache/services/bluez.conf
 EnvironmentFile=/storage/.cache/services/obexd.conf
 EnvironmentFile=-/run/libreelec/debug/obexd.conf
 ExecStartPre=/bin/sh -c 'mkdir -p $OBEXD_ROOT'
-ExecStart=/usr/lib/bluetooth/obexd -r $OBEXD_ROOT $OBEXD_DEBUG
+ExecStart=/usr/lib/bluetooth/obexd -s -r $OBEXD_ROOT $OBEXD_DEBUG
 TimeoutStopSec=1s
 
 [Install]

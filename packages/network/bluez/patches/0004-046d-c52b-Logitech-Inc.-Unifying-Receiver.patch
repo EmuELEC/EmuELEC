@@ -22,5 +22,5 @@ index 7db4572..1feca6e 100644
  ENV{DEVTYPE}!="usb_device", GOTO="hid2hci_end"
  
 -- 
-1.7.2.5
+2.53.0
 

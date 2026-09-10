@@ -1,8 +1,13 @@
+From 2d7faa8b220b825f95d4e5f17e0948e1daaa0874 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Tue, 06 Aug 2013 12:37:04 +0300
+Subject: [PATCH] add obexd policy
+
 diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 8a1e258..31b7542 100644
+index b6c6149..7b48aa9 100644
 --- a/src/bluetooth.conf
 +++ b/src/bluetooth.conf
-@@ -20,10 +20,24 @@
+@@ -21,10 +21,24 @@
      <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
      <allow send_interface="org.freedesktop.DBus.Properties"/>
      <allow send_interface="org.mpris.MediaPlayer2.Player"/>
@@ -27,3 +32,6 @@ index 8a1e258..31b7542 100644
    </policy>
  
  </busconfig>
+-- 
+2.53.0
+

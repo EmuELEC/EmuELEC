@@ -21,8 +21,8 @@ diff --git a/Makefile.tools b/Makefile.tools
 index 4b513366f..1842e6285 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -378,7 +378,8 @@ tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
- 						tools/hciattach_ath3k.c \
+@@ -417,7 +417,8 @@ tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
+ 						tools/hciattach_rome.c \
  						tools/hciattach_qualcomm.c \
  						tools/hciattach_intel.c \
 -						tools/hciattach_bcm43xx.c
@@ -56,7 +56,7 @@ index 276a4e56e..a3267a962 100644
  #define FLOW_CTL	0x0001
  #define AMP_DEV		0x0002
  #define ENABLE_PM	1
-@@ -266,6 +252,19 @@ static int bcm43xx(int fd, struct uart_t *u, struct termios *ti)
+@@ -271,6 +252,19 @@ static int bcm43xx(int fd, struct uart_t *u, struct termios *ti)
  	return bcm43xx_init(fd, u->init_speed, u->speed, ti, u->bdaddr);
  }
  
@@ -76,12 +76,12 @@ index 276a4e56e..a3267a962 100644
  static int read_check(int fd, void *buf, int count)
  {
  	int res;
-@@ -1097,6 +1096,9 @@ struct uart_t uart[] = {
+@@ -1106,6 +1096,9 @@ struct uart_t uart[] = {
  	{ "amp",	0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
  			AMP_DEV, DISABLE_PM, NULL, NULL, NULL },
  
 +	/* Bluetooth chip (UWE5622)*/
-+	{  "sprd",      0x0000, 0x0000, NULL, 115200, 1500000,
++	{  "sprd",      0x0000, 0x0000, 0, 115200, 1500000,
 +			FLOW_CTL, DISABLE_PM, NULL, sprd_init, sprd_post},
  	{ NULL, 0 }
  };
@@ -90,9 +90,9 @@ diff --git a/tools/hciattach.h b/tools/hciattach.h
 index 26c0d5424..69bc0ccef 100644
 --- a/tools/hciattach.h
 +++ b/tools/hciattach.h
-@@ -40,6 +40,20 @@
- #define HCI_UART_EXT_CONFIG	4
- #define HCI_UART_VND_DETECT	5
+@@ -44,6 +40,20 @@
+ #define FIRMWARE_DIR "/etc/firmware"
+ #endif
  
 +struct uart_t {
 +	char *type;
@@ -111,7 +111,7 @@ index 26c0d5424..69bc0ccef 100644
  int read_hci_event(int fd, unsigned char *buf, int size);
  int set_speed(int fd, struct termios *ti, int speed);
  int uart_speed(int speed);
-@@ -56,3 +70,7 @@ int qualcomm_init(int fd, int speed, struct termios *ti, const char *bdaddr);
+@@ -61,3 +70,7 @@ int qualcomm_init(int fd, int speed, struct termios *ti, const char *bdaddr);
  int intel_init(int fd, int init_speed, int *speed, struct termios *ti);
  int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
  		const char *bdaddr);
@@ -136,8 +136,9 @@ index 000000000..12b4795de
 +#include <stdint.h>
 +#include <sys/termios.h>
 +#include <sys/ioctl.h>
++#include <sys/uio.h>
 +#include <limits.h>
-+#include "lib/bluetooth.h"
++#include <bluetooth/bluetooth.h>
 +#include "hciattach.h"
 +
 +/******************************************************************************
@@ -538,35 +539,34 @@ index 000000000..12b4795de
 +	unsigned char buff[255];
 +	fscanf(fp, "%s", buff);
 +	fclose(fp);
-+	int k = 0;
 +
 +	unsigned char tmp[5];
-+	sprintf(tmp, "%c%c", buff[0], buff[1]);
++	sprintf((char *)tmp, "%c%c", buff[0], buff[1]);
 +	unsigned char str = compare_char(tmp[0]);
 +	unsigned char str2 = compare_char(tmp[1]);
 +	local_bdaddr[0] = (str << 4) | str2;
 +
-+	sprintf(tmp, "%c%c", buff[3], buff[4]);
++	sprintf((char *)tmp, "%c%c", buff[3], buff[4]);
 +	str = compare_char(tmp[0]);
 +	str2 = compare_char(tmp[1]);
 +	local_bdaddr[1] = (str << 4) | str2;
 +
-+	sprintf(tmp, "%c%c", buff[6], buff[7]);
++	sprintf((char *)tmp, "%c%c", buff[6], buff[7]);
 +	str = compare_char(tmp[0]);
 +	str2 = compare_char(tmp[1]);
 +	local_bdaddr[2] = (str << 4) | str2;
 +
-+	sprintf(tmp, "%c%c", buff[9], buff[10]);
++	sprintf((char *)tmp, "%c%c", buff[9], buff[10]);
 +	str = compare_char(tmp[0]);
 +	str2 = compare_char(tmp[1]);
 +	local_bdaddr[3] = (str << 4) | str2;
 +
-+	sprintf(tmp, "%c%c", buff[12], buff[13]);
++	sprintf((char *)tmp, "%c%c", buff[12], buff[13]);
 +	str = compare_char(tmp[0]);
 +	str2 = compare_char(tmp[1]);
 +	local_bdaddr[4] = (str << 4) | str2;
 +
-+	sprintf(tmp, "%c%c", buff[15], buff[16]);
++	sprintf((char *)tmp, "%c%c", buff[15], buff[16]);
 +	str = compare_char(tmp[0]);
 +	str2 = compare_char(tmp[1]);
 +	local_bdaddr[5] = (str << 4) | str2;
@@ -644,7 +644,7 @@ index 000000000..12b4795de
 +	if (ret == -1) {
 +		SPRD_ERR("%s error writing to UART (%s)", __func__, strerror(errno));
 +	} else if (ret < length + 1) {
-+		SPRD_ERR("%s: %d / %d bytes written - something went wrong...", __func__, ret, length + 1);
++		SPRD_ERR("%s: %zd / %zu bytes written - something went wrong...", __func__, ret, length + 1);
 +	}
 +
 +	return ret;

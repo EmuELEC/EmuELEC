@@ -1,9 +1,15 @@
-diff -Naur bluez-5.7/configure.ac bluez-5.7.patch/configure.ac
---- bluez-5.7/configure.ac	2013-06-26 18:17:07.000000000 +0200
-+++ bluez-5.7.patch/configure.ac	2013-07-12 20:21:17.000000000 +0200
-@@ -238,10 +238,13 @@
- 	prefix="${ac_default_prefix}"
+From 541b9953dd44fbb3d46be38d7243f3c812863d2a Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Fri, 12 Jul 2013 20:37:41 +0200
+Subject: [PATCH] storagedir
+
+diff --git a/configure.ac b/configure.ac
+index b011e9b..07304c6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -480,10 +480,13 @@ else
  fi
+ AC_SUBST(PKGLIBEXECDIR, "${pkglibexecdir}")
  
 -if (test "$localstatedir" = '${prefix}/var'); then
 -	storagedir="${prefix}/var/lib/bluetooth"
@@ -19,3 +25,6 @@ diff -Naur bluez-5.7/configure.ac bluez-5.7.patch/configure.ac
  fi
  AC_DEFINE_UNQUOTED(STORAGEDIR, "${storagedir}",
  			[Directory for the storage files])
+-- 
+2.53.0
+

@@ -25,5 +25,5 @@ index db6bb03..7db4572 100644
  
  ENV{DEVTYPE}!="usb_device", GOTO="hid2hci_end"
 -- 
-1.8.0.1
+2.53.0
 
