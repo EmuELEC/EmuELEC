@@ -67,6 +67,14 @@
 		<image>./setup_images/cmdmaker.png</image>
 	</game>
 	<game>
+		<path>./optsmaker.sh</path>
+		<name>.opts maker for Tsugaru (FM Towns)</name>
+		<desc>This script lets you create and edit per-game .opts files for the Tsugaru FM Towns emulator in EmuELEC. What it does: - Scans your FM Towns ROM directories for CD/floppy images - Lets you browse and select a game - Toggle over 30 Tsugaru command-line options (gameport/controller mode, CPU fidelity, CD speed, RAM size, resolution, sound, boot key, and more) with a live preview of the resulting command line - Edit free-form options directly for anything not covered by the toggles (e.g. -APP presets) - Saves the result as a "&lt;romname&gt;.opts" file next to the ROM, automatically picked up by tsugarustart.sh on the next launch - Lets you delete an existing .opts file to reset a game back to defaults.</desc>
+		<developer>worstcase_scenario </developer>
+		<genre>script</genre>
+		<image>./setup_images/optsmaker.png</image>
+	</game>
+	<game>
 		<path>./file_manager.sh</path>
 		<name>File Manager</name>
 		<desc>MC File Manager. NO keyboard required</desc>
