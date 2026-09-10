@@ -1278,11 +1278,19 @@
       ],
       "emulators": [
         {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        },
+        {
           "name": "libretro",
           "cores": [
             {
-              "name": "bluemsx",
-              "default": true
+              "name": "bluemsx"
             },
             {
               "name": "fmsx"
@@ -1313,14 +1321,122 @@
       ],
       "emulators": [
         {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        },
+        {
           "name": "libretro",
           "cores": [
             {
-              "name": "bluemsx",
-              "default": true
+              "name": "bluemsx"
             },
             {
               "name": "fmsx"
+            }
+          ]
+        }
+      ]
+    },
+	 {
+      "name": "msx2+",
+      "fullname": "MSX2+",
+      "manufacturer": "Microsoft",
+      "release": "1988",
+      "hardware": "computer",
+      "path": "/storage/roms/msx2+",
+      "platform": "msx2+",
+      "theme": "msx2+",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cas",
+        ".dsk",
+        ".m3u",
+        ".mx1",
+        ".mx2",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bluemsx"
+            },
+            {
+              "name": "fmsx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "msxturbor",
+      "fullname": "MSX TURBO R",
+      "manufacturer": "Microsoft",
+      "release": "1990",
+      "hardware": "computer",
+      "path": "/storage/roms/msxturbor",
+      "platform": "msxturbor",
+      "theme": "msxturbor",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cas",
+        ".dsk",
+        ".m3u",
+        ".mx1",
+        ".mx2",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+	{
+      "name": "msxlaserdisc",
+      "fullname": "MSX Palcom LaserDisc",
+      "manufacturer": "Pioneer",
+      "release": "1983",
+      "hardware": "computer",
+      "path": "/storage/roms/msxlaserdisc",
+      "platform": "msxlaserdisc",
+      "theme": "msxlaserdisc",
+      "command": "default",
+      "extensions": [
+        ".ogv"
+      ],
+      "emulators": [
+        {
+          "name": "openmsx-ld",
+          "cores": [
+            {
+              "name": "openmsx-ld",
+              "default": true
             }
           ]
         }
@@ -5085,7 +5201,42 @@
 			}
 		]
 	},
-
+{
+		"name": "mvem",
+		"fullname": "Milton Bradley Microvision",
+		"manufacturer": "Milton Bradley",
+		"release": "1979",
+		"hardware": "portable",
+		"path": "/storage/roms/microvsn",
+		"platform": "microvsn",
+		"theme": "microvsn",
+		"command": "default",
+		"extensions": [
+			".bin",
+			".zip",
+			".7z",
+			".cmd"
+		],
+		"emulators": [
+			{
+			"name": "libretro",
+			"cores": [
+				{
+				"name": "mame",
+				"default": true
+				}
+			]
+			},
+			{
+			"name": "mvem",
+			"cores": [
+				{
+				"name": "mvem"
+				}
+			]
+			}
+		]
+	},
 	{
       "name": "multivision",
       "fullname": "Othello Multivision",

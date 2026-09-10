@@ -1,0 +1,47 @@
+# openMSX gptokeyb configuration.
+# I N S T R U C T I O N S :
+#
+# For game-specific key mappings (e.g. F1 for pause, F2 for menu), save a
+# modified copy of this file under the game's name, for example:
+#   /storage/.config/emuelec/configs/openmsx/gptk/1942 (1987)(Compile).gptk
+#
+# If no game-specific file is found, openmsx.gptk from the same folder is used.
+#
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Controller buttons -> keyboard keys
+back = esc
+start = enter
+a = space
+b = lctrl
+x = f1
+y = f12
+# Shoulders/triggers -> keyboard keys
+l1 = pause
+l2 = pageup
+r1 = f9
+r2 = pagedown
+# Select -> enter
+select = enter
+# Analog stick buttons -> mouse buttons
+l3 = mouse_left
+r3 = enter
+# D-pad -> cursor keys
+up = up
+down = down
+left = left
+right = right
+# Left analog as alternative to D-pad
+left_analog_up = up
+left_analog_down = down
+left_analog_left = left
+left_analog_right = right
+# Right analog -> mouse movement
+right_analog_up = mouse_movement_up
+right_analog_down = mouse_movement_down
+right_analog_left = mouse_movement_left
+right_analog_right = mouse_movement_right
+
+mouse_scale = 3600
+mouse_delay = 16
+right_analog_deadzone = 16000
