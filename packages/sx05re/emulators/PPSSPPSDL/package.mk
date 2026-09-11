@@ -20,6 +20,8 @@ PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_EGL=OFF \
                         -DUSING_GLES2=ON \
                         -DUSING_X11_VULKAN=OFF \
+                        -DUSE_WAYLAND_WSI=OFF \
+                        -DUSE_VULKAN_DISPLAY_KHR=OFF \
                         -DUSE_DISCORD=OFF"
 
 if [ ${ARCH} == "aarch64" ]; then

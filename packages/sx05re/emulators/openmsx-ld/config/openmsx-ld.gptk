@@ -1,0 +1,52 @@
+# openMSX Laserdisc (Pioneer PX-7) gptokeyb configuration.
+# I N S T R U C T I O N S :
+#
+# If you have a game with special keys, change the mapping table beneath accordingly.
+#
+# Then SAVE that modified file under the game's name. For Example: Badlands (1983)(Atari).gptk
+#
+# The correct filepath for the game-gptk file is: /storage/.config/emuelec/configs/openmsx/gptk
+#
+# For example: /storage/.config/emuelec/configs/openmsx/gptk/Badlands (1983)(Atari).gptk
+#
+# openMSX will automatically load the respective gptk file when starting the game.
+# If no gptk file is found, the emulator will always use "openmsx-ld.gptk" in /storage/.config/emuelec/configs/openmsx/gptk
+#
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Controller buttons -> keyboard keys
+back = esc
+start = enter
+a = space
+b = lctrl
+x = f1
+y = f12
+# Shoulders/triggers -> keyboard keys
+l1 = pause
+l2 = pageup
+r1 = f9
+r2 = pagedown
+# Select -> enter
+select = enter
+# Analog stick buttons -> mouse buttons
+l3 = mouse_left
+r3 = mouse_right
+# D-pad -> cursor keys
+up = up
+down = down
+left = left
+right = right
+# Left analog as alternative to D-pad
+left_analog_up = up
+left_analog_down = down
+left_analog_left = left
+left_analog_right = right
+# Right analog -> mouse movement
+right_analog_up = mouse_movement_up
+right_analog_down = mouse_movement_down
+right_analog_left = mouse_movement_left
+right_analog_right = mouse_movement_right
+
+mouse_scale = 3600
+mouse_delay = 16
+right_analog_deadzone = 16000

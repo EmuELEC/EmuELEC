@@ -9,14 +9,14 @@ PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/thieman/exa-rs"
 PKG_URL="${PKG_SITE}.git"
 
-PKG_DEPENDS_TARGET="toolchain rust cargo" 
+PKG_DEPENDS_TARGET="toolchain cargo:host" 
 PKG_SECTION="emuelec/libretro"
 PKG_SHORTDESC="exa-rs libretro core (TEC Redshift / EXAPUNKS)"
 PKG_LONGDESC="Libretro core for the TEC Redshift, the fictional handheld from Zachtronics' EXAPUNKS."
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-  #export RUSTC_LINKER=${CC}
+  export RUSTC_LINKER=${CC}
   cargo build --lib --release --target ${TARGET_NAME}
  }
 
