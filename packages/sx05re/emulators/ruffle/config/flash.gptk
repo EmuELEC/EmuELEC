@@ -1,0 +1,51 @@
+# Flash (Ruffle) gptokeyb configuration.
+# I N S T R U C T I O N S :
+#
+# If a game requires a different button layout, save a modified copy of this
+# file under the game's name next to the .swf file. For example:
+#
+# /storage/roms/flash/Alien Hominid.gptk
+#
+# The launcher automatically loads the game-specific .gptk file if found.
+# If no game-specific file exists, this default flash.gptk is used instead.
+#
+# The layout follows the conventions of the Flash era: arrows and WASD for
+# movement, space as the main action, Z and X as the classic action pair, and
+# the mouse on the right stick since many Flash games are point-and-click.
+#
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Face buttons
+a = space
+b = mouse_left
+x = z
+y = x
+# Menu keys
+start = enter
+back = esc
+# Shoulders/triggers
+r1 = mouse_left
+l1 = shift
+l2 = ctrl
+r2 = p
+# Analog stick buttons -> mouse buttons
+l3 = mouse_left
+r3 = mouse_right
+# D-pad -> cursor keys
+up = up
+down = down
+left = left
+right = right
+# Left analog -> WASD, so both movement conventions work out of the box
+left_analog_up = w
+left_analog_down = s
+left_analog_left = a
+left_analog_right = d
+# Right analog -> mouse movement
+right_analog_up = mouse_movement_up
+right_analog_down = mouse_movement_down
+right_analog_left = mouse_movement_left
+right_analog_right = mouse_movement_right
+mouse_scale = 1500
+mouse_delay = 16
+right_analog_deadzone = 16000

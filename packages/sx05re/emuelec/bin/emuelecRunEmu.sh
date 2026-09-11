@@ -349,6 +349,12 @@ case ${PLATFORM} in
                 set_kill_keys "${EMU}"
                 RUNTHIS='${TBASH} fbterm.sh mplayer_video "${ROMNAME}" "${EMU}"'
                 ;;
+		"flash")
+                if [ "${EMU}" = "ruffle" ]; then
+            set_kill_keys "ruffle.aarch64"
+            RUNTHIS='${TBASH} /usr/bin/startruffle.sh "${ROMNAME}"'
+                fi
+                ;;
         "pico8")
                 set_kill_keys "pico8_dyn"
                 RUNTHIS='${TBASH} pico8.sh "${ROMNAME}"'

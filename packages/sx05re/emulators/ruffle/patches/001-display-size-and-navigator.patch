@@ -1,0 +1,96 @@
+diff --git a/src/backends/navigator.rs b/src/backends/navigator.rs
+index 69edc1a..0d94b28 100644
+--- a/src/backends/navigator.rs
++++ b/src/backends/navigator.rs
+@@ -15,2 +15,4 @@ impl NavigatorInterface for ConsoleNavigatorInterface {
+-    fn navigate_to_website(&self, _url: Url) {
+-        unimplemented!()
++    fn navigate_to_website(&self, url: Url) {
++        // Handheld firmwares do not provide a safe browser hand-off here.
++        // Treat navigation requests as a no-op instead of crashing the game.
++        println!("External navigation ignored: {}", url);
+diff --git a/src/main.rs b/src/main.rs
+index 88227a9..e3de7b4 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -23 +23 @@ use ruffle_core::tag_utils::SwfMovie;
+-use ruffle_core::{Player, PlayerBuilder, PlayerEvent, ViewportDimensions};
++use ruffle_core::{Player, PlayerBuilder, PlayerEvent, StageScaleMode, ViewportDimensions};
+@@ -198 +198 @@ const BASE_PATH: &str = "/switch/ruffle";
+-const BASE_PATH: &str = "/home/paulo/Repos/ruffle4consoles/ruffle";
++const BASE_PATH: &str = "ruffle_data";
+@@ -251,6 +251,5 @@ pub fn main() {
+-    if cfg!(target_os = "vita") {
+-        unsafe {
+-            let id = vitasdk_sys::sceKernelGetThreadId();
+-            vitasdk_sys::sceKernelChangeThreadPriority(id, vitasdk_sys::SCE_KERNEL_PROCESS_PRIORITY_USER_HIGH as _);
+-            vitasdk_sys::sceKernelChangeThreadCpuAffinityMask(id, vitasdk_sys::SCE_KERNEL_CPU_MASK_USER_1 as _);
+-        }
++    #[cfg(target_os = "vita")]
++    unsafe {
++        let id = vitasdk_sys::sceKernelGetThreadId();
++        vitasdk_sys::sceKernelChangeThreadPriority(id, vitasdk_sys::SCE_KERNEL_PROCESS_PRIORITY_USER_HIGH as _);
++        vitasdk_sys::sceKernelChangeThreadCpuAffinityMask(id, vitasdk_sys::SCE_KERNEL_CPU_MASK_USER_1 as _);
+@@ -328,0 +328,17 @@ pub fn main() {
++    #[cfg(not(any(target_os = "horizon", target_os = "vita")))]
++    let display_mode = sdl2_video.current_display_mode(0).ok();
++
++    #[cfg(not(any(target_os = "horizon", target_os = "vita")))]
++    let display_width = std::env::var("RUFFLE_HANDHELD_WIDTH")
++        .ok()
++        .and_then(|value| value.parse::<u32>().ok())
++        .or_else(|| display_mode.as_ref().map(|mode| mode.w as u32))
++        .unwrap_or(1280);
++
++    #[cfg(not(any(target_os = "horizon", target_os = "vita")))]
++    let display_height = std::env::var("RUFFLE_HANDHELD_HEIGHT")
++        .ok()
++        .and_then(|value| value.parse::<u32>().ok())
++        .or_else(|| display_mode.as_ref().map(|mode| mode.h as u32))
++        .unwrap_or(720);
++
+@@ -331,2 +347,2 @@ pub fn main() {
+-        width: 1280,
+-        height: 720,
++        width: display_width,
++        height: display_height,
+@@ -336,7 +352,9 @@ pub fn main() {
+-    let sdl2_window = sdl2_video
+-        .window("ruffle4consoles", dimensions.width, dimensions.height)
+-        .opengl()
+-        .resizable()
+-        .position_centered()
+-        .build()
+-        .unwrap();
++    let mut window_builder = sdl2_video.window(
++        "Ruffle Handheld",
++        dimensions.width,
++        dimensions.height,
++    );
++    window_builder.opengl().resizable().position_centered();
++    #[cfg(target_os = "linux")]
++    window_builder.fullscreen_desktop();
++    let sdl2_window = window_builder.build().unwrap();
+@@ -345,0 +364,8 @@ pub fn main() {
++    #[cfg(target_os = "linux")]
++    {
++        let (drawable_width, drawable_height) = sdl2_window.drawable_size();
++        if drawable_width > 0 && drawable_height > 0 {
++            dimensions.width = drawable_width;
++            dimensions.height = drawable_height;
++        }
++    }
+@@ -394 +420 @@ pub fn main() {
+-    let player = PlayerBuilder::new()
++    let mut player_builder = PlayerBuilder::new()
+@@ -403,2 +429,8 @@ pub fn main() {
+-        .with_viewport_dimensions(dimensions.width, dimensions.height, dimensions.scale_factor)
+-        //.with_scale_mode(ruffle_core::StageScaleMode::ShowAll, true)
++        .with_viewport_dimensions(dimensions.width, dimensions.height, dimensions.scale_factor);
++    if std::env::var("RUFFLE_HANDHELD_FORCE_SCALE")
++        .map(|value| value.eq_ignore_ascii_case("showall"))
++        .unwrap_or(false)
++    {
++        player_builder = player_builder.with_scale_mode(StageScaleMode::ShowAll, true);
++    }
++    let player = player_builder

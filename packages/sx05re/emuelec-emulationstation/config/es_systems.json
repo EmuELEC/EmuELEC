@@ -5694,6 +5694,31 @@
       ]
     },
 	{
+      "name": "flash",
+      "fullname": "Adobe Flash Player",
+      "manufacturer": "Macromedia",
+      "release": "1996",
+      "hardware": "computer",
+      "path": "/storage/roms/flash",
+      "platform": "flash",
+      "theme": "flash",
+      "command": "default",
+      "extensions": [
+        ".swf"
+      ],
+      "emulators": [
+        {
+          "name": "ruffle",
+          "cores": [
+            {
+              "name": "ruffle",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+	{
 	  "name": "oricutron",
       "fullname": "Oric Atmos",
       "manufacturer": "Tangerine Computer Systems",

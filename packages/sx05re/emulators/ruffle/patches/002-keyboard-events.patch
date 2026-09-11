@@ -1,0 +1,116 @@
+diff --git a/src/main.rs b/src/main.rs
+index e3de7b4..4f41cc6 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -20 +20,4 @@ use ruffle_core::config::Letterbox;
+-use ruffle_core::events::{GamepadButton, KeyCode, MouseButton, ParseEnumError};
++use ruffle_core::events::{
++    GamepadButton, KeyCode, KeyDescriptor, KeyLocation, LogicalKey, MouseButton,
++    NamedKey, ParseEnumError, PhysicalKey,
++};
+@@ -211,0 +215,74 @@ struct Config {
++/// Translate an SDL key press into Ruffle's key descriptor. Only the keys
++/// Flash content commonly uses are mapped; anything else is ignored. The
++/// character is derived from the scancode so that no keycode conversion is
++/// needed, which keeps this independent of the sdl2 crate version.
++fn key_descriptor(scancode: Option<sdl2::keyboard::Scancode>) -> Option<KeyDescriptor> {
++    use sdl2::keyboard::Scancode as S;
++
++    let (physical, logical) = match scancode? {
++        S::Left => (PhysicalKey::ArrowLeft, LogicalKey::Named(NamedKey::ArrowLeft)),
++        S::Right => (PhysicalKey::ArrowRight, LogicalKey::Named(NamedKey::ArrowRight)),
++        S::Up => (PhysicalKey::ArrowUp, LogicalKey::Named(NamedKey::ArrowUp)),
++        S::Down => (PhysicalKey::ArrowDown, LogicalKey::Named(NamedKey::ArrowDown)),
++        S::Space => (PhysicalKey::Space, LogicalKey::Character(' ')),
++        S::Return | S::KpEnter => (PhysicalKey::Enter, LogicalKey::Named(NamedKey::Enter)),
++        S::Escape => (PhysicalKey::Escape, LogicalKey::Named(NamedKey::Escape)),
++        S::Tab => (PhysicalKey::Tab, LogicalKey::Named(NamedKey::Tab)),
++        S::Backspace => (PhysicalKey::Backspace, LogicalKey::Named(NamedKey::Backspace)),
++        S::LShift => (PhysicalKey::ShiftLeft, LogicalKey::Named(NamedKey::Shift)),
++        S::RShift => (PhysicalKey::ShiftRight, LogicalKey::Named(NamedKey::Shift)),
++        S::LCtrl => (PhysicalKey::ControlLeft, LogicalKey::Named(NamedKey::Control)),
++        S::RCtrl => (PhysicalKey::ControlRight, LogicalKey::Named(NamedKey::Control)),
++        S::LAlt => (PhysicalKey::AltLeft, LogicalKey::Named(NamedKey::Alt)),
++        S::RAlt => (PhysicalKey::AltRight, LogicalKey::Named(NamedKey::Alt)),
++        S::Home => (PhysicalKey::Home, LogicalKey::Named(NamedKey::Home)),
++        S::End => (PhysicalKey::End, LogicalKey::Named(NamedKey::End)),
++        S::PageUp => (PhysicalKey::PageUp, LogicalKey::Named(NamedKey::PageUp)),
++        S::PageDown => (PhysicalKey::PageDown, LogicalKey::Named(NamedKey::PageDown)),
++        S::Delete => (PhysicalKey::Delete, LogicalKey::Named(NamedKey::Delete)),
++        S::A => (PhysicalKey::KeyA, LogicalKey::Character('a')),
++        S::B => (PhysicalKey::KeyB, LogicalKey::Character('b')),
++        S::C => (PhysicalKey::KeyC, LogicalKey::Character('c')),
++        S::D => (PhysicalKey::KeyD, LogicalKey::Character('d')),
++        S::E => (PhysicalKey::KeyE, LogicalKey::Character('e')),
++        S::F => (PhysicalKey::KeyF, LogicalKey::Character('f')),
++        S::G => (PhysicalKey::KeyG, LogicalKey::Character('g')),
++        S::H => (PhysicalKey::KeyH, LogicalKey::Character('h')),
++        S::I => (PhysicalKey::KeyI, LogicalKey::Character('i')),
++        S::J => (PhysicalKey::KeyJ, LogicalKey::Character('j')),
++        S::K => (PhysicalKey::KeyK, LogicalKey::Character('k')),
++        S::L => (PhysicalKey::KeyL, LogicalKey::Character('l')),
++        S::M => (PhysicalKey::KeyM, LogicalKey::Character('m')),
++        S::N => (PhysicalKey::KeyN, LogicalKey::Character('n')),
++        S::O => (PhysicalKey::KeyO, LogicalKey::Character('o')),
++        S::P => (PhysicalKey::KeyP, LogicalKey::Character('p')),
++        S::Q => (PhysicalKey::KeyQ, LogicalKey::Character('q')),
++        S::R => (PhysicalKey::KeyR, LogicalKey::Character('r')),
++        S::S => (PhysicalKey::KeyS, LogicalKey::Character('s')),
++        S::T => (PhysicalKey::KeyT, LogicalKey::Character('t')),
++        S::U => (PhysicalKey::KeyU, LogicalKey::Character('u')),
++        S::V => (PhysicalKey::KeyV, LogicalKey::Character('v')),
++        S::W => (PhysicalKey::KeyW, LogicalKey::Character('w')),
++        S::X => (PhysicalKey::KeyX, LogicalKey::Character('x')),
++        S::Y => (PhysicalKey::KeyY, LogicalKey::Character('y')),
++        S::Z => (PhysicalKey::KeyZ, LogicalKey::Character('z')),
++        S::Num0 => (PhysicalKey::Digit0, LogicalKey::Character('0')),
++        S::Num1 => (PhysicalKey::Digit1, LogicalKey::Character('1')),
++        S::Num2 => (PhysicalKey::Digit2, LogicalKey::Character('2')),
++        S::Num3 => (PhysicalKey::Digit3, LogicalKey::Character('3')),
++        S::Num4 => (PhysicalKey::Digit4, LogicalKey::Character('4')),
++        S::Num5 => (PhysicalKey::Digit5, LogicalKey::Character('5')),
++        S::Num6 => (PhysicalKey::Digit6, LogicalKey::Character('6')),
++        S::Num7 => (PhysicalKey::Digit7, LogicalKey::Character('7')),
++        S::Num8 => (PhysicalKey::Digit8, LogicalKey::Character('8')),
++        S::Num9 => (PhysicalKey::Digit9, LogicalKey::Character('9')),
++        _ => return None,
++    };
++
++    Some(KeyDescriptor {
++        physical_key: physical,
++        logical_key: logical,
++        key_location: KeyLocation::Standard,
++    })
++}
++
+@@ -522,0 +600,30 @@ pub fn main() {
++                // Keyboard: on handhelds the pad is usually translated into
++                // key presses by an external mapper (gptokeyb), so Flash
++                // content expecting arrows or letters needs these events.
++                sdl2::event::Event::KeyDown {
++                    scancode,
++                    repeat: false,
++                    ..
++                } => {
++                    if let Some(key) = key_descriptor(scancode) {
++                        let logical = key.logical_key;
++                        player
++                            .lock()
++                            .unwrap()
++                            .handle_event(PlayerEvent::KeyDown { key });
++                        if let LogicalKey::Character(c) = logical {
++                            player
++                                .lock()
++                                .unwrap()
++                                .handle_event(PlayerEvent::TextInput { codepoint: c });
++                        }
++                    }
++                }
++                sdl2::event::Event::KeyUp { scancode, .. } => {
++                    if let Some(key) = key_descriptor(scancode) {
++                        player
++                            .lock()
++                            .unwrap()
++                            .handle_event(PlayerEvent::KeyUp { key });
++                    }
++                }
