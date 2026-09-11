@@ -5904,6 +5904,31 @@
 	]
 	},
     {
+	"name": "dreamm",
+	"fullname": "Dreamm",
+	"manufacturer": "Aaron Giles",
+	"release": "2026",
+	"hardware": "computer",
+	"path": "/storage/roms/dreamm",
+	"platform": "dreamm",
+	"theme": "dreamm",
+	"command": "default",
+	"extensions": [
+    ".dreamm"
+	],
+	"emulators": [
+    {
+      "name": "dreamm",
+      "cores": [
+			{
+          "name": "dreamm",
+          "default": true
+			}
+		]
+		}
+	]
+	},
+    {
       "name": "bk",
       "fullname": "Electronika",
       "path": "/storage/roms/bk",
