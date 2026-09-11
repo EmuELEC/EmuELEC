@@ -5845,7 +5845,7 @@
 		}
 	]
 	},
-	{
+    {
 	"name": "gp32",
 	"fullname": "GP 32",
 	"manufacturer": "Game Park",
@@ -5856,7 +5856,7 @@
 	"theme": "gp32",
 	"command": "default",
 	"extensions": [
-    ".smc",
+  ".smc",
 	".cmd",
 	".fxe",
 	".fpk",
@@ -5867,12 +5867,40 @@
       "name": "libretro",
       "cores": [
 			{
-          "name": "lowresnx",
+          "name": "gp32emu",
           "default": true
 			},
 			{
           "name": "mame"
             }
+		]
+		}
+	]
+	},
+	{
+	"name": "native32",
+	"fullname": "Native 32",
+	"manufacturer": "Sunplus",
+	"release": "",
+	"hardware": "hardware",
+	"path": "/storage/roms/native32",
+	"platform": "native32",
+	"theme": "native32",
+	"command": "default",
+	"extensions": [
+   ".smf",
+	".sgm",
+	".ssl",
+	".zip"
+	],
+	"emulators": [
+    {
+      "name": "libretro",
+      "cores": [
+			{
+          "name": "native32emu",
+          "default": true
+			}
 		]
 		}
 	]
