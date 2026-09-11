@@ -274,6 +274,7 @@
 LIBRETRO_CORES="2048 \
 81 \
 a5200 \
+amiarcadia \
 arduous \
 atari800 \
 b2 \
@@ -296,6 +297,7 @@ dosbox-svn \
 easyrpg \
 emuscv \
 ep128emu \
+exa-rs \
 fake_08 \
 fbalpha2012 \
 fbneo \
@@ -316,6 +318,7 @@ genesis_plus_gx_cart_special \
 genesis-plus-gx-wide \
 geolith \
 gme \
+gp32emu \
 gpsp \
 gw-libretro \
 handy \
@@ -335,11 +338,13 @@ mu \
 mupen64plus \
 neocd_libretro \
 nestopia \
+numero \
 nxengine \
 o2em \
 opera \
 parallel-n64 \
 pcsx_rearmed \
+pd777 \
 picodrive \
 pocketcdg \
 pokemini \
@@ -347,6 +352,7 @@ prboom \
 prosystem \
 puae \
 puae2021 \
+pzretro \
 px68k \
 reminiscence \
 sameboy \
@@ -371,6 +377,7 @@ vbam \
 vecx \
 vice \
 vircon32 \
+virtualxt \
 wasm4 \
 yabasanshiro"
 

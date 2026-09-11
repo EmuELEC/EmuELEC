@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present EmuELEC Team (https://github.com/EmuELEC/EmuELEC)
 
 PKG_NAME="bigpemu"
-PKG_VERSION="121"
-PKG_SHA256="ac524e91fa6e90d9256d247d410279315fff9b61b6317c5f23172225139cceb1"
+PKG_VERSION="122"
+PKG_SHA256="afacd7254baa5d2858146651e1e2b7f7cc7beb7f0ea65cdc62a87c296170f646"
 PKG_ARCH="aarch64"
 PKG_LICENSE="Proprietary"
 PKG_SITE="https://www.richwhitehouse.com/jaguar"

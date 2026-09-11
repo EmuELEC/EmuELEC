@@ -1,0 +1,56 @@
+# MEMU gptokeyb configuration (Memotech MTX).
+#
+# I N S T R U C T I O N S :
+#
+# If you have a game with special keys (for example Q for UP, A for DOWN etc.), change the mapping table beneath accordingly.
+#
+# Then SAVE that modified file under the game's name. For Example: Kilopede.gptk
+#
+# The correct filepath for the game-gptk file is: /storage/.config/emuelec/configs/memu/gptk
+#
+# For example: /storage/.config/emuelec/configs/memu/gptk/Kilopede.gptk
+#
+# MEMU will automatically load the respective gptk file when starting the game.
+# If no gptk file is found, the emulator will always use "memu.gptk" in /storage/.config/emuelec/configs/memu/gptk
+#
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Controller buttons -> keyboard keys 
+# HOME key is the FIRE button
+
+back  = space
+start = enter
+a = home
+b = 0
+x = 1
+y = 2
+
+# Shoulders/triggers/sticks -> keyboard keys
+
+l1 = z
+l2 = n
+l3 = m
+r1 = q
+r2 = a
+r3 = p
+
+# D-pad -> cursor keys
+
+up = up
+down = down
+left = left
+right = right
+
+# Left analog as alternative to D-pad
+
+left_analog_up = up
+left_analog_down = down
+left_analog_left = left
+left_analog_right = right
+
+# Right analog
+
+right_analog_up = up
+right_analog_down = down
+right_analog_left = left
+right_analog_right = right

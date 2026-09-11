@@ -1,9 +1,9 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="cargo"
 PKG_VERSION="$(get_pkg_version rust)"
-PKG_LICENSE="MIT"
+PKG_LICENSE="MIT OR Apache-2.0"
 PKG_SITE="https://www.rust-lang.org"
 PKG_DEPENDS_HOST="openssl:host rust:host"
 PKG_DEPENDS_UNPACK="cargo-snapshot rust"

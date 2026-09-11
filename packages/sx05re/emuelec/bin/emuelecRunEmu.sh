@@ -155,7 +155,12 @@ emuelec-utils init_app_video "${PLATFORM}" "${ROMNAME}"
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 echo "${CONTROLLERCONFIG}" | tr -d '"' > "/tmp/controllerconfig.txt"
 
-if [ -z ${LIBRETRO} ] && [ -z ${RETRORUN} ]; then
+# .bighard files always go to BigInstinct, regardless of platform/emu choice
+if [[ "${ROMNAME,,}" == *.bighard ]]; then
+    set_kill_keys "biginstinct"
+    RUNTHIS='${TBASH} biginstinctstart.sh "${ROMNAME}"'
+
+elif [ -z ${LIBRETRO} ] && [ -z ${RETRORUN} ]; then
 
 GPTOKEYB=$(get_ee_setting "gptokeyb" "${PLATFORM}" "${BASEROMNAME}")
 VIRTUAL_KB=
@@ -284,6 +289,18 @@ case ${PLATFORM} in
 				RUNTHIS='${TBASH} simcoupestart.sh "${ROMNAME}"'
                 fi
                 ;;	
+		"msx"|"msx2"|"msx2+"|"msxturbor")
+				if [ "${EMU}" = "openmsx" ]; then
+				set_kill_keys "openmsx"
+				RUNTHIS='${TBASH} startopenmsx.sh "${ROMNAME}"'
+				fi
+				;;
+		"msxlaserdisc")
+				if [ "${EMU}" = "openmsx-ld" ]; then
+				set_kill_keys "openmsx-ld"
+				RUNTHIS='${TBASH} startopenmsx-ld.sh "${ROMNAME}"'
+				fi
+				;;
         "daphne")
                 if [ "${EMU}" = "HYPSEUS" ]; then
             set_kill_keys "hypseus"
@@ -381,30 +398,18 @@ case ${PLATFORM} in
             RUNTHIS='${TBASH} oricutronstart.sh "${ROMNAME}"'
         fi
 		;;	
-        "dragon32"|"dragon64")
-			if [ "${EMU}" = "xroar" ]; then
-			set_kill_keys "xroar.aarch64"
-			RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
-		fi
-		;;
-		"coco")
-			if [ "${EMU}" = "xroar" ]; then
-			set_kill_keys "xroar.aarch64"
-            RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
-		fi
-		;;
-		"coco3")
-			if [ "${EMU}" = "xroar" ]; then
-			set_kill_keys "xroar.aarch64"
-		    RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
-		fi
-		;;
-		"mc10")
-			if [ "${EMU}" = "xroar" ]; then
-			set_kill_keys "xroar.aarch64"
-            RUNTHIS='${TBASH} /usr/bin/xroar.sh "${ROMNAME}"'
-		fi
-		;;
+		"mtx512")
+        if [ "${EMU}" = "memu" ]; then
+            set_kill_keys "memu"
+            RUNTHIS='${TBASH} memustart.sh "${ROMNAME}"'
+        fi
+		;;	
+		"dragon32"|"dragon64"|"mc10"|"coco"|"coco3")
+        if [ "${EMU}" = "xroar" ]; then
+            set_kill_keys "xroar"
+            RUNTHIS='${TBASH} /usr/bin/xroarstart.sh "${ROMNAME}"'
+        fi
+     	;;
 		"saturn")
         if [ "${EMU}" = "yabasanshiroSA" ]; then
             set_kill_keys "yabasanshiro"

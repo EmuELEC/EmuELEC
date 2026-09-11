@@ -1,42 +1,48 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 PKG_NAME="xroar"
-PKG_VERSION="2025-07-16"
-PKG_SHA256="25731a74cc9d5888b318c7b6be2dcf981b37cc95138e3dcf4c4d91402544faea"
+PKG_VERSION="1.11"
+PKG_SHA256="70270805ebd52c0b62237cc2f28b32b5c7df9764d10a7c7190de584cfc6e95af"
 PKG_ARCH="aarch64"
 PKG_LICENSE="GPL-3.0-or-later"
-PKG_SITE="https://github.com/PortsMaster/PortMaster-New"
-PKG_URL="https://github.com/PortsMaster/PortMaster-New/releases/download/2025-07-16_2108/xroar.zip"
-PKG_SOURCE_NAME="xroar.zip"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_SITE="https://www.6809.org.uk/xroar/"
+PKG_URL="https://www.6809.org.uk/xroar/dl/xroar-${PKG_VERSION}.tar.gz"
+PKG_DEPENDS_TARGET="toolchain SDL2 libpng zlib"
 PKG_SECTION="emuelec/emulators"
 PKG_SHORTDESC="XRoar - Dragon/CoCo Emulator"
-PKG_TOOLCHAIN="manual"
+PKG_TOOLCHAIN="autotools"
 
-unpack() {
-  mkdir -p ${PKG_BUILD}
-  unzip -q ${SOURCES}/${PKG_NAME}/${PKG_SOURCE_NAME} -d ${PKG_BUILD}
+configure_target() {
+  cd ${PKG_BUILD}
+  ./configure \
+    --host=${TARGET_NAME} \
+    --prefix=/usr \
+    --enable-dragon \
+    --enable-coco3 \
+    --enable-mc10 \
+    --without-gtk2 \
+    --without-gtk3 \
+    --without-gtkgl \
+    --without-cocoa \
+    --without-oss \
+    --without-pulse \
+    --without-coreaudio \
+    --without-x
+}
 
-  if [ -d "${PKG_BUILD}/xroar" ]; then
-    mv ${PKG_BUILD}/xroar/* ${PKG_BUILD}/
-    rmdir ${PKG_BUILD}/xroar
-  fi
+make_target() {
+  cd ${PKG_BUILD}
+  make
 }
 
 makeinstall_target() {
+  cd ${PKG_BUILD}
+  make DESTDIR=${INSTALL} install
 
-  mkdir -p ${INSTALL}/usr/bin
-  cp ${PKG_BUILD}/xroar.aarch64 ${INSTALL}/usr/bin/xroar.aarch64
-  chmod +x ${INSTALL}/usr/bin/xroar.aarch64
-
-  cp ${PKG_DIR}/scripts/xroar.sh ${INSTALL}/usr/bin/xroar.sh
-  chmod +x ${INSTALL}/usr/bin/xroar.sh
+  cp ${PKG_DIR}/scripts/xroarstart.sh ${INSTALL}/usr/bin/xroarstart.sh
+  chmod +x ${INSTALL}/usr/bin/xroarstart.sh
 
   mkdir -p ${INSTALL}/usr/config/emuelec/configs/xroar
-  cp -r ${PKG_BUILD}/libs.aarch64 ${INSTALL}/usr/config/emuelec/configs/xroar/
-  cp -r ${PKG_BUILD}/gptk ${INSTALL}/usr/config/emuelec/configs/xroar/
-  cp ${PKG_BUILD}/xroar.conf ${INSTALL}/usr/config/emuelec/configs/xroar/
-  cp -r ${PKG_BUILD}/fonts ${INSTALL}/usr/config/emuelec/configs/xroar/
 
   if [ -f "${PKG_DIR}/config/xroar.gptk" ]; then
     mkdir -p ${INSTALL}/usr/config/emuelec/configs/xroar/gptk

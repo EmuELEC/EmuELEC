@@ -34,15 +34,23 @@
 		<genre>script</genre>
 		<image>./setup_images/portmaster.png</image>
 	</game>
-		<game>
+	<game>
 		<path>./eka-install.sh</path>
 		<name>EKA2L1 Commander</name>
-		<desc>Use this tool to setup eka2l1, install SIS/SISX apps and install/import firmware. You can also show and change the active device, create `.uid` launcher files for installed applications, and convert selected device folders and their contents to lowercase so EKA2L1 can access case-sensitive paths correctly. For the firmware installation, you WILL need both a .rpkg and a .rom file (for example sym.rpkg and sym.rom) in one of the folders on your device (for example /storage/bios). In order to run N-GAGE 2.0 games, you need to install the N-Gage Installer, which must be a .sis-file. Afterwards you need to copy your .ngage files to /storage/.config/eka2l1/data/drives/e/n-gage. Then create an empty "Launch.ngage" file in /storage/roms/ngage and start it in Emulationstation. The N-GAGE-Games-app will start up and list all the ngage files that you then can install and start via the menu. If you have created .uid files, each game or app can be started individually through the gamelist.</desc>
+		<desc>Controller-driven management tool for the eka2l1 Symbian emulator on EmuELEC. Features: initial setup, firmware installation, SIS/SISX game installation with platform detection, UID launcher and gamelist.xml generation, device management, app listing and uninstallation, and a complete reset option.</desc>
 		<developer>worstcase_scenario </developer>
 		<genre>script</genre>
 		<image>./setup_images/ekainstall.png</image>
 	</game>
-		<game>
+	<game>
+		<path>./dreamm-install.sh</path>
+		<name>DREAMM Commander</name>
+		<desc>Controller-driven management tool for the standalone DREAMM emulator on EmuELEC. Features: install games from folders or disk images, create .dreamm entries for EmulationStation and manually build .dreamm files for unrecognized games.</desc>
+		<developer>worstcase_scenario </developer>
+		<genre>script</genre>
+		<image>./setup_images/dreammer.png</image>
+	</game>
+	<game>
 		<path>./macrosetup.sh</path>
 		<name>Macro Setup</name>
 		<desc>Define a trigger button on your controller that executes a macro of button presses. When you are finished recording the button input, wait three seconds. The configuration is being saved in macro_config.json</desc>

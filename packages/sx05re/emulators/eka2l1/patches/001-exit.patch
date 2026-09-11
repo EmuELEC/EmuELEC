@@ -1,0 +1,123 @@
+--- a/src/emu/sdl2/src/main.cpp
++++ b/src/emu/sdl2/src/main.cpp
+@@ -697,7 +697,24 @@
+             if (registry) {
+                 epoc::apa::command_line cmd;
+                 cmd.launch_cmd_ = epoc::apa::command_create;
+-                svr->launch_app(*registry, cmd, nullptr, nullptr);
++                emu->app_exited.store(false);
++                svr->launch_app(*registry, cmd, nullptr, [emu](kernel::process *pr) {
++                    if (!pr) return;
++                    std::thread([emu, pr]() {
++                        while (!emu->should_emu_quit.load()) {
++                            if (pr->get_exit_type() != kernel::entity_exit_type::pending) {
++                                emu->app_exited.store(true);
++                                break;
++                            }
++                            kernel::thread *thr = pr->get_primary_thread();
++                            if (thr && static_cast<int>(thr->current_state()) == 4) {
++                                emu->app_exited.store(true);
++                                break;
++                            }
++                            std::this_thread::sleep_for(std::chrono::milliseconds(50));
++                        }
++                    }).detach();
++                });
+                 emu->app_launch_from_command_line = true;
+                 return true;
+             }
+@@ -713,7 +730,25 @@
+                 *err = "Unable to launch process: " + tokstr;
+                 return false;
+             }
++            emu->app_exited.store(false);
++
+             pr->run();
++
++        std::thread([emu, pr]() mutable {
++            while (!emu->should_emu_quit.load()) {
++                if (pr->get_exit_type() != kernel::entity_exit_type::pending) {
++                    emu->app_exited.store(true);
++                    break;
++                }
++                kernel::thread *thr = pr->get_primary_thread();
++                if (thr && static_cast<int>(thr->current_state()) == 4) {
++                    emu->app_exited.store(true);
++                    break;
++                }
++                std::this_thread::sleep_for(std::chrono::milliseconds(50));
++            }
++        }).detach();
++
+             emu->app_launch_from_command_line = true;
+             return true;
+         }
+@@ -724,7 +759,24 @@
+             if (common::ucs2_to_utf8(reg.mandatory_info.long_caption.to_std_string(nullptr)) == tokstr) {
+                 epoc::apa::command_line cmd;
+                 cmd.launch_cmd_ = epoc::apa::command_create;
+-                svr->launch_app(reg, cmd, nullptr, nullptr);
++                emu->app_exited.store(false);
++                svr->launch_app(reg, cmd, nullptr, [emu](kernel::process *pr) {
++                    if (!pr) return;
++                    std::thread([emu, pr]() {
++                        while (!emu->should_emu_quit.load()) {
++                            if (pr->get_exit_type() != kernel::entity_exit_type::pending) {
++                                emu->app_exited.store(true);
++                                break;
++                            }
++                            kernel::thread *thr = pr->get_primary_thread();
++                            if (thr && static_cast<int>(thr->current_state()) == 4) {
++                                emu->app_exited.store(true);
++                                break;
++                            }
++                            std::this_thread::sleep_for(std::chrono::milliseconds(50));
++                        }
++                    }).detach();
++                });
+                 emu->app_launch_from_command_line = true;
+                 return true;
+             }
+@@ -775,6 +827,27 @@
+         return false;
+     }
+ 
++    static bool remove_handler(common::arg_parser *parser, void *userdata, std::string *err) {
++        const char *tok = parser->next_token();
++        if (!tok) { *err = "No UID specified. Usage: --remove 0x<uid>"; return false; }
++        std::string tokstr = tok;
++        std::uint32_t uid = 0;
++        try {
++            if (tokstr.length() > 2 && tokstr.substr(0, 2) == "0x")
++                uid = static_cast<std::uint32_t>(std::stoul(tokstr.substr(2), nullptr, 16));
++            else
++                uid = static_cast<std::uint32_t>(std::stoul(tokstr, nullptr, 10));
++        } catch (...) { *err = "Invalid UID: " + tokstr; return false; }
++        auto *emu = reinterpret_cast<emulator_state *>(userdata);
++        manager::packages *pkgmngr = emu->symsys->get_packages();
++        if (!pkgmngr) { *err = "Package manager not available"; return false; }
++        package::object *pkg = pkgmngr->package(uid);
++        if (!pkg) { *err = "No installed package found with UID " + tokstr; return false; }
++        if (!pkgmngr->uninstall_package(*pkg)) { *err = "Uninstall failed for UID " + tokstr; return false; }
++        std::cout << "Package uninstalled: " << tokstr << std::endl;
++        return false;
++    }
++
+     static bool install_device_handler(common::arg_parser *parser, void *userdata, std::string *err) {
+         const char *rpkg_path = parser->next_token();
+         if (!rpkg_path) {
+@@ -1539,6 +1612,7 @@
+     parser.add("--app, -a, --run", "Run an app by name, UID (0x...), or virtual path", eka2l1::sdl::app_run_handler);
+     parser.add("--device, -dvc", "Set device by firmware code", eka2l1::sdl::device_set_handler);
+     parser.add("--install, -i", "Install a SIS package", eka2l1::sdl::install_handler);
++    parser.add("--remove, --uninstall", "Uninstall a package by UID (0x...)", eka2l1::sdl::remove_handler);
+     parser.add("--installdevice", "Install device from RPKG + ROM files", eka2l1::sdl::install_device_handler);
+     parser.add("--mount, -m", "Mount a folder/zip as Game Card ROM on E:", eka2l1::sdl::mount_card_handler);
+ 
+@@ -1629,4 +1703,4 @@
+ 
+     SDL_Quit();
+     return 0;
+-}
++}
+\ No newline at end of file

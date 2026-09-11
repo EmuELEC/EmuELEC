@@ -90,6 +90,7 @@
       "extensions": [
         ".7z",
         ".cmd",
+		".bighard",
         ".zip"
       ],
       "emulators": [
@@ -144,6 +145,7 @@
       "extensions": [
         ".7z",
         ".cmd",
+		".bighard",
         ".zip"
       ],
       "emulators": [
@@ -1047,6 +1049,7 @@
         ".sh",
         ".zip",
         ".iso",
+		".img",
         ".cue"
       ],
       "emulators": [
@@ -1067,6 +1070,9 @@
             },
             {
               "name": "dosbox_svn"
+            },
+            {
+              "name": "virtualxt"
             }
           ]
         }
@@ -1221,6 +1227,7 @@
       "command": "default",
       "extensions": [
         ".7z",
+		".bighard",
         ".zip"
       ],
       "emulators": [
@@ -1271,11 +1278,19 @@
       ],
       "emulators": [
         {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        },
+        {
           "name": "libretro",
           "cores": [
             {
-              "name": "bluemsx",
-              "default": true
+              "name": "bluemsx"
             },
             {
               "name": "fmsx"
@@ -1306,14 +1321,122 @@
       ],
       "emulators": [
         {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        },
+        {
           "name": "libretro",
           "cores": [
             {
-              "name": "bluemsx",
-              "default": true
+              "name": "bluemsx"
             },
             {
               "name": "fmsx"
+            }
+          ]
+        }
+      ]
+    },
+	 {
+      "name": "msx2+",
+      "fullname": "MSX2+",
+      "manufacturer": "Microsoft",
+      "release": "1988",
+      "hardware": "computer",
+      "path": "/storage/roms/msx2+",
+      "platform": "msx2+",
+      "theme": "msx2+",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cas",
+        ".dsk",
+        ".m3u",
+        ".mx1",
+        ".mx2",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "bluemsx"
+            },
+            {
+              "name": "fmsx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "msxturbor",
+      "fullname": "MSX TURBO R",
+      "manufacturer": "Microsoft",
+      "release": "1990",
+      "hardware": "computer",
+      "path": "/storage/roms/msxturbor",
+      "platform": "msxturbor",
+      "theme": "msxturbor",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".cas",
+        ".dsk",
+        ".m3u",
+        ".mx1",
+        ".mx2",
+        ".rom",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "openmsx",
+          "cores": [
+            {
+              "name": "openmsx",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+	{
+      "name": "msxlaserdisc",
+      "fullname": "MSX Palcom LaserDisc",
+      "manufacturer": "Pioneer",
+      "release": "1983",
+      "hardware": "computer",
+      "path": "/storage/roms/msxlaserdisc",
+      "platform": "msxlaserdisc",
+      "theme": "msxlaserdisc",
+      "command": "default",
+      "extensions": [
+        ".ogv"
+      ],
+      "emulators": [
+        {
+          "name": "openmsx-ld",
+          "cores": [
+            {
+              "name": "openmsx-ld",
+              "default": true
             }
           ]
         }
@@ -3827,6 +3950,7 @@
         ".ngage",
 		".symbian",
 		".zip",
+		".uid",
         ".sis"
       ],
       "emulators": [
@@ -4251,6 +4375,31 @@
       ]
     },
 	{
+      "name": "redshift",
+      "fullname": "TEC Redshift",
+      "manufacturer": "",
+      "release": "",
+      "hardware": "portable",
+      "path": "/storage/roms/redshift",
+      "platform": "redshift",
+      "theme": "redshift",
+      "command": "default",
+      "extensions": [
+        ".png"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "exa",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+	{
       "name": "wasm4",
       "fullname": "Wasm-4",
       "manufacturer": "Aduros",
@@ -4540,6 +4689,7 @@
       "extensions": [
         ".cmd",
 		".zip",
+		".bin",
 		".7z"
       ],
       "emulators": [
@@ -4547,8 +4697,40 @@
           "name": "libretro",
           "cores": [
             {
-              "name": "mame",
+              "name": "amiarcadia",
               "default": true
+            },
+			{
+              "name": "mame"
+            }
+          ]
+        }
+      ]
+    },
+	{
+      "name": "tvgc",
+      "fullname": "Elektor TV Games Computer",
+      "manufacturer": "Elektor",
+      "release": "1979",
+      "hardware": "computer",
+      "path": "/storage/roms/tvgc",
+      "platform": "tvgc",
+      "theme": "tvgc",
+      "command": "default",
+      "extensions": [
+        ".tvc",
+		".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "amiarcadia",
+              "default": true
+            },
+			{
+              "name": "mame"
             }
           ]
         }
@@ -4645,7 +4827,7 @@
     },
 	{
       "name": "archimedes",
-      "fullname": "Archimede",
+      "fullname": "Archimedes",
       "manufacturer": "Acorn Computers",
       "release": "1987",
       "hardware": "computer",
@@ -4859,8 +5041,11 @@
           "name": "libretro",
           "cores": [
             {
-              "name": "mame",
+              "name": "amiarcadia",
               "default": true
+            },
+			{
+              "name": "mame"
             }
           ]
         }
@@ -4953,6 +5138,32 @@
       ]
     },
 	{
+      "name": "ti83",
+      "fullname": "Texas Instruments TI-83",
+      "manufacturer": "Texas Instruments",
+      "release": "1996",
+      "hardware": "computer",
+      "path": "/storage/roms/ti83",
+      "platform": "ti83",
+      "theme": "ti83",
+      "command": "default",
+      "extensions": [
+        ".8xp",
+		".8xk"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "numero",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+	{
 		"name": "ti99",
 		"fullname": "Texas Instruments TI-99/4A",
 		"manufacturer": "Texas Instruments",
@@ -4990,7 +5201,42 @@
 			}
 		]
 	},
-
+{
+		"name": "mvem",
+		"fullname": "Milton Bradley Microvision",
+		"manufacturer": "Milton Bradley",
+		"release": "1979",
+		"hardware": "portable",
+		"path": "/storage/roms/microvsn",
+		"platform": "microvsn",
+		"theme": "microvsn",
+		"command": "default",
+		"extensions": [
+			".bin",
+			".zip",
+			".7z",
+			".cmd"
+		],
+		"emulators": [
+			{
+			"name": "libretro",
+			"cores": [
+				{
+				"name": "mame",
+				"default": true
+				}
+			]
+			},
+			{
+			"name": "mvem",
+			"cores": [
+				{
+				"name": "mvem"
+				}
+			]
+			}
+		]
+	},
 	{
       "name": "multivision",
       "fullname": "Othello Multivision",
@@ -5070,6 +5316,31 @@
           "cores": [
             {
               "name": "genesis_plus_gx",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+		{
+      "name": "puzzlescript",
+      "fullname": "PuzzleScript",
+      "manufacturer": "",
+      "release": "",
+      "hardware": "computer",
+      "path": "/storage/roms/puzzlescript",
+      "platform": "puzzlescript",
+      "theme": "puzzlescript",
+      "command": "default",
+      "extensions": [
+        ".pz"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "puzzlescript",
               "default": true
             }
           ]
@@ -5189,6 +5460,14 @@
       "command": "default",
       "extensions": [
         ".cas",
+        ".c10",
+        ".bas",
+        ".asc",
+        ".rom",
+        ".ccc",
+        ".os9",
+        ".dmk",
+        ".bin",
         ".wav",
         ".k7",
         ".vdk",
@@ -5230,6 +5509,14 @@
       "command": "default",
       "extensions": [
         ".cas",
+        ".c10",
+        ".bas",
+        ".asc",
+        ".rom",
+        ".ccc",
+        ".os9",
+        ".dmk",
+        ".bin",
         ".wav",
         ".k7",
         ".vdk",
@@ -5271,6 +5558,14 @@
       "command": "default",
       "extensions": [
         ".cas",
+        ".c10",
+        ".bas",
+        ".asc",
+        ".rom",
+        ".ccc",
+        ".os9",
+        ".dmk",
+        ".bin",
         ".wav",
         ".k7",
         ".vdk",
@@ -5312,6 +5607,14 @@
       "command": "default",
       "extensions": [
         ".cas",
+        ".c10",
+        ".bas",
+        ".asc",
+        ".rom",
+        ".ccc",
+        ".os9",
+        ".dmk",
+        ".bin",
         ".wav",
         ".k7",
         ".vdk",
@@ -5352,8 +5655,20 @@
       "theme": "mc10",
       "command": "default",
       "extensions": [
+        ".cas",
         ".c10",
+        ".bas",
+        ".asc",
+        ".rom",
+        ".ccc",
+        ".os9",
+        ".dmk",
+        ".bin",
+        ".wav",
         ".k7",
+        ".vdk",
+        ".jvc",
+        ".dsk",
         ".cmd",
         ".zip",
         ".7z"
@@ -5400,6 +5715,41 @@
           "cores": [
             {
               "name": "oricutron",
+              "default": true
+            }
+          ]
+        },
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "mame"
+            }
+          ]
+        }
+      ]
+    },
+	{
+	  "name": "mtx512",
+      "fullname": "Memotech MTX 512",
+      "manufacturer": "Memotech",
+      "release": "1984",
+      "hardware": "computer",
+      "path": "/storage/roms/mtx512",
+      "platform": "mtx512",
+      "theme": "mtx512",
+      "command": "default",
+      "extensions": [
+        ".cmd",
+		".zip",
+        ".mtx"
+					],
+      "emulators": [
+        {
+          "name": "memu",
+          "cores": [
+            {
+              "name": "memu",
               "default": true
             }
           ]
@@ -5493,6 +5843,64 @@
 			}
 		]
 		}
+	]
+	},
+	{
+	"name": "gp32",
+	"fullname": "GP 32",
+	"manufacturer": "Game Park",
+	"release": "2005",
+	"hardware": "portable",
+	"path": "/storage/roms/gp32",
+	"platform": "gp32",
+	"theme": "gp32",
+	"command": "default",
+	"extensions": [
+    ".smc",
+	".cmd",
+	".fxe",
+	".fpk",
+	".zip"
+	],
+	"emulators": [
+    {
+      "name": "libretro",
+      "cores": [
+			{
+          "name": "lowresnx",
+          "default": true
+			},
+			{
+          "name": "mame"
+            }
+		]
+		}
+	]
+	},
+	{
+	"name": "cassettevision",
+	"fullname": "Cassette Vision",
+	"manufacturer": "Epoch",
+	"release": "1981",
+	"hardware": "console",
+	"path": "/storage/roms/cassettevision",
+	"platform": "cassettevision",
+	"theme": "cassettevision",
+	"command": "default",
+	"extensions": [
+    ".bin",
+	".zip"
+	],
+	"emulators": [
+    {
+      "name": "libretro",
+      "cores": [
+			{
+          "name": "pd777",
+          "default": true
+			}
+			   ]
+	}
 	]
 	},
     {

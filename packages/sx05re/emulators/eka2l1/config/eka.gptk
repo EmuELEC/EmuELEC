@@ -1,37 +1,62 @@
-# EKA2L1 gptokeyb configuration.
-
-# I N S T R U C T I O N S :
+# EKA2L1 gptokeyb configuration
+# https://wiki.retrobat.org/systems-and-emulators/supported-game-systems/portable-game-consoles/nokia/ngage
 #
-# The correct filepath for this file is: /storage/.config/eka2l1/gptk/eka.gptk
+# Filepath: /storage/.config/eka2l1/gptk/eka.gptk
 #
-#-----------------------------------------------------------------------------------------------------------------------
-#
-# EKA2L1 gptokeyb configuration.
-#
-# Keyboard bindings in eka2l1:
+# EKA2L1 keyboard bindings:
 #   Arrow Keys  -> D-pad
-#   Enter       -> OK / Select
+#   Enter       -> OK / Middle key
 #   F1 / F2     -> Left / Right Softkey
 #   F3 / F4     -> Green (Call) / Red (End)
 #   Backspace   -> Backspace
-#   Escape      -> End key
+#   Escape      -> End / Red key
+#   0-9         -> N-Gage numpad keys
+#
+#
+#
+# YOU CAN MODIFY THIS FILE ANY WAY YOU NEED THE BUTTONS (FOR EXAMPLE THE NUMPAD NUMBERS) TO BE !!!
 
-back  = escape
-start = backspace
+start  = enter
 
-a = enter
-b = f4
-y = f3
+# Red / End key
+select = escape
+back = escape
 
+# Face buttons -> N-Gage numpad
+a = 4
+b = 5
+x = 2
+y = 1
+
+# Softkeys
 l1 = f1
 r1 = f2
 
-up = up
-down = down
-left = left
+# Stick clicks / r3 is for rotating the screen
+l3 = enter
+r3 = f5
+
+# D-Pad
+up    = up
+down  = down
+left  = left
 right = right
 
-left_analog_up = up
-left_analog_down = down
-left_analog_left = left
+# Left analog stick -> D-pad
+left_analog_up    = up
+left_analog_down  = down
+left_analog_left  = left
 left_analog_right = right
+
+# Shoulder buttons -> N-Gage numpad
+#l1 = 3
+#r1 = 6
+
+l2 = asterisk
+r2 = hash
+
+# Right analog stick -> N-Gage numpad (0, 7, 8, 9)
+right_analog_up    = 0
+right_analog_left  = 7
+right_analog_down  = 8
+right_analog_right = 9

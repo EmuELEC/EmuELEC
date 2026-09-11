@@ -2,7 +2,7 @@
 # Copyright (C) 2024-present
 
 PKG_NAME="arduous"
-PKG_VERSION="50c1e48084f003dee582ed5f4f5c0f59eb30bc4c"
+PKG_VERSION="798e3950f1de7c69455bc988d55eafeebac5a1eb"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-3.0-or-later"
 
