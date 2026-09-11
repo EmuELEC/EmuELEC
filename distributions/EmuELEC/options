@@ -267,7 +267,7 @@
 # Space separated list is supported,
 # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
   ADDITIONAL_PACKAGES="u-boot-script dtc CoreELEC-Debug-Scripts inject_bl301
-                       nfs-utils dtb-xml megatools"
+                       nfs-utils dtb-xml"
 
 # start SX05RE added options
 
@@ -387,6 +387,7 @@ desmume \
 desmume-2015 \
 lutro \
 melonds \
+melondsds \
 snes9x2005 \
 yabause"
 

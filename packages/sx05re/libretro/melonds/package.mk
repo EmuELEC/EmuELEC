@@ -41,10 +41,11 @@ PKG_USE_CMAKE="no"
 
 configure_target() {
   cd ${PKG_BUILD}
-  PKG_MAKE_OPTS_TARGET+=" HAVE_OPENGL=0 HAVE_NEON=1"
+  PKG_MAKE_OPTS_TARGET+=" HAVE_OPENGL=0 HAVE_NEON=1 HAVE_THREADS=1 JIT_ARCH=aarch64 HAVE_OPENGLES3=1"
 }
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib/libretro
   cp melonds_libretro.so ${INSTALL}/usr/lib/libretro/
 }
+
