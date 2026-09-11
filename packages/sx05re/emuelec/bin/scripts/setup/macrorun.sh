@@ -1,45 +1,43 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present worstcase_scenario (https://github.com/worstcase-scenario)
+# THIS FILE HAS BEEN CREATED BY CLAUDE.AI
 . /etc/profile
 
-macro_confirm() {
-    text_viewer -y -w -t "ACTIVATE MACRO" -f 24 -m "This will activate the macro mode in the background.\n\nThe macro will be active while you continue using EmulationStation.\n\nContinue?"
-    if [[ $? == 21 ]]; then
-        if macro_start; then
-			text_viewer -w -t "MACRO ACTIVATED!" -f 24 -m "Macro mode is now active in the background!\n\nATTENTION: DO NOT press the trigger button as long as you are in Emulationstation, otherwise the new controller-setup screen will pop up.\n\nIn this case, just press the hotkey button to exit the routine.\n\nTo DISABLE the macro again, press the macro button for around 3-5 seconds."
-        else
-            text_viewer -e -w -t "MACRO ACTIVATION FAILED!" -f 24 -m "Failed to activate macro mode! Check /tmp/macrorun.log for details."
-        fi
-    fi
+SCRIPT="/usr/bin/scripts/setup/macrorun.py"
+LOG="/emuelec/logs/macrorun.log"
+
+ee_console enable
+
+TTY="/dev/tty1"
+[[ -w "$TTY" ]] || TTY="/dev/tty0"
+[[ -w "$TTY" ]] || TTY="/dev/console"
+exec <"$TTY" >"$TTY" 2>&1
+
+for b in /sys/class/graphics/fb0/blank /sys/class/graphics/fb1/blank; do
+    [[ -w "$b" ]] && echo 0 >"$b"
+done
+command -v setterm >/dev/null 2>&1 && setterm -blank 0 -powerdown 0 -powersave off >"$TTY" 2>/dev/null || true
+
+clear
+
+if [[ ! -f "$SCRIPT" ]]; then
+    echo "ERROR: macrorun.py not found at $SCRIPT"
     ee_console disable
-}
+    exit 1
+fi
 
-macro_start() {
-    ee_console enable
-    echo "Starting macro run (foreground menu, then daemonize)..."
-	
-    /usr/bin/python3 -u /usr/bin/scripts/setup/macrorun.py
-    rc=$?
+mkdir -p "$(dirname "$LOG")"
+/usr/bin/python3 -u "$SCRIPT" 2>&1 | tee "$LOG"
+result=${PIPESTATUS[0]}
 
-   
-    sleep 1
-    if [[ -f /tmp/macrorun.pid ]] && ps -p "$(cat /tmp/macrorun.pid)" >/dev/null 2>&1; then
-        echo "Macro daemon running with PID $(cat /tmp/macrorun.pid)"
-        ee_console disable
-        rm /tmp/display >/dev/null 2>&1
-        return 0
-    fi
+ee_console disable
+rm -f /tmp/display 2>/dev/null
 
-  
-    if pgrep -f "Virtual-Macro" >/dev/null 2>&1 || pgrep -f "/usr/bin/scripts/setup/macrorun.py" >/dev/null 2>&1; then
-        ee_console disable
-        rm /tmp/display >/dev/null 2>&1
-        return 0
-    fi
-
-    echo "Macro daemon not detected (rc=${rc})"
-    ee_console disable
-    rm /tmp/display >/dev/null 2>&1
-    return 1
-}
-
-macro_confirm
+if [[ $result == 0 ]]; then
+    text_viewer -w -t "MACRO ENABLER" -f 24 \
+        -m "If you have activated macro mode, DO NOT press the press the trigger button while in EmulationStation, otherwise the setup screen will pop up.\n\nPress the hotkey button to exit that routine.\n\nTo DISABLE the macro, hold the macro button for 3-5 seconds."
+else
+    text_viewer -e -w -t "MACRO ENABLER" -f 24 \
+        -m "Cancelled or error.\n\nSee: $LOG"
+fi
