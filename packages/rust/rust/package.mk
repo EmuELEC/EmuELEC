@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rust"
-PKG_VERSION="1.67.1"
-PKG_SHA256="46483d3e5de85a3bd46f8e7a3ae1837496391067dbe713a25d3cf051b3d9ff6e"
-PKG_LICENSE="MIT"
+PKG_VERSION="1.97.1"
+PKG_SHA256="622c2b429c53cbfdc0dd3a51d03554e91cd63ebec1912c1f5709640cdfef1a9d"
+PKG_LICENSE="MIT OR Apache-2.0"
 PKG_SITE="https://www.rust-lang.org"
 PKG_URL="https://static.rust-lang.org/dist/rustc-${PKG_VERSION}-src.tar.gz"
 PKG_DEPENDS_HOST="toolchain llvm:host"
@@ -20,20 +20,11 @@ pre_configure_host() {
 
 configure_host() {
 
-  mkdir -p ${PKG_BUILD}/targets
+  cat >${PKG_BUILD}/config.toml  <<END
+change-id = 154587
 
-  case "${TARGET_ARCH}" in
-    "arm")
-      # the arm target is special because we specify the subarch. ie armv8a
-      cp -a ${PKG_DIR}/targets/arm-libreelec-linux-gnueabihf.json ${PKG_BUILD}/targets/${TARGET_NAME}.json
-      ;;
-    "aarch64"|"x86_64")
-      cp -a ${PKG_DIR}/targets/${TARGET_NAME}.json ${PKG_BUILD}/targets/${TARGET_NAME}.json
-      ;;
-  esac
-
-  cat > ${PKG_BUILD}/config.toml <<END
-changelog-seen = 2
+[llvm]
+download-ci-llvm = false
 
 [target.${TARGET_NAME}]
 llvm-config = "${TOOLCHAIN}/bin/llvm-config"
@@ -50,6 +41,7 @@ rpath = true
 channel = "stable"
 codegen-tests = false
 optimize = true
+download-rustc = false
 
 [build]
 submodules = false
@@ -80,10 +72,10 @@ mandir = "${TOOLCHAIN}/share/man"
 
 END
 
-CARGO_HOME="${PKG_BUILD}/cargo_home"
-mkdir -p "${CARGO_HOME}"
+  CARGO_HOME="${PKG_BUILD}/cargo_home"
+  mkdir -p "${CARGO_HOME}"
 
-cat > ${CARGO_HOME}/config << END
+  cat >${CARGO_HOME}/config.toml <<END
 [target.${TARGET_NAME}]
 linker = "${TARGET_PREFIX}gcc"
 
@@ -99,7 +91,6 @@ progress.when = 'always'
 progress.width = 80
 
 END
-
 }
 
 make_host() {
@@ -111,6 +102,8 @@ make_host() {
   unset LDFLAGS
 
   export RUST_TARGET_PATH="${PKG_BUILD}/targets/"
+  export HOST_CMAKE="${TOOLCHAIN}/bin/cmake"
+  export HOST_CMAKE_TOOLCHAIN_FILE="${CMAKE_CONF}"
 
   python3 src/bootstrap/bootstrap.py -j ${CONCURRENCY_MAKE_LEVEL} build --stage 2 --verbose
 }
@@ -121,6 +114,4 @@ makeinstall_host() {
 
   mkdir -p ${TOOLCHAIN}/lib/rustlib
     cp -a build/${RUST_HOST}/stage2/lib/* ${TOOLCHAIN}/lib
-
-    cp -a ${PKG_BUILD}/targets/*.json ${TOOLCHAIN}/lib/rustlib/
 }

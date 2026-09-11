@@ -1,0 +1,424 @@
+From 28fa72ca43bb05ce7e9af91f632af6c7cb624b90 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 24 Apr 2026 09:41:06 +0000
+Subject: [PATCH] target: add LibreELEC target specifications for aarch64,
+ armv7a, armv7ve, and x86_64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add four new Rust target specifications for LibreELEC. These targets
+replace the previous JSON-based custom target definitions in the LibreELEC
+build system.
+
+Targets added:
+  - aarch64-libreelec-linux-gnu
+  - armv7a-libreelec-linux-gnueabihf
+  - armv7ve-libreelec-linux-gnueabihf
+  - x86_64-libreelec-linux-gnu
+
+Each target is based on its corresponding upstream Linux GNU target
+(aarch64-unknown-linux-gnu, arm-unknown-linux-gnueabihf, x86_64-unknown-linux-gnu)
+and inherits all defaults from base::linux_gnu::opts(), with the following
+LibreELEC-specific overrides applied:
+
+aarch64-libreelec-linux-gnu:
+  - supported_sanitizers: ADDRESS | CFI | LEAK | MEMORY | MEMTAG | THREAD | HWADDRESS
+    Drops KCFI and REALTIME. Retains MEMTAG and HWADDRESS which provide
+    valuable memory safety tooling on AArch64 hardware.
+  - supports_xray: false (upstream: true)
+
+armv7a-libreelec-linux-gnueabihf:
+armv7ve-libreelec-linux-gnueabihf:
+  - features: +strict-align,+v6,+vfp2,-d32
+    Adds -d32 to the upstream feature set to disable the upper 16
+    double-precision VFP registers. Targets older ARM SoCs common in
+    LibreELEC-supported media devices (Amlogic, Rockchip, Allwinner)
+    whose VFP units provide only 16 double-precision registers.
+  - No sanitizer overrides; upstream arm-unknown-linux-gnueabihf defines
+    none and the LibreELEC JSON spec lists none.
+
+x86_64-libreelec-linux-gnu:
+  - stack_probes: Call (upstream: Inline)
+    Conservative stack probing via function call rather than inlined
+    instructions. Reduces code size on appliance hardware where probe
+    performance is not a concern.
+  - supported_sanitizers: ADDRESS | CFI | LEAK | MEMORY | THREAD
+    Drops KCFI, DATAFLOW, SAFESTACK, and REALTIME which require toolchain
+    support not present in LibreELEC builds.
+  - supports_xray: false (upstream: true)
+
+All four targets are registered in supported_targets! in
+compiler/rustc_target/src/spec/mod.rs.
+
+Metadata:
+  - tier: 3 (community-maintained, not part of official Rust CI)
+  - host_tools: false (LibreELEC is a read-only appliance OS)
+  - std: true
+
+diff between rust-1.95.0 and the libreelec target, these should be checked on rust updates
+check with:
+    diff ./compiler/rustc_target/src/spec/targets/aarch64_unknown_linux_gnu.rs ./compiler/rustc_target/src/spec/targets/aarch64_libreelec_linux_gnu.rs -Nu
+    diff ./compiler/rustc_target/src/spec/targets/arm_unknown_linux_gnueabihf.rs ./compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs -Nu
+      - armv7ve_libreelec_linux_gnueabihf.rs is a copy of armv7a_libreelec_linux_gnueabihf.rs
+    diff ./compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs ./compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs -Nu
+
+*   --- ./compiler/rustc_target/src/spec/targets/aarch64_unknown_linux_gnu.rs	2026-04-24 01:07:35.956658721 +0000
+*   +++ ./compiler/rustc_target/src/spec/targets/aarch64_libreelec_linux_gnu.rs	2026-04-24 09:28:58.238836195 +0000
+*   @@ -1,14 +1,15 @@
+*        Target {
+*            llvm_target: "aarch64-unknown-linux-gnu".into(),
+*            metadata: TargetMetadata {
+*   -            description: Some("ARM64 Linux (kernel 4.1, glibc 2.17+)".into()),
+*   -            tier: Some(1),
+*   -            host_tools: Some(true),
+*   +            description: Some("ARM64 Linux for LibreELEC (kernel 4.1, glibc 2.17+)".into()),
+*   +            tier: Some(3),
+*   +            host_tools: Some(false),
+*                std: Some(true),
+*            },
+*            pointer_width: 64,
+*            data_layout: "e-m:e-p270:32:32-p271:32:32-p272:64:64-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128-Fn32".into(),
+*            arch: Arch::AArch64,
+*            options: TargetOptions {
+*   +            // ── Upstream aarch64-unknown-linux-gnu defaults ───────────────
+*                features: "+v8a,+outline-atomics".into(),
+*                // the AAPCS64 expects use of non-leaf frame pointers per
+*                // https://github.com/ARM-software/abi-aa/blob/4492d1570eb70c8fd146623e0db65b2d241f12e7/aapcs64/aapcs64.rst#the-frame-pointer
+*   @@ -33,3 +34,21 @@
+*                    | SanitizerSet::HWADDRESS
+*                    | SanitizerSet::REALTIME,
+*                supports_xray: true,
+*   +
+*   +            // ── LibreELEC overrides ───────────────────────────────────────
+*   +
+*   +            // Drops KCFI, REALTIME, and XRay which LibreELEC's toolchain
+*   +            // can't support; keeps HWAddress and MemTag which are
+*   +            // valuable on AArch64 hardware
+*   +            supported_sanitizers: SanitizerSet::ADDRESS
+*   +                | SanitizerSet::CFI
+*   +                | SanitizerSet::LEAK
+*   +                | SanitizerSet::MEMORY
+*   +                | SanitizerSet::MEMTAG
+*   +                | SanitizerSet::THREAD
+*   +                | SanitizerSet::HWADDRESS,
+*   +            supports_xray: false,
+*   +
+*                ..base::linux_gnu::opts()
+*            },
+*        }
+*   --- ./compiler/rustc_target/src/spec/targets/arm_unknown_linux_gnueabihf.rs	2026-04-24 01:07:35.956658721 +0000
+*   +++ ./compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs	2026-04-24 09:36:06.559588395 +0000
+*   @@ -1,14 +1,15 @@
+*        Target {
+*            llvm_target: "arm-unknown-linux-gnueabihf".into(),
+*            metadata: TargetMetadata {
+*   -            description: Some("Armv6 Linux, hardfloat (kernel 3.2, glibc 2.17)".into()),
+*   -            tier: Some(2),
+*   -            host_tools: Some(true),
+*   +            description: Some("Armv6 Linux hardfloat for LibreELEC (kernel 3.2, glibc 2.17)".into()),
+*   +            tier: Some(3),
+*   +            host_tools: Some(false),
+*                std: Some(true),
+*            },
+*            pointer_width: 32,
+*            data_layout: "e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64".into(),
+*            arch: Arch::Arm,
+*            options: TargetOptions {
+*   +            // ── Upstream arm-unknown-linux-gnueabihf defaults ─────────────
+*                cfg_abi: CfgAbi::EabiHf,
+*                llvm_floatabi: Some(FloatAbi::Hard),
+*                features: "+strict-align,+v6,+vfp2".into(),
+*   @@ -24,3 +25,14 @@
+*                // linker error, so set it to `true` here.
+*                // FIXME(#146996): Remove this override once #146996 has been fixed.
+*                default_uwtable: false,
+*   +
+*   +            // ── LibreELEC overrides ───────────────────────────────────────
+*   +
+*   +            // LibreELEC targets older ARM SoCs (e.g. Raspberry Pi, Amlogic)
+*   +            // that need the -d32 flag to disable 32 double-precision VFP
+*   +            // registers, keeping only 16
+*   +            features: "+strict-align,+v6,+vfp2,-d32".into(),
+*   +
+*                ..base::linux_gnu::opts()
+*            },
+*        }
+*   --- ./compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs	2026-04-24 01:07:35.959303910 +0000
+*   +++ ./compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs	2026-04-24 09:21:00.398842587 +0000
+*   @@ -1,5 +1,7 @@
+*
+*    pub(crate) fn target() -> Target {
+*        let mut base = base::linux_gnu::opts();
+*   +
+*   +    // ── Upstream x86_64-unknown-linux-gnu defaults ────────────────────────
+*        base.cpu = "x86-64".into();
+*        base.plt_by_default = false;
+*        base.max_atomic_width = Some(64);
+*   @@ -21,9 +23,24 @@
+*            | SanitizerSet::REALTIME;
+*        base.supports_xray = true;
+*
+*   +    // ── LibreELEC overrides ───────────────────────────────────────────────
+*   +
+*   +    // Call-based stack probes — conservative choice for appliance hardware
+*   +    base.stack_probes = StackProbeType::Call;
+*   +
+*   +    // Reduced sanitizer set — drops what LibreELEC's toolchain can't support
+*   +    base.supported_sanitizers = SanitizerSet::ADDRESS
+*   +        | SanitizerSet::CFI
+*   +        | SanitizerSet::LEAK
+*   +        | SanitizerSet::MEMORY
+*   +        | SanitizerSet::THREAD;
+*   +
+*        Target {
+*            llvm_target: "x86_64-unknown-linux-gnu".into(),
+*            metadata: TargetMetadata {
+*   -            description: Some("64-bit Linux (kernel 3.2+, glibc 2.17+)".into()),
+*   -            tier: Some(1),
+*   -            host_tools: Some(true),
+*   +            description: Some("64-bit Linux for LibreELEC (kernel 3.2+, glibc 2.17+)".into()),
+*   +            tier: Some(3),
+*   +            host_tools: Some(false),
+*                std: Some(true),
+*            },
+*            pointer_width: 64,
+---
+ compiler/rustc_target/src/spec/mod.rs         |  4 ++
+ .../targets/aarch64_libreelec_linux_gnu.rs    | 55 +++++++++++++++++++
+ .../armv7a_libreelec_linux_gnueabihf.rs       | 39 +++++++++++++
+ .../armv7ve_libreelec_linux_gnueabihf.rs      | 39 +++++++++++++
+ .../targets/x86_64_libreelec_linux_gnu.rs     | 52 ++++++++++++++++++
+ 5 files changed, 189 insertions(+)
+ create mode 100644 compiler/rustc_target/src/spec/targets/aarch64_libreelec_linux_gnu.rs
+ create mode 100644 compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs
+ create mode 100644 compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs
+ create mode 100644 compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs
+
+diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
+index d6a9e27c465..b6dc05b8986 100644
+--- a/compiler/rustc_target/src/spec/mod.rs
++++ b/compiler/rustc_target/src/spec/mod.rs
+@@ -1455,6 +1455,10 @@ macro_rules! supported_targets {
+ }
+ 
+ supported_targets! {
++    ("x86_64-libreelec-linux-gnu", x86_64_libreelec_linux_gnu),
++    ("aarch64-libreelec-linux-gnu", aarch64_libreelec_linux_gnu),
++    ("armv7a-libreelec-linux-gnueabihf", armv7a_libreelec_linux_gnueabihf),
++    ("armv7ve-libreelec-linux-gnueabihf", armv7ve_libreelec_linux_gnueabihf),
+     ("x86_64-unknown-linux-gnu", x86_64_unknown_linux_gnu),
+     ("x86_64-unknown-linux-gnux32", x86_64_unknown_linux_gnux32),
+     ("i686-unknown-linux-gnu", i686_unknown_linux_gnu),
+diff --git a/compiler/rustc_target/src/spec/targets/aarch64_libreelec_linux_gnu.rs b/compiler/rustc_target/src/spec/targets/aarch64_libreelec_linux_gnu.rs
+new file mode 100644
+index 00000000000..65c9c61f83f
+--- /dev/null
++++ b/compiler/rustc_target/src/spec/targets/aarch64_libreelec_linux_gnu.rs
+@@ -0,0 +1,55 @@
++use crate::spec::{
++    Arch, FramePointer, SanitizerSet, StackProbeType, Target, TargetMetadata, TargetOptions, base,
++};
++
++pub(crate) fn target() -> Target {
++    Target {
++        llvm_target: "aarch64-unknown-linux-gnu".into(),
++        metadata: TargetMetadata {
++            description: Some("ARM64 Linux for LibreELEC (kernel 4.1, glibc 2.17+)".into()),
++            tier: Some(3),
++            host_tools: Some(false),
++            std: Some(true),
++        },
++        pointer_width: 64,
++        data_layout: "e-m:e-p270:32:32-p271:32:32-p272:64:64-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128-Fn32".into(),
++        arch: Arch::AArch64,
++        options: TargetOptions {
++            // ── Upstream aarch64-unknown-linux-gnu defaults ───────────────
++            features: "+v8a,+outline-atomics".into(),
++            // the AAPCS64 expects use of non-leaf frame pointers per
++            // https://github.com/ARM-software/abi-aa/blob/4492d1570eb70c8fd146623e0db65b2d241f12e7/aapcs64/aapcs64.rst#the-frame-pointer
++            // and we tend to encounter interesting bugs in AArch64 unwinding code if we do not
++            frame_pointer: FramePointer::NonLeaf,
++            mcount: "\u{1}_mcount".into(),
++            max_atomic_width: Some(128),
++            stack_probes: StackProbeType::Inline,
++            // supported_sanitizers: SanitizerSet::ADDRESS
++            //     | SanitizerSet::CFI
++            //     | SanitizerSet::KCFI
++            //     | SanitizerSet::LEAK
++            //     | SanitizerSet::MEMORY
++            //     | SanitizerSet::MEMTAG
++            //     | SanitizerSet::THREAD
++            //     | SanitizerSet::HWADDRESS
++            //     | SanitizerSet::REALTIME,
++            // supports_xray: true,
++
++            // ── LibreELEC overrides ───────────────────────────────────────
++
++            // Drops KCFI, REALTIME, and XRay which LibreELEC's toolchain
++            // can't support; keeps HWAddress and MemTag which are
++            // valuable on AArch64 hardware
++            supported_sanitizers: SanitizerSet::ADDRESS
++                | SanitizerSet::CFI
++                | SanitizerSet::LEAK
++                | SanitizerSet::MEMORY
++                | SanitizerSet::MEMTAG
++                | SanitizerSet::THREAD
++                | SanitizerSet::HWADDRESS,
++            supports_xray: false,
++
++            ..base::linux_gnu::opts()
++        },
++    }
++}
+diff --git a/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs b/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs
+new file mode 100644
+index 00000000000..cbda6d57bde
+--- /dev/null
++++ b/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs
+@@ -0,0 +1,39 @@
++use crate::spec::{Arch, CfgAbi, FloatAbi, Target, TargetMetadata, TargetOptions, base};
++
++pub(crate) fn target() -> Target {
++    Target {
++        llvm_target: "arm-unknown-linux-gnueabihf".into(),
++        metadata: TargetMetadata {
++            description: Some("Armv6 Linux hardfloat for LibreELEC (kernel 3.2, glibc 2.17)".into()),
++            tier: Some(3),
++            host_tools: Some(false),
++            std: Some(true),
++        },
++        pointer_width: 32,
++        data_layout: "e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64".into(),
++        arch: Arch::Arm,
++        options: TargetOptions {
++            // ── Upstream arm-unknown-linux-gnueabihf defaults ─────────────
++            cfg_abi: CfgAbi::EabiHf,
++            llvm_floatabi: Some(FloatAbi::Hard),
++            // features: "+strict-align,+v6,+vfp2".into(),
++            max_atomic_width: Some(64),
++            mcount: "\u{1}__gnu_mcount_nc".into(),
++            llvm_mcount_intrinsic: Some("llvm.arm.gnu.eabi.mcount".into()),
++            // The default on linux is to have `default_uwtable=true`, but on
++            // this target we get an "`__aeabi_unwind_cpp_pr0` not defined"
++            // linker error, so set it to `true` here.
++            // FIXME(#146996): Remove this override once #146996 has been fixed.
++            default_uwtable: false,
++
++            // ── LibreELEC overrides ───────────────────────────────────────
++
++            // LibreELEC targets older ARM SoCs (e.g. Raspberry Pi, Amlogic)
++            // that need the -d32 flag to disable 32 double-precision VFP
++            // registers, keeping only 16
++            features: "+strict-align,+v6,+vfp2,-d32".into(),
++
++            ..base::linux_gnu::opts()
++        },
++    }
++}
+diff --git a/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs b/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs
+new file mode 100644
+index 00000000000..cbda6d57bde
+--- /dev/null
++++ b/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs
+@@ -0,0 +1,39 @@
++use crate::spec::{Arch, CfgAbi, FloatAbi, Target, TargetMetadata, TargetOptions, base};
++
++pub(crate) fn target() -> Target {
++    Target {
++        llvm_target: "arm-unknown-linux-gnueabihf".into(),
++        metadata: TargetMetadata {
++            description: Some("Armv6 Linux hardfloat for LibreELEC (kernel 3.2, glibc 2.17)".into()),
++            tier: Some(3),
++            host_tools: Some(false),
++            std: Some(true),
++        },
++        pointer_width: 32,
++        data_layout: "e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64".into(),
++        arch: Arch::Arm,
++        options: TargetOptions {
++            // ── Upstream arm-unknown-linux-gnueabihf defaults ─────────────
++            cfg_abi: CfgAbi::EabiHf,
++            llvm_floatabi: Some(FloatAbi::Hard),
++            // features: "+strict-align,+v6,+vfp2".into(),
++            max_atomic_width: Some(64),
++            mcount: "\u{1}__gnu_mcount_nc".into(),
++            llvm_mcount_intrinsic: Some("llvm.arm.gnu.eabi.mcount".into()),
++            // The default on linux is to have `default_uwtable=true`, but on
++            // this target we get an "`__aeabi_unwind_cpp_pr0` not defined"
++            // linker error, so set it to `true` here.
++            // FIXME(#146996): Remove this override once #146996 has been fixed.
++            default_uwtable: false,
++
++            // ── LibreELEC overrides ───────────────────────────────────────
++
++            // LibreELEC targets older ARM SoCs (e.g. Raspberry Pi, Amlogic)
++            // that need the -d32 flag to disable 32 double-precision VFP
++            // registers, keeping only 16
++            features: "+strict-align,+v6,+vfp2,-d32".into(),
++
++            ..base::linux_gnu::opts()
++        },
++    }
++}
+diff --git a/compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs b/compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs
+new file mode 100644
+index 00000000000..2d32c689ad6
+--- /dev/null
++++ b/compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs
+@@ -0,0 +1,52 @@
++use crate::spec::{
++    Arch, Cc, LinkerFlavor, Lld, SanitizerSet, StackProbeType, Target, TargetMetadata, base,
++};
++
++pub(crate) fn target() -> Target {
++    let mut base = base::linux_gnu::opts();
++
++    // ── Upstream x86_64-unknown-linux-gnu defaults ────────────────────────
++    base.cpu = "x86-64".into();
++    base.plt_by_default = false;
++    base.max_atomic_width = Some(64);
++    base.add_pre_link_args(LinkerFlavor::Gnu(Cc::Yes, Lld::No), &["-m64"]);
++    base.stack_probes = StackProbeType::Inline;
++    base.static_position_independent_executables = true;
++    base.supported_sanitizers = SanitizerSet::ADDRESS
++        | SanitizerSet::CFI
++        | SanitizerSet::KCFI
++        | SanitizerSet::DATAFLOW
++        | SanitizerSet::LEAK
++        | SanitizerSet::MEMORY
++        | SanitizerSet::SAFESTACK
++        | SanitizerSet::THREAD
++        | SanitizerSet::REALTIME;
++    base.supports_xray = true;
++
++    // ── LibreELEC overrides ───────────────────────────────────────────────
++
++    // Call-based stack probes — conservative choice for appliance hardware
++    base.stack_probes = StackProbeType::Call;
++
++    // Reduced sanitizer set — drops what LibreELEC's toolchain can't support
++    base.supported_sanitizers = SanitizerSet::ADDRESS
++        | SanitizerSet::CFI
++        | SanitizerSet::LEAK
++        | SanitizerSet::MEMORY
++        | SanitizerSet::THREAD;
++
++    Target {
++        llvm_target: "x86_64-unknown-linux-gnu".into(),
++        metadata: TargetMetadata {
++            description: Some("64-bit Linux for LibreELEC (kernel 3.2+, glibc 2.17+)".into()),
++            tier: Some(3),
++            host_tools: Some(false),
++            std: Some(true),
++        },
++        pointer_width: 64,
++        data_layout:
++            "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128".into(),
++        arch: Arch::X86_64,
++        options: base,
++    }
++}
+-- 
+2.53.0
+

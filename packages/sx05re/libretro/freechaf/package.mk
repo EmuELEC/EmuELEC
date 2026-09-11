@@ -2,7 +2,7 @@
 # EmuELEC / LibreELEC style package for libretro FreeChaF core
 
 PKG_NAME="freechaf"
-PKG_VERSION="cdb8ad6fcecb276761b193650f5ce9ae8b878067"
+PKG_VERSION="76c7a84f1f7e80f3e6f2bba96fe100cb24e99124"
 PKG_SHA256=""
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
