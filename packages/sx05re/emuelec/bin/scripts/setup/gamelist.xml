@@ -34,7 +34,7 @@
 		<genre>script</genre>
 		<image>./setup_images/portmaster.png</image>
 	</game>
-		<game>
+	<game>
 		<path>./eka-install.sh</path>
 		<name>EKA2L1 Commander</name>
 		<desc>Controller-driven management tool for the eka2l1 Symbian emulator on EmuELEC. Features: initial setup, firmware installation, SIS/SISX game installation with platform detection, UID launcher and gamelist.xml generation, device management, app listing and uninstallation, and a complete reset option.</desc>
@@ -42,7 +42,15 @@
 		<genre>script</genre>
 		<image>./setup_images/ekainstall.png</image>
 	</game>
-		<game>
+	<game>
+		<path>./dreamm-install.sh</path>
+		<name>DREAMM Commander</name>
+		<desc>Controller-driven management tool for the standalone DREAMM emulator on EmuELEC. Features: install games from folders or disk images, create .dreamm entries for EmulationStation and manually build .dreamm files for unrecognized games.</desc>
+		<developer>worstcase_scenario </developer>
+		<genre>script</genre>
+		<image>./setup_images/dreammer.png</image>
+	</game>
+	<game>
 		<path>./macrosetup.sh</path>
 		<name>Macro Setup</name>
 		<desc>Define a trigger button on your controller that executes a macro of button presses. When you are finished recording the button input, wait three seconds. The configuration is being saved in macro_config.json</desc>

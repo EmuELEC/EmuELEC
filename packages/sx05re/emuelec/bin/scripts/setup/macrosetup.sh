@@ -1,44 +1,43 @@
 #!/bin/bash
-# Source predefined functions and variables
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present worstcase_scenario (https://github.com/worstcase-scenario)
+# THIS FILE HAS BEEN CREATED BY CLAUDE.AI
 . /etc/profile
 
-function macrosetup_confirm() {
-    text_viewer -y -w -t "SETUP MACRO" -f 24 -m "This will start the macro setup configuration.\n\nThe setup will guide you through configuring your macro settings.\n\nContinue?"
-    if [[ $? == 21 ]]; then
-        if macrosetup_start; then
-            text_viewer -w -t "MACRO SETUP COMPLETED!" -f 24 -m "Macro setup has been completed successfully!\n\nYour macro configuration has been saved and is ready to use.\n\nYou can now select and activate macros using the macro activation script."
-        else
-            text_viewer -e -w -t "MACRO SETUP FAILED!" -f 24 -m "Failed to complete macro setup! Check /tmp/macrosetup.log for details."
-        fi
-    fi
+SCRIPT="/usr/bin/scripts/setup/macrosetup.py"
+LOG="/emuelec/logs/macrosetup.log"
+
+ee_console enable
+
+TTY="/dev/tty1"
+[[ -w "$TTY" ]] || TTY="/dev/tty0"
+[[ -w "$TTY" ]] || TTY="/dev/console"
+exec <"$TTY" >"$TTY" 2>&1
+
+for b in /sys/class/graphics/fb0/blank /sys/class/graphics/fb1/blank; do
+    [[ -w "$b" ]] && echo 0 >"$b"
+done
+command -v setterm >/dev/null 2>&1 && setterm -blank 0 -powerdown 0 -powersave off >"$TTY" 2>/dev/null || true
+
+clear
+
+if [[ ! -f "$SCRIPT" ]]; then
+    echo "ERROR: macrosetup.py not found at $SCRIPT"
     ee_console disable
-}
+    exit 1
+fi
 
-function macrosetup_start() {
-    ee_console enable
-    
-    echo "Starting macro setup..."
-    echo "Follow the instructions that will appear below:"
-    echo ""
-    
-    # Run Python setup script with logging (but keep interactive output)
-    /usr/bin/python3 -u /usr/bin/scripts/setup/macrosetup.py 2>&1 | tee /tmp/macrosetup.log
-    setup_result=${PIPESTATUS[0]}
-    
-    echo ""
-    
-    # Check if setup completed successfully
-    if [[ $setup_result == 0 ]]; then
-        echo "Macro setup completed successfully"
-        ee_console disable
-        rm /tmp/display > /dev/null 2>&1
-        return 0
-    else
-        echo "Failed to complete macro setup"
-        ee_console disable
-        rm /tmp/display > /dev/null 2>&1
-        return 1
-    fi
-}
+mkdir -p "$(dirname "$LOG")"
+/usr/bin/python3 -u "$SCRIPT" 2>&1 | tee "$LOG"
+result=${PIPESTATUS[0]}
 
-macrosetup_confirm
+ee_console disable
+rm -f /tmp/display 2>/dev/null
+
+if [[ $result == 0 ]]; then
+    text_viewer -w -t "MACRO SETUP" -f 24 \
+        -m "If you have saved a macro, choose and activate it with Macro Enabler."
+else
+    text_viewer -e -w -t "MACRO SETUP" -f 24 \
+        -m "Cancelled or error.\n\nSee: $LOG"
+fi
