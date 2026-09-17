@@ -1,2 +1,2 @@
-SUBSYSTEM=="input", ATTRS{name}=="Nintendo Wii Remote", MODE="666", ENV{ID_INPUT_JOYSTICK}="1"
-SUBSYSTEM=="input", ATTRS{name}=="Nintendo Wii Remote Classic Controller", MODE="666", ENV{ID_INPUT_JOYSTICK}="1"
+SUBSYSTEM=="input", ATTRS{name}=="Nintendo Wii Remote", MODE="666", ENV{ID_INPUT_JOYSTICK}="1", ENV{eventlircd_enable}="false"
+SUBSYSTEM=="input", ATTRS{name}=="Nintendo Wii Remote Classic Controller", MODE="666", ENV{ID_INPUT_JOYSTICK}="1", ENV{eventlircd_enable}="false"
