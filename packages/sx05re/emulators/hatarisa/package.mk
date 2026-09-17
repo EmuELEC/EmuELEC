@@ -41,4 +41,8 @@ makeinstall_target() {
   # copy binary & start script
   cp src/hatari ${INSTALL}/usr/bin
   cp -R ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin/
+
+  mkdir -p "${INSTALL}/usr/config/emuelec/configs"
+  ln -sf "/storage/.config/hatari" "${INSTALL}/usr/config/emuelec/configs/hatari"
+
 }
