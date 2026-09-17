@@ -238,6 +238,32 @@
         }
       ]
     },
+	{
+      "name": "iphone",
+      "fullname": "iPhone",
+      "manufacturer": "Apple",
+      "release": "2008",
+      "hardware": "portable",
+      "path": "/storage/roms/iphone",
+      "platform": "iphone",
+      "theme": "iphone",
+      "command": "default",
+      "extensions": [
+        ".ipa",
+		".app"
+      ],
+      "emulators": [
+        {
+          "name": "touchhle",
+          "cores": [
+            {
+              "name": "touchhle",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "pgm2",
       "fullname": "PolyGame Master",

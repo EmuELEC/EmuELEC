@@ -288,6 +288,12 @@ case ${PLATFORM} in
 				set_kill_keys "simcoupe"
 				RUNTHIS='${TBASH} simcoupestart.sh "${ROMNAME}"'
                 fi
+                ;;
+		"iphone")
+                if [ "${EMU}" = "touchhle" ]; then
+				set_kill_keys "touchhle-sa"
+				RUNTHIS='${TBASH} start_touchhle.sh "${ROMNAME}"'
+                fi
                 ;;	
 		"msx"|"msx2"|"msx2+"|"msxturbor")
 				if [ "${EMU}" = "openmsx" ]; then
