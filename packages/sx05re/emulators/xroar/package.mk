@@ -14,6 +14,15 @@ PKG_TOOLCHAIN="autotools"
 
 configure_target() {
   cd ${PKG_BUILD}
+
+  # XRoar calls AX_CHECK_GL without an ACTION-IF-NOT-FOUND hook, so configure
+  # aborts when no desktop OpenGL is present. configure.ac also drops the
+  # option again via "unset with_opengl", so remove that line to make
+  # --without-opengl effective. Patch the generated configure, autoreconf has
+  # already run at this point. Video output uses SDL_CreateRenderer, vo_opengl
+  # is optional.
+  sed -i '/^unset with_opengl$/d' configure
+
   ./configure \
     --host=${TARGET_NAME} \
     --prefix=/usr \
@@ -27,7 +36,8 @@ configure_target() {
     --without-oss \
     --without-pulse \
     --without-coreaudio \
-    --without-x
+    --without-x \
+    --without-opengl
 }
 
 make_target() {
