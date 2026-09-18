@@ -1915,8 +1915,11 @@
           "name": "libretro",
           "cores": [
             {
-              "name": "melonds",
+              "name": "melondsds",
               "default": true
+            },
+	    {
+	      "name": "melonds"
             },
             {
               "name": "desmume"
