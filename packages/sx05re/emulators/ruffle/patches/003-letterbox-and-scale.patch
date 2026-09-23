@@ -1,0 +1,14 @@
+diff --git a/src/main.rs b/src/main.rs
+index 4f41cc6..b99cf2a 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -507,2 +507,4 @@ pub fn main() {
+-    if std::env::var("RUFFLE_HANDHELD_FORCE_SCALE")
+-        .map(|value| value.eq_ignore_ascii_case("showall"))
++    // Fit the movie into the display and keep its aspect ratio by default;
++    // RUFFLE_HANDHELD_FORCE_SCALE=noscale restores the original behaviour.
++    if !std::env::var("RUFFLE_HANDHELD_FORCE_SCALE")
++        .map(|value| value.eq_ignore_ascii_case("noscale"))
+@@ -515 +517 @@ pub fn main() {
+-        .with_letterbox(Letterbox::Off)
++        .with_letterbox(Letterbox::Fullscreen)
