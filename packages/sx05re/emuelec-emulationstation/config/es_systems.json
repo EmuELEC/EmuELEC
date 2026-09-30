@@ -5929,6 +5929,40 @@
 	}
 	]
 	},
+	{
+      "name": "3ds",
+      "fullname": "Nintendo 3DS",
+      "manufacturer": "Nintendo",
+      "release": "2011",
+      "hardware": "portable",
+      "path": "/storage/roms/3ds",
+      "platform": "n3ds",
+      "theme": "3ds",
+      "command": "default",
+      "extensions": [
+        ".3ds",
+        ".3dsx",
+        ".app",
+        ".axf",
+        ".cci",
+        ".cxi",
+        ".elf",
+        ".z3dsx",
+        ".zcci",
+        ".zcxi"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "azahar",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "bk",
       "fullname": "Electronika",
