@@ -11,16 +11,17 @@ ROMBASE="${ROMNAME%.*}"
 CONF_DIR="/storage/.config/emuelec/configs/basilisk2"
 PREFS="${CONF_DIR}/basilisk2.prefs"
 
-# Create prefs from default on first start
-mkdir -p "$CONF_DIR"
+# Create prefs and gptk from default on first start
+mkdir -p "${CONF_DIR}/gptk"
 [ -f "$PREFS" ] || cp /usr/config/emuelec/configs/basilisk2/basilisk2.prefs "$PREFS"
+[ -f "${CONF_DIR}/gptk/basilisk2.gptk" ] || cp /usr/config/emuelec/configs/basilisk2/gptk/basilisk2.gptk "${CONF_DIR}/gptk/"
 
 # Kill old instances
 killall -9 gptokeyb 2>/dev/null
 
 # Check for game-specific gptk config
 GPTK_GAME="${CONF_DIR}/gptk/${ROMBASE}.gptk"
-GPTK_DEFAULT="/usr/config/emuelec/configs/basilisk2/gptk/basilisk2.gptk"
+GPTK_DEFAULT="${CONF_DIR}/gptk/basilisk2.gptk"
 
 if [ -f "$GPTK_GAME" ]; then
     GPTK_CONFIG="$GPTK_GAME"
@@ -44,3 +45,5 @@ kill -SIGCONT $(pgrep emulationstation) 2>/dev/null
 
 # Cleanup
 killall -9 gptokeyb 2>/dev/null
+
+exit 0
