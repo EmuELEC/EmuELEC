@@ -425,6 +425,12 @@ case ${PLATFORM} in
             	RUNTHIS='yabasanshiro1_5.sh "${ROMNAME}"'
         fi
         ;;
+		"macintosh")
+        if [ "${EMU}" = "basilisk2" ]; then
+			set_kill_keys "BasiliskII"
+			RUNTHIS='${TBASH} basilisk2start.sh "${ROMNAME}"'
+        fi
+        ;;
         esac
 elif [ ${LIBRETRO} == "yes" ]; then
 # We are running a Libretro emulator set all the settings that we chose on ES

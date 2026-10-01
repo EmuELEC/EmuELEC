@@ -4557,7 +4557,6 @@
 		".1dd",
 		".cqm",
 		".cqi",
-		".dsk",
 		".ima",
 		".img",
 		".ufi",
@@ -4575,16 +4574,26 @@
 		".cdr",
 		".hd",
 		".hdv",
-		".2mg",
-		".hdi"
+		".hdi",
+		".hfv",
+		".hda"
       ],
       "emulators": [
+        {
+          "name": "basilisk2",
+          "cores": [
+            {
+              "name": "basilisk2",
+              "default": true,
+              "incompatible": [".zip", ".7z", ".mfi", ".dfi", ".hfe", ".mfm", ".td0", ".imd", ".d77", ".d88", ".1dd", ".cqm", ".cqi", ".ufi", ".ipf", ".dc42", ".woz", ".2mg", ".360", ".chd", ".cue", ".toc", ".nrg", ".gdi", ".cdr", ".hdi"]
+            }
+          ]
+        },
         {
           "name": "libretro",
           "cores": [
             {
-              "name": "mame",
-              "default": true
+              "name": "mame"
             },
 			{
               "name": "minivmac"
