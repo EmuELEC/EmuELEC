@@ -1,0 +1,8 @@
+rom /storage/roms/bios/mac.rom
+modelid 14
+cpu 4
+fpu true
+ramsize 67108864
+screen dga/640/480
+nocdrom true
+nogui true
