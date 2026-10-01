@@ -1,0 +1,39 @@
+# Basilisk II gptokeyb configuration.
+
+# I N S T R U C T I O N S :
+#
+# If you have a game with special keys, change the mapping table beneath accordingly.
+#
+# Then SAVE that modified file under the game's name. For Example: Dark Castle.gptk
+#
+# The correct filepath for the game-gptk file is: /storage/.config/emuelec/configs/basilisk2/gptk
+#
+# For example: /storage/.config/emuelec/configs/basilisk2/gptk/Dark Castle.gptk
+#
+# Basilisk II will automatically load the respective gptk file when starting the game.
+# If no gptk file is found, the emulator will always use "basilisk2.gptk"
+#
+#-----------------------------------------------------------------------------------------------------------------------
+#
+back  = esc
+start = enter
+
+a = mouse_left
+b = enter
+x = space
+y = tab
+
+l1 = esc
+r1 = enter
+
+# D-pad -> cursor keys
+up = up
+down = down
+left = left
+right = right
+
+# Left analog -> mouse
+left_analog_up = mouse_movement_up
+left_analog_down = mouse_movement_down
+left_analog_left = mouse_movement_left
+left_analog_right = mouse_movement_right
