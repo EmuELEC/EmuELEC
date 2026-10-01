@@ -213,7 +213,7 @@
         }
       ]
     },
-    {
+        {
       "name": "apple2",
       "fullname": "Apple 2",
       "manufacturer": "Apple",
@@ -224,15 +224,33 @@
       "theme": "apple2",
       "command": "default",
       "extensions": [
-        ".cmd"
+        ".2mg",
+        ".2img",
+        ".apl",
+        ".bin",
+        ".cmd",
+        ".do",
+        ".dsk",
+        ".gz",
+        ".hdv",
+        ".m3u",
+        ".nib",
+        ".po",
+        ".woz",
+        ".zip"
       ],
       "emulators": [
         {
           "name": "libretro",
           "cores": [
             {
+              "name": "applewin",
+              "default": true,
+              "incompatible": [".cmd"]
+            },
+            {
               "name": "mame",
-              "default": true
+              "incompatible": [".2mg", ".2img", ".apl", ".bin", ".do", ".dsk", ".gz", ".hdv", ".m3u", ".nib", ".po", ".woz", ".zip"]
             }
           ]
         }
