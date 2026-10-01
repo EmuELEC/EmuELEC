@@ -1,4 +1,4 @@
-rom /storage/roms/bios/basilisk2/mac.rom
+rom /storage/roms/bios/mac.rom
 modelid 14
 cpu 4
 fpu true
