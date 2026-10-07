@@ -1,0 +1,45 @@
+# Tsugaru (FM Towns) gptokeyb configuration.
+
+# I N S T R U C T I O N S :
+#
+# If a game needs special keys (for example A for UP, Z for DOWN etc.), change the mapping table beneath accordingly.
+#
+# Then SAVE this file under the game's name. For example: Alltynex.gptk
+#
+# The correct filepath for the game-gptk file is: /emuelec/configs/tsugaru/gptk
+#
+# For example: /emuelec/configs/tsugaru/gptk/Alltynex.gptk
+#
+# tsugarustart.sh will automatically load the respective gptk file when starting the game.
+#
+# If no game-specific gptk file is found, the emulator will always use "tsugaru.gptk" in /emuelec/configs/tsugaru/gptk
+#----------------------------------------------------------------------------------------------------------------------------
+back = a
+start = s
+select =
+a = z
+b = x
+x =
+y =
+
+l1 = mouse_left
+l2 =
+r1 = mouse_right
+r2 =
+
+up = up
+down = down
+left = left
+right = right
+
+left_analog_left = left
+left_analog_right = right
+left_analog_up = up
+left_analog_down = down
+
+right_analog_up = mouse_movement_up
+right_analog_down = mouse_movement_down
+right_analog_left = mouse_movement_left
+right_analog_right = mouse_movement_right
+mouse_scale = 1500
+mouse_delay = 16
