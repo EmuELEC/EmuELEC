@@ -35,6 +35,20 @@ makeinstall_target() {
   # dependent packages (e.g. openMSX).
   make -C ${PKG_BUILD}/unix DESTDIR=${SYSROOT_PREFIX} install
 
+  # DESTDIR only redirects where files are written, not the paths inside
+  # them: the sysroot copy of tclConfig.sh still points at the host's /usr
+  # and at the build directory. openMSX sources this file and uses
+  # TCL_INCLUDE_SPEC verbatim, so -I/usr/include reaches the cross compiler
+  # and trips the toolchain's host-path guard. Rewrite the sysroot copy
+  # only; the one under ${INSTALL} must keep /usr for the image.
+  sed -i \
+    -e "s|^TCL_PREFIX='/usr'|TCL_PREFIX='${SYSROOT_PREFIX}/usr'|" \
+    -e "s|^TCL_EXEC_PREFIX='/usr'|TCL_EXEC_PREFIX='${SYSROOT_PREFIX}/usr'|" \
+    -e "s|-I/usr/include|-I${SYSROOT_PREFIX}/usr/include|g" \
+    -e "s|-L/usr/lib|-L${SYSROOT_PREFIX}/usr/lib|g" \
+    -e "s|-L${PKG_BUILD}/unix|-L${SYSROOT_PREFIX}/usr/lib|g" \
+    "${SYSROOT_PREFIX}/usr/lib/tclConfig.sh"
+
   # Tcl 8.6 does not install a pkg-config .pc file by default.
   # Create one so probe.py can discover the link flags (-ltcl8.6).
   # Without it, probe.py finds tcl.h but links with no -l flag and fails.
