@@ -23,7 +23,7 @@ ln -sf "$ROM" "$SESSION/ruffle_data/movie.swf"
 # has no hardware cursor - the preloaded shim draws one from the mouse events.
 export SDL_VIDEODRIVER=mali
 export SDL_AUDIODRIVER=alsa
-export LD_PRELOAD="/usr/bin/ruffle_cursor.so"
+export LD_PRELOAD="/usr/lib/sdl_swcursor.so"
 
 # gptokeyb: a .gptk named like the SWF next to it wins over the default
 kill -9 $(pidof gptokeyb) 2>/dev/null
