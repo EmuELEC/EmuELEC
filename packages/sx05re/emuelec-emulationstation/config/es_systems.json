@@ -200,31 +200,34 @@
       "command": "default",
       "extensions": [
         ".cmd",
-		".chd",
-		".cue",
-		".iso",
-		".mds",
-		".ccd",
-		".d77",
-		".d88",
-		".hdm",
-		".m3u"
+        ".chd",
+        ".cue",
+        ".iso",
+        ".mds",
+        ".mdf",
+        ".ccd",
+        ".d77",
+        ".d88",
+        ".hdm",
+        ".xdf"
       ],
       "emulators": [
         {
           "name": "libretro",
           "cores": [
             {
-              "name": "mame"            
+              "name": "mame",
+              "incompatible": [".cue", ".iso", ".mds", ".mdf", ".ccd", ".d77", ".d88", ".hdm", ".xdf"]
             }
-					]
-		},
-		{
+          ]
+        },
+        {
           "name": "tsugaru",
           "cores": [
             {
               "name": "tsugaru",
-			  "default": true
+              "default": true,
+              "incompatible": [".cmd", ".chd"]
             }
           ]
         }

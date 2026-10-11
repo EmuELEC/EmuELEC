@@ -20,15 +20,6 @@ pre_configure_target() {
   # CMakeLists lives in src/, not in the repo root
   PKG_CMAKE_SCRIPT="${PKG_BUILD}/src/CMakeLists.txt"
   PKG_CMAKE_OPTS_TARGET="-DCMAKE_BUILD_TYPE=Release"
-
-  # Replace the X11/GL fssimplewindow connection with the SDL2 backend
-  cp ${PKG_DIR}/files/fssimplewindow_connection.h \
-     ${PKG_DIR}/files/fssimplewindow_connection.cpp \
-     ${PKG_DIR}/files/CMakeLists.txt \
-     ${PKG_BUILD}/src/externals/connect_fssimplewindow/
-
-  # CPU/disc/no-GL patches; abort the build if the source layout changed
-  python3 ${PKG_DIR}/files/patch_i486.py ${PKG_BUILD} || die "tsugaru: patch stage failed"
 }
 
 make_target() {
