@@ -6,13 +6,14 @@ PKG_NAME="mesa"
 if [ "${DEVICE}" = "RPi5" ]; then
   PKG_VERSION="23.2.1"
   PKG_SHA256="64de0616fc2d801f929ab1ac2a4f16b3e2783c4309a724c8a259b20df8bbc1cc"
+  PKG_URL="https://archive.mesa3d.org/mesa-${PKG_VERSION}.tar.xz"
 else
   PKG_VERSION="22.3.7"
   PKG_SHA256="894ce2f4a1c2e76177cdd2284620192d0da3066b243eec2fbb1d7cf37f13042c"
+  PKG_URL="https://archive.mesa3d.org/older-versions/22.x/mesa-${PKG_VERSION}.tar.xz"
 fi
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
-PKG_URL="https://mesa.freedesktop.org/archive/mesa-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 
