@@ -11,8 +11,8 @@ PKG_LONGDESC="TIC-80 is a fantasy computer for making, playing and sharing tiny 
 GET_HANDLER_SUPPORT="git"
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_LIBRETRO=ON \
-					   -DBUILD_PLAYER=ON \
-                       -DBUILD_SDL=ON \
+					   -DBUILD_PLAYER=OFF \
+                       -DBUILD_SDL=OFF \
                        -DBUILD_WITH_RUBY=OFF \
                        -DBUILD_WITH_YUE=OFF \
                        -DCMAKE_BUILD_TYPE=Release \
