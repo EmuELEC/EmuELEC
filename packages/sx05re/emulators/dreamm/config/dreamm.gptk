@@ -35,7 +35,7 @@
 #
 # NOTE: gptokeyb can only emit F1-F10 and cannot send modifier combinations, so
 # DREAMM's own menu shortcuts (F12 and ALT+U) are out of reach from a pad. L1
-# therefore sends F10, which dreamm_cursor.so translates into a synthetic F12
+# therefore sends F10, which sdl_swcursor.so translates into a synthetic F12
 # key event. The same applies to the cursor toggle on L2, which sends F9.
 # Attach a USB keyboard for the remaining ALT shortcuts (ALT+ENTER window mode,
 # ALT+V volume, ALT+BACKSPACE screenshot, ALT+X exit).
@@ -58,10 +58,10 @@ r2 = mouse_right
 a = enter
 b = space
 
-# DREAMM in-game menu (translated to F12 by dreamm_cursor.so)
+# DREAMM in-game menu (translated to F12 by sdl_swcursor.so)
 l1 = f10
 
-# Software cursor toggle (handled by dreamm_cursor.so)
+# Software cursor toggle (handled by sdl_swcursor.so)
 l2 = f9
 
 # Game keys
