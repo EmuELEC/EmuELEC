@@ -8,10 +8,10 @@
 
 # Software mouse pointer: EmuELEC's SDL2 only ships the "mali" and "offscreen"
 # video drivers, neither of which implements a hardware cursor.
-export LD_PRELOAD="/usr/lib/dreamm_cursor.so"
-export DREAMM_CURSOR_SCALE="${DREAMM_CURSOR_SCALE:-3}"
-export DREAMM_CURSOR_TOGGLE="${DREAMM_CURSOR_TOGGLE:-66}"   # F9
-export DREAMM_MENU_KEY="${DREAMM_MENU_KEY:-67}"             # F10 -> F12
+export LD_PRELOAD="/usr/lib/sdl_swcursor.so"
+export SWCURSOR_SCALE="${SWCURSOR_SCALE:-3}"
+export SWCURSOR_TOGGLE="${SWCURSOR_TOGGLE:-66}"   # F9
+export SWCURSOR_MENU="${SWCURSOR_MENU:-67}"       # F10 -> F12
 
 export LIBGL_NOTEST=1
 export SDL_VIDEODRIVER=mali
@@ -37,7 +37,7 @@ else
     GPTK_CONFIG="$GPTK_DEFAULT"
 fi
 
-# Per-game overrides: DREAMM_CURSOR=0 for titles drawing their own pointer,
+# Per-game overrides: SWCURSOR=0 for titles drawing their own pointer,
 # DREAMM_GPTOKEYB=0 for joystick games so DREAMM can grab the pad itself
 if [ -d "$dir" ] && [ -f "${dir}/dreamm.conf" ]; then
     . "${dir}/dreamm.conf"
@@ -94,7 +94,4 @@ fi
 
 killall -9 gptokeyb 2>/dev/null
 
-case "${DREAMM_EXIT:-0}" in
-    137|143) exit 0 ;;
-esac
 exit "${DREAMM_EXIT:-0}"
