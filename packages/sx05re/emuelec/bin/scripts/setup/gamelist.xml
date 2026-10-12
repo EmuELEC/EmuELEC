@@ -1,20 +1,12 @@
 <?xml version="1.0"?>
 <gameList>
 	<game>
-		<path>./btsetup.sh</path>
-		<name>Setup Bluetooth Audio device</name>
-		<desc>Scan and pair bluetooth audio devices (like speakers and headphones or earbuds) to EmuELEC (via pulseaudio). After the setup, you must run the "Connect Bluetooth Audio device"-script. Make sure to switch the audio device in the retroarch menu from alsa to pulseaudio in order to hear the in-game sound.</desc>
+		<path>./bt-commander.sh</path>
+		<name>BT Commander</name>
+		<desc>Scan and pair bluetooth audio devices (like speakers and headphones or earbuds) to EmuELEC via pulseaudio, pick one from the list of paired devices, reconnect the device used last, disconnect it again or remove its pairing. Connecting also switches EmulationStation and RetroArch over to pulseaudio, so both play through the device without any further setup. Standalone emulators keep using the analog or HDMI output.</desc>
 		<developer>worstcase_scenario </developer>
 		<genre>script</genre>
 		<image>./setup_images/btsetup.png</image>
-	</game>
-	<game>
-		<path>./btconnect.sh</path>
-		<name>Connect Bluetooth Audio device</name>
-		<desc>Connect last paired bluetooth audio device. Make sure to switch the audio device in retroarch menu from alsa to pulseaudio in order to hear the in-game sound.</desc>
-		<developer>worstcase_scenario </developer>
-		<genre>script</genre>
-		<image>./setup_images/btconnect.png</image>
 	</game>
 	<game>
 		<path>./create_rom_dirs.sh</path>

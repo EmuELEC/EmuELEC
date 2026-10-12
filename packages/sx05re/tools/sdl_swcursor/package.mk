@@ -9,12 +9,17 @@ PKG_SECTION="emuelec/tools"
 PKG_SHORTDESC="LD_PRELOAD software mouse cursor for SDL2 apps on the mali backend"
 PKG_TOOLCHAIN="manual"
 
+CC32="${TOOLCHAIN}/bin/armv8a-emuelec-linux-gnueabihf"
+
 make_target() {
   ${CC} -shared -fPIC -O2 -o sdl_swcursor.so ${PKG_DIR}/sources/sdl_swcursor.c -ldl
   ${STRIP} sdl_swcursor.so
+  ${CC32}-gcc -shared -fPIC -O2 -o sdl_swcursor32.so ${PKG_DIR}/sources/sdl_swcursor.c -ldl
+  ${CC32}-strip sdl_swcursor32.so
 }
 
 makeinstall_target() {
-  mkdir -p ${INSTALL}/usr/lib
+  mkdir -p ${INSTALL}/usr/lib ${INSTALL}/usr/lib32
   cp sdl_swcursor.so ${INSTALL}/usr/lib/
+  cp sdl_swcursor32.so ${INSTALL}/usr/lib32/sdl_swcursor.so
 }

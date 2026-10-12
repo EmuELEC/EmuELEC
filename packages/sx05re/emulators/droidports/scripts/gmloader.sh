@@ -9,4 +9,4 @@
 [ ! -e "/storage/roms/ports/gmloader/libc++_shared.so" ] && cp "/usr/config/emuelec/configs/gmloader/libc++_shared.so" "/storage/roms/ports/gmloader/libc++_shared.so"
 
 cd /storage/roms/ports/gmloader
-gmloader "${1}"
+LD_PRELOAD=/usr/lib32/sdl_swcursor.so gmloader "${1}"
