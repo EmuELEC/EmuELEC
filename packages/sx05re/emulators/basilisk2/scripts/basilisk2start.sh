@@ -29,9 +29,6 @@ else
     GPTK_CONFIG="$GPTK_DEFAULT"
 fi
 
-# Pause EmulationStation
-kill -SIGSTOP $(pgrep emulationstation) 2>/dev/null
-
 # Start gptokeyb
 gptokeyb 1 BasiliskII -c "$GPTK_CONFIG" &
 
@@ -39,9 +36,6 @@ sleep 1
 
 # Launch Basilisk II
 /usr/bin/BasiliskII --config "$PREFS" --disk "$ROM"
-
-# Resume EmulationStation
-kill -SIGCONT $(pgrep emulationstation) 2>/dev/null
 
 # Cleanup
 killall -9 gptokeyb 2>/dev/null
