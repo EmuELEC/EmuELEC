@@ -7,7 +7,7 @@ PKG_URL="${PKG_SITE}.git"
 PKG_LICENSE="MPLv2"
 PKG_ARCH="aarch64"
 PKG_TOOLCHAIN="manual"
-PKG_DEPENDS_TARGET="toolchain rust cargo SDL2 openal-soft"
+PKG_DEPENDS_TARGET="toolchain rust:host cargo:host SDL2 openal-soft"
 make_target() {
   unset CMAKE
   export PKG_CONFIG_ALLOW_CROSS=1

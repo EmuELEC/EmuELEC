@@ -1,0 +1,131 @@
+diff --git a/src/cpputil/cpputil.h b/src/cpputil/cpputil.h
+index a4e52239..33668f31 100644
+--- a/src/cpputil/cpputil.h
++++ b/src/cpputil/cpputil.h
+@@ -175,7 +175,7 @@ inline uint32_t MakeUnsignedDword(uint8_t lowByte,uint8_t midLowByte,uint8_t mid
+ inline int GetSignedByte(const unsigned char byteData)
+ {
+ #if defined(YS_LITTLE_ENDIAN) && defined(YS_TWOS_COMPLEMENT)
+-	char *signedPtr=(char *)&byteData;
++	const int8_t *signedPtr=(const int8_t *)&byteData; // aarch64: char is unsigned
+ 	return *signedPtr;
+ #else
+ 	int byte=byteData;
+diff --git a/src/cpu/i486runinstruction.h b/src/cpu/i486runinstruction.h
+index 0e67d065..afcf2a23 100644
+--- a/src/cpu/i486runinstruction.h
++++ b/src/cpu/i486runinstruction.h
+@@ -1980,10 +1980,10 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 					ShrByte(i,ctr); \
+ 					clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+ 					break; \
+-				case 6: \
+-					Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode())); \
++				case 6: /* SAL: undocumented alias of SHL on real i486 */ \
++					ShlByte(i,ctr); \
+ 					clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+-					return 0; \
++					break; \
+ 				case 7: \
+ 					SarByte(i,ctr); \
+ 					clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+@@ -2024,10 +2024,10 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 					ShrByte(i,ctr); \
+ 					clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+ 					break; \
+-				case 6: \
+-					Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode())); \
++				case 6: /* SAL: undocumented alias of SHL on real i486 */ \
++					ShlByte(i,ctr); \
+ 					clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+-					return 0; \
++					break; \
+ 				case 7: \
+ 					SarByte(i,ctr); \
+ 					clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+@@ -2078,10 +2078,10 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 						ShrWord(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+ 						break; \
+-					case 6: \
+-						Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode())); \
++					case 6: /* SAL: undocumented alias of SHL on real i486 */ \
++						ShlWord(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+-						return 0; \
++						break; \
+ 					case 7: \
+ 						SarWord(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+@@ -2124,10 +2124,10 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 						ShrWord(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+ 						break; \
+-					case 6: \
+-						Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode())); \
++					case 6: /* SAL: undocumented alias of SHL on real i486 */ \
++						ShlWord(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+-						return 0; \
++						break; \
+ 					case 7: \
+ 						SarWord(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+@@ -2175,10 +2175,10 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 						ShrDword(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+ 						break; \
+-					case 6: \
+-						Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode())); \
++					case 6: /* SAL: undocumented alias of SHL on real i486 */ \
++						ShlDword(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+-						return 0; \
++						break; \
+ 					case 7: \
+ 						SarDword(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+@@ -2221,10 +2221,10 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 						ShrDword(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+ 						break; \
+-					case 6: \
+-						Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode())); \
++					case 6: /* SAL: undocumented alias of SHL on real i486 */ \
++						ShlDword(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+-						return 0; \
++						break; \
+ 					case 7: \
+ 						SarDword(i,ctr); \
+ 						clocksPassed=(OPER_ADDR==op1.operandType ? 4 : 2); \
+@@ -5304,8 +5304,12 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 			case 5:
+ 			case 6:
+ 			case 7:
+-				Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode()));
+-				return 0;
++				// aarch64/EmuELEC port: real i486 raises #UD here; FM Towns BIOS relies on it.
++				RaiseException(EXCEPTION_UD,0);
++				HandleException(true,mem,inst.numBytes);
++				clocksPassed+=ClocksForHandlingException();
++				EIPIncrement=0;
++				break;
+ 			default:
+ 				std_unreachable;
+ 			}
+@@ -5570,8 +5574,12 @@ unsigned int i486DXFidelityLayer<FIDELITY>::RunOneInstruction(Memory &mem,InOut
+ 				}
+ 				break;
+ 			case 7:
+-				Abort("Undefined REG for "+cpputil::Ustox(inst.RealOpCode()));
+-				return 0;
++				// aarch64/EmuELEC port: real i486 raises #UD here; FM Towns BIOS relies on it.
++				RaiseException(EXCEPTION_UD,0);
++				HandleException(true,mem,inst.numBytes);
++				clocksPassed=ClocksForHandlingException();
++				EIPIncrement=0;
++				break;
+ 			default:
+ 				std_unreachable;
+ 			}
