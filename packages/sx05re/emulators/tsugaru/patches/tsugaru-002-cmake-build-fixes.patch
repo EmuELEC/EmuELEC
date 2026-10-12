@@ -1,0 +1,27 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 606c2480..587d5bc5 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
+ if(UNIX)
+-	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} -Wno-unused-variable)
+-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-unused-variable)
++	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-variable")
++	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
+ endif()
+ 
+ 
+diff --git a/src/externals/fssimplewindow/src/CMakeLists.txt b/src/externals/fssimplewindow/src/CMakeLists.txt
+index fa9f3183..7a4ee83e 100644
+--- a/src/externals/fssimplewindow/src/CMakeLists.txt
++++ b/src/externals/fssimplewindow/src/CMakeLists.txt
+@@ -59,6 +59,7 @@ target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+ set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER ${SUB_FOLDER})
+ 
+ add_library(fssimplenowindow fssimplewindowcommon.cpp nownd/fssimplenowindow.cpp)
++target_compile_definitions(fssimplenowindow PUBLIC FSSIMPLEWINDOW_DONT_INCLUDE_OPENGL_HEADERS)
+ target_include_directories(fssimplenowindow PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+ set_property(TARGET fssimplenowindow PROPERTY FOLDER ${SUB_FOLDER})
+ 

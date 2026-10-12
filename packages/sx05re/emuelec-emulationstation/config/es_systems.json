@@ -199,7 +199,17 @@
       "theme": "fmtowns",
       "command": "default",
       "extensions": [
-        ".cmd"
+        ".cmd",
+        ".chd",
+        ".cue",
+        ".iso",
+        ".mds",
+        ".mdf",
+        ".ccd",
+        ".d77",
+        ".d88",
+        ".hdm",
+        ".xdf"
       ],
       "emulators": [
         {
@@ -207,7 +217,17 @@
           "cores": [
             {
               "name": "mame",
-              "default": true
+              "incompatible": [".cue", ".iso", ".mds", ".mdf", ".ccd", ".d77", ".d88", ".hdm", ".xdf"]
+            }
+          ]
+        },
+        {
+          "name": "tsugaru",
+          "cores": [
+            {
+              "name": "tsugaru",
+              "default": true,
+              "incompatible": [".cmd", ".chd"]
             }
           ]
         }

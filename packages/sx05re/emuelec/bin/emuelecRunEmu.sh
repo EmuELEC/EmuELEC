@@ -283,6 +283,12 @@ case ${PLATFORM} in
 				RUNTHIS='${TBASH} ti99sdlstart.sh "${ROMNAME}"'
                 fi
                 ;;	
+		"fmtowns"|"fmtownsux")
+				if [ "${EMU}" = "tsugaru" ]; then
+				set_kill_keys "tsugaru"
+				RUNTHIS='${TBASH} tsugarustart.sh "${ROMNAME}"'
+				fi
+				;;		
 		"samcoupe")
                 if [ "${EMU}" = "simcoupe" ]; then
 				set_kill_keys "simcoupe"
