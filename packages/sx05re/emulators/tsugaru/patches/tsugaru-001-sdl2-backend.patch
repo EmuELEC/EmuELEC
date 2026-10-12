@@ -1,0 +1,923 @@
+diff --git a/src/externals/connect_fssimplewindow/CMakeLists.txt b/src/externals/connect_fssimplewindow/CMakeLists.txt
+index 451bf1aa..dffe5f01 100644
+--- a/src/externals/connect_fssimplewindow/CMakeLists.txt
++++ b/src/externals/connect_fssimplewindow/CMakeLists.txt
+@@ -1,15 +1,19 @@
+ set(TARGET_NAME fssimplewindow_connection)
+ 
+ add_library(${TARGET_NAME} fssimplewindow_connection.h fssimplewindow_connection.cpp)
+-target_link_libraries(${TARGET_NAME} outside_world fssimplewindow yssimplesound cpputil ysgamepad)
++# SDL2 backend: link fssimplenowindow (no-op Fs* stubs + FsKeyCode tables)
++# instead of fssimplewindow (X11/GLX). Keeps yssimplesound (ALSA) and ysgamepad.
++target_link_libraries(${TARGET_NAME} outside_world fssimplenowindow yssimplesound cpputil ysgamepad)
+ target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+ 
+-if(MSVC)
+-	target_link_libraries(${TARGET_NAME} yssimplesound_dsound)
+-elseif(APPLE)
+-	find_library(COCOA_LIB Cocoa)
+-	mark_as_advanced(COCOA_LIB)
+-	target_link_libraries(${TARGET_NAME} yssimplesound_macosx ${COCOA_LIB})
+-elseif(UNIX)
++find_package(SDL2 REQUIRED)
++if(TARGET SDL2::SDL2)
++	target_link_libraries(${TARGET_NAME} SDL2::SDL2)
++else()
++	target_include_directories(${TARGET_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
++	target_link_libraries(${TARGET_NAME} ${SDL2_LIBRARIES})
++endif()
++
++if(UNIX)
+ 	target_link_libraries(${TARGET_NAME} yssimplesound_linux_alsa)
+ endif()
+diff --git a/src/externals/connect_fssimplewindow/fssimplewindow_connection.cpp b/src/externals/connect_fssimplewindow/fssimplewindow_connection.cpp
+index 93ff5dbd..6f05d163 100644
+--- a/src/externals/connect_fssimplewindow/fssimplewindow_connection.cpp
++++ b/src/externals/connect_fssimplewindow/fssimplewindow_connection.cpp
+@@ -24,6 +24,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 	#include <unistd.h>
+ #endif
+ 
++#ifndef FSSIMPLEWINDOW_DONT_INCLUDE_OPENGL_HEADERS
++#define FSSIMPLEWINDOW_DONT_INCLUDE_OPENGL_HEADERS
++#endif
+ #include "fssimplewindow.h"
+ #include "fssimplewindow_connection.h"
+ 
+@@ -70,19 +73,21 @@ FsSimpleWindowConnection::~FsSimpleWindowConnection()
+ 
+ std::string FsSimpleWindowConnection::GetProgramResourceDirectory(void) const
+ {
+-	std::string RCDIR;
+-
+-	char cwd[1024];
+-	getcwd(cwd,1024);
+-
+-	FsChangeToProgramDir();
+-	char rcdir[1024];
+-	getcwd(rcdir,1024);
+-	RCDIR=rcdir;
+-
+-	chdir(cwd);
+-
+-	return RCDIR;
++	// SDL2/Linux port: derive the resource directory from /proc/self/exe
++	// instead of FsChangeToProgramDir (which is a no-op in fssimplenowindow).
++	char buf[1024];
++	auto len=readlink("/proc/self/exe",buf,sizeof(buf)-1);
++	if(0<len)
++	{
++		buf[len]=0;
++		std::string path=buf;
++		auto pos=path.find_last_of('/');
++		if(std::string::npos!=pos)
++		{
++			return path.substr(0,pos);
++		}
++	}
++	return ".";
+ }
+ 
+ /* virtual */ std::vector <std::string> FsSimpleWindowConnection::MakeDefaultKeyMappingText(void) const
+@@ -1586,97 +1591,78 @@ void FsSimpleWindowConnection::PauseKeyPressed(void)
+ 
+ void FsSimpleWindowConnection::WindowConnection::Start(void)
+ {
+-	int wid=640*shared.scalingX/100;
+-	int hei=480*shared.scalingY/100;
+-
+-	int winY0=0;
+-	if(true==windowShift)
++	if(0==SDL_WasInit(SDL_INIT_VIDEO))
+ 	{
+-		winY0=48;
+-	}
+-
+-
+-	// In tight GUI integration, FsResizeWindow will re-enter OnDraw call-back, and will crash inside
+-	// unless bitmaps are ready.  Do it before FsResizeWindow.
+-
+-	// Make PAUSE and MENU icons.  Used only in the tightly-integrated GUI.
+-	PAUSEicon.resize(4*PAUSE_wid*PAUSE_hei);
+-	MENUicon.resize(4*MENU_wid*MENU_hei);
+-	for(int y=0; y<PAUSE_hei; ++y)
+-	{
+-		int Y=PAUSE_hei-1-y;
+-		for(int x=0; x<PAUSE_wid; ++x)
++		if(0>SDL_InitSubSystem(SDL_INIT_VIDEO))
+ 		{
+-			PAUSEicon[(y*PAUSE_wid+x)*4  ]=PAUSE[(Y*PAUSE_wid+x)*4  ];
+-			PAUSEicon[(y*PAUSE_wid+x)*4+1]=PAUSE[(Y*PAUSE_wid+x)*4+1];
+-			PAUSEicon[(y*PAUSE_wid+x)*4+2]=PAUSE[(Y*PAUSE_wid+x)*4+2];
+-			PAUSEicon[(y*PAUSE_wid+x)*4+3]=PAUSE[(Y*PAUSE_wid+x)*4+3];
++			fprintf(stderr,"SDL_InitSubSystem(VIDEO) failed: %s\n",SDL_GetError());
+ 		}
+ 	}
+-	for(int y=0; y<MENU_hei; ++y)
+-	{
+-		int Y=MENU_hei-1-y;
+-		for(int x=0; x<MENU_wid; ++x)
+-		{
+-			MENUicon[(y*MENU_wid+x)*4  ]=MENU[(Y*MENU_wid+x)*4  ];
+-			MENUicon[(y*MENU_wid+x)*4+1]=MENU[(Y*MENU_wid+x)*4+1];
+-			MENUicon[(y*MENU_wid+x)*4+2]=MENU[(Y*MENU_wid+x)*4+2];
+-			MENUicon[(y*MENU_wid+x)*4+3]=MENU[(Y*MENU_wid+x)*4+3];
+-		}
+-	}
+-
+-
+ 
+-	if(0==FsCheckWindowOpen())
++	// PAUSE and MENU icons.  Unlike the OpenGL back-end, SDL textures are
++	// top-down, therefore the icons are copied without the vertical flip.
++	PAUSEicon.resize(4*PAUSE_wid*PAUSE_hei);
++	MENUicon.resize(4*MENU_wid*MENU_hei);
++	for(int i=0; i<4*PAUSE_wid*PAUSE_hei; ++i)
+ 	{
+-		FsOpenWindow(0,winY0,wid,hei+STATUS_HEI,1,WINDOW_TITLE);
+-		FsRegisterCloseWindowCallBack(FsSimpleWindowConnection::WindowConnection::CloseWindowCallBack,this);
++		PAUSEicon[i]=PAUSE[i];
+ 	}
+-	else
++	for(int i=0; i<4*MENU_wid*MENU_hei; ++i)
+ 	{
+-		FsResizeWindow(wid,hei+STATUS_HEI);
++		MENUicon[i]=MENU[i];
+ 	}
+ 
+-	switch(windowModeOnStartUp)
++	if(nullptr==sdlWindow)
+ 	{
+-	case TownsStartParameters::WINDOW_MAXIMIZE:
+-		FsPollDevice();
+-		FsMaximizeWindow();
+-		for(int i=0; i<10; ++i)
++		int wid=640*shared.scalingX/100;
++		int hei=480*shared.scalingY/100;
++		Uint32 flags=SDL_WINDOW_SHOWN;
++		switch(windowModeOnStartUp)
+ 		{
+-			FsPollDevice();
++		case TownsStartParameters::WINDOW_MAXIMIZE:
++		case TownsStartParameters::WINDOW_FULLSCREEN:
++			flags|=SDL_WINDOW_FULLSCREEN_DESKTOP;
++			break;
++		case TownsStartParameters::WINDOW_SPECIFY_SIZE:
++			wid=windowSizeOnStartUp[0];
++			hei=windowSizeOnStartUp[1];
++			break;
+ 		}
+-		break;
+-	case TownsStartParameters::WINDOW_FULLSCREEN:
+-		FsPollDevice();
+-		FsMakeFullScreen();
+-		for(int i=0; i<10; ++i)
++		sdlWindow=SDL_CreateWindow(WINDOW_TITLE,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,wid,hei+STATUS_HEI,flags);
++		if(nullptr==sdlWindow)
+ 		{
+-			FsPollDevice();
++			fprintf(stderr,"SDL_CreateWindow failed: %s\n",SDL_GetError());
+ 		}
+-		autoScaling=true;
+-		break;
+-	case TownsStartParameters::WINDOW_SPECIFY_SIZE:
+-		FsPollDevice();
+-		FsResizeWindow(windowSizeOnStartUp[0],windowSizeOnStartUp[1]+STATUS_HEI);
+-		for(int i=0; i<10; ++i)
++		else
+ 		{
+-			FsPollDevice();
++			sdlRenderer=SDL_CreateRenderer(sdlWindow,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
++			if(nullptr==sdlRenderer)
++			{
++				sdlRenderer=SDL_CreateRenderer(sdlWindow,-1,0);
++			}
++			if(nullptr==sdlRenderer)
++			{
++				fprintf(stderr,"SDL_CreateRenderer failed: %s\n",SDL_GetError());
++			}
+ 		}
+-		break;
+ 	}
+ 
++	// On KMSDRM (EmuELEC) the window always covers the whole display.
++	// Scale-to-fit with aspect ratio is the only sensible mode there,
++	// and it also behaves well on a desktop.
++	autoScaling=true;
++
++	SDL_StartTextInput();
++
+ 	winThr.winWid=640;
+ 	winThr.winHei=480;
+ 
+-	glClearColor(0,0,0,0);
+-	mainTexId=GenTexture();
+-	statusTexId=GenTexture();
+-
+-	pauseIconTexId=GenTexture();
+-	UpdateTexture(pauseIconTexId,PAUSE_wid,PAUSE_hei,PAUSEicon.data());
+-	menuIconTexId=GenTexture();
+-	UpdateTexture(menuIconTexId,MENU_wid,MENU_hei,MENUicon.data());
++	if(nullptr!=sdlRenderer)
++	{
++		statusTex=SDL_CreateTexture(sdlRenderer,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_STREAMING,STATUS_WID,STATUS_HEI);
++		pauseIconTex=MakeStaticTexture(sdlRenderer,PAUSE_wid,PAUSE_hei,PAUSEicon.data());
++		menuIconTex=MakeStaticTexture(sdlRenderer,MENU_wid,MENU_hei,MENUicon.data());
++	}
+ 
+ 	// Make initial status bitmap
+ 	Put16x16Invert(0,15,CD_IDLE);
+@@ -1689,7 +1675,6 @@ void FsSimpleWindowConnection::WindowConnection::Start(void)
+ 		Put16x16Invert(48+16*hdd,15,HDD_IDLE);
+ 	}
+ 
+-
+ 	if(true!=winThrEx.gamePadInitialized)
+ 	{
+ 		YsGamePadInitialize();
+@@ -1708,54 +1693,281 @@ void FsSimpleWindowConnection::WindowConnection::Start(void)
+ }
+ void FsSimpleWindowConnection::WindowConnection::Stop(void)
+ {
+-	if(TownsStartParameters::WINDOW_NORMAL!=windowModeOnStartUp)
++	SDL_StopTextInput();
++	if(nullptr!=mainTex)
++	{
++		SDL_DestroyTexture(mainTex);
++		mainTex=nullptr;
++		mainTexWid=0;
++		mainTexHei=0;
++	}
++	if(nullptr!=statusTex)
++	{
++		SDL_DestroyTexture(statusTex);
++		statusTex=nullptr;
++	}
++	if(nullptr!=pauseIconTex)
++	{
++		SDL_DestroyTexture(pauseIconTex);
++		pauseIconTex=nullptr;
++	}
++	if(nullptr!=menuIconTex)
++	{
++		SDL_DestroyTexture(menuIconTex);
++		menuIconTex=nullptr;
++	}
++}
++static int SDLScancodeToFSKEY(int scancode)
++{
++	switch(scancode)
+ 	{
+-		FsUnmaximizeWindow();
++	case SDL_SCANCODE_SPACE:        return FSKEY_SPACE;
++	case SDL_SCANCODE_0:            return FSKEY_0;
++	case SDL_SCANCODE_1:            return FSKEY_1;
++	case SDL_SCANCODE_2:            return FSKEY_2;
++	case SDL_SCANCODE_3:            return FSKEY_3;
++	case SDL_SCANCODE_4:            return FSKEY_4;
++	case SDL_SCANCODE_5:            return FSKEY_5;
++	case SDL_SCANCODE_6:            return FSKEY_6;
++	case SDL_SCANCODE_7:            return FSKEY_7;
++	case SDL_SCANCODE_8:            return FSKEY_8;
++	case SDL_SCANCODE_9:            return FSKEY_9;
++	case SDL_SCANCODE_A:            return FSKEY_A;
++	case SDL_SCANCODE_B:            return FSKEY_B;
++	case SDL_SCANCODE_C:            return FSKEY_C;
++	case SDL_SCANCODE_D:            return FSKEY_D;
++	case SDL_SCANCODE_E:            return FSKEY_E;
++	case SDL_SCANCODE_F:            return FSKEY_F;
++	case SDL_SCANCODE_G:            return FSKEY_G;
++	case SDL_SCANCODE_H:            return FSKEY_H;
++	case SDL_SCANCODE_I:            return FSKEY_I;
++	case SDL_SCANCODE_J:            return FSKEY_J;
++	case SDL_SCANCODE_K:            return FSKEY_K;
++	case SDL_SCANCODE_L:            return FSKEY_L;
++	case SDL_SCANCODE_M:            return FSKEY_M;
++	case SDL_SCANCODE_N:            return FSKEY_N;
++	case SDL_SCANCODE_O:            return FSKEY_O;
++	case SDL_SCANCODE_P:            return FSKEY_P;
++	case SDL_SCANCODE_Q:            return FSKEY_Q;
++	case SDL_SCANCODE_R:            return FSKEY_R;
++	case SDL_SCANCODE_S:            return FSKEY_S;
++	case SDL_SCANCODE_T:            return FSKEY_T;
++	case SDL_SCANCODE_U:            return FSKEY_U;
++	case SDL_SCANCODE_V:            return FSKEY_V;
++	case SDL_SCANCODE_W:            return FSKEY_W;
++	case SDL_SCANCODE_X:            return FSKEY_X;
++	case SDL_SCANCODE_Y:            return FSKEY_Y;
++	case SDL_SCANCODE_Z:            return FSKEY_Z;
++	case SDL_SCANCODE_ESCAPE:       return FSKEY_ESC;
++	case SDL_SCANCODE_F1:           return FSKEY_F1;
++	case SDL_SCANCODE_F2:           return FSKEY_F2;
++	case SDL_SCANCODE_F3:           return FSKEY_F3;
++	case SDL_SCANCODE_F4:           return FSKEY_F4;
++	case SDL_SCANCODE_F5:           return FSKEY_F5;
++	case SDL_SCANCODE_F6:           return FSKEY_F6;
++	case SDL_SCANCODE_F7:           return FSKEY_F7;
++	case SDL_SCANCODE_F8:           return FSKEY_F8;
++	case SDL_SCANCODE_F9:           return FSKEY_F9;
++	case SDL_SCANCODE_F10:          return FSKEY_F10;
++	case SDL_SCANCODE_F11:          return FSKEY_F11;
++	case SDL_SCANCODE_F12:          return FSKEY_F12;
++	case SDL_SCANCODE_PRINTSCREEN:  return FSKEY_PRINTSCRN;
++	case SDL_SCANCODE_CAPSLOCK:     return FSKEY_CAPSLOCK;
++	case SDL_SCANCODE_SCROLLLOCK:   return FSKEY_SCROLLLOCK;
++	case SDL_SCANCODE_PAUSE:        return FSKEY_PAUSEBREAK;
++	case SDL_SCANCODE_BACKSPACE:    return FSKEY_BS;
++	case SDL_SCANCODE_TAB:          return FSKEY_TAB;
++	case SDL_SCANCODE_RETURN:       return FSKEY_ENTER;
++	case SDL_SCANCODE_LSHIFT:       return FSKEY_LEFT_SHIFT;
++	case SDL_SCANCODE_RSHIFT:       return FSKEY_RIGHT_SHIFT;
++	case SDL_SCANCODE_LCTRL:        return FSKEY_LEFT_CTRL;
++	case SDL_SCANCODE_RCTRL:        return FSKEY_RIGHT_CTRL;
++	case SDL_SCANCODE_LALT:         return FSKEY_LEFT_ALT;
++	case SDL_SCANCODE_RALT:         return FSKEY_RIGHT_ALT;
++	case SDL_SCANCODE_INSERT:       return FSKEY_INS;
++	case SDL_SCANCODE_DELETE:       return FSKEY_DEL;
++	case SDL_SCANCODE_HOME:         return FSKEY_HOME;
++	case SDL_SCANCODE_END:          return FSKEY_END;
++	case SDL_SCANCODE_PAGEUP:       return FSKEY_PAGEUP;
++	case SDL_SCANCODE_PAGEDOWN:     return FSKEY_PAGEDOWN;
++	case SDL_SCANCODE_UP:           return FSKEY_UP;
++	case SDL_SCANCODE_DOWN:         return FSKEY_DOWN;
++	case SDL_SCANCODE_LEFT:         return FSKEY_LEFT;
++	case SDL_SCANCODE_RIGHT:        return FSKEY_RIGHT;
++	case SDL_SCANCODE_NUMLOCKCLEAR: return FSKEY_NUMLOCK;
++	case SDL_SCANCODE_GRAVE:        return FSKEY_TILDA;
++	case SDL_SCANCODE_MINUS:        return FSKEY_MINUS;
++	case SDL_SCANCODE_EQUALS:       return FSKEY_PLUS;
++	case SDL_SCANCODE_LEFTBRACKET:  return FSKEY_LBRACKET;
++	case SDL_SCANCODE_RIGHTBRACKET: return FSKEY_RBRACKET;
++	case SDL_SCANCODE_BACKSLASH:    return FSKEY_BACKSLASH;
++	case SDL_SCANCODE_SEMICOLON:    return FSKEY_SEMICOLON;
++	case SDL_SCANCODE_APOSTROPHE:   return FSKEY_SINGLEQUOTE;
++	case SDL_SCANCODE_COMMA:        return FSKEY_COMMA;
++	case SDL_SCANCODE_PERIOD:       return FSKEY_DOT;
++	case SDL_SCANCODE_SLASH:        return FSKEY_SLASH;
++	case SDL_SCANCODE_KP_0:         return FSKEY_TEN0;
++	case SDL_SCANCODE_KP_1:         return FSKEY_TEN1;
++	case SDL_SCANCODE_KP_2:         return FSKEY_TEN2;
++	case SDL_SCANCODE_KP_3:         return FSKEY_TEN3;
++	case SDL_SCANCODE_KP_4:         return FSKEY_TEN4;
++	case SDL_SCANCODE_KP_5:         return FSKEY_TEN5;
++	case SDL_SCANCODE_KP_6:         return FSKEY_TEN6;
++	case SDL_SCANCODE_KP_7:         return FSKEY_TEN7;
++	case SDL_SCANCODE_KP_8:         return FSKEY_TEN8;
++	case SDL_SCANCODE_KP_9:         return FSKEY_TEN9;
++	case SDL_SCANCODE_KP_PERIOD:    return FSKEY_TENDOT;
++	case SDL_SCANCODE_KP_DIVIDE:    return FSKEY_TENSLASH;
++	case SDL_SCANCODE_KP_MULTIPLY:  return FSKEY_TENSTAR;
++	case SDL_SCANCODE_KP_MINUS:     return FSKEY_TENMINUS;
++	case SDL_SCANCODE_KP_PLUS:      return FSKEY_TENPLUS;
++	case SDL_SCANCODE_KP_ENTER:     return FSKEY_TENENTER;
++	case SDL_SCANCODE_APPLICATION:  return FSKEY_CONTEXT;
++	case SDL_SCANCODE_INTERNATIONAL3: return FSKEY_RO;        // JIS RO
++	case SDL_SCANCODE_INTERNATIONAL4: return FSKEY_CONVERT;   // Henkan
++	case SDL_SCANCODE_INTERNATIONAL5: return FSKEY_NONCONVERT;// Muhenkan
++	case SDL_SCANCODE_LANG1:        return FSKEY_KANA;
++	case SDL_SCANCODE_LANG5:        return FSKEY_ZENKAKU;
+ 	}
+-	glDeleteTextures(1,&mainTexId);
+-	glDeleteTextures(1,&statusTexId);
+-	glDeleteTextures(1,&pauseIconTexId);
+-	glDeleteTextures(1,&menuIconTexId);
++	return FSKEY_NULL;
+ }
++
+ /*! Called from the Window Thread.
+ */
+ void FsSimpleWindowConnection::WindowConnection::Interval(void)
+ {
+ 	BaseInterval();
+ 
+-	FsPollDevice();
+-
+-	FsGetWindowSize(winThrEx.primary.winWid,winThrEx.primary.winHei);
+-
+-	int code;
+-	while(FSKEY_NULL!=(code=FsInkey()))
+-	{
+-		winThrEx.primary.keyCode.push_back(code);
+-	}
+-	while(0!=(code=FsInkeyChar()))
++	SDL_Event sdlEvent;
++	while(0!=SDL_PollEvent(&sdlEvent))
+ 	{
+-		winThrEx.primary.charCode.push_back(code);
++		switch(sdlEvent.type)
++		{
++		case SDL_QUIT:
++			{
++				std::lock_guard <std::mutex> lock(deviceStateLock);
++				closeWindow=true;
++			}
++			break;
++		case SDL_KEYDOWN:
++			if(0==sdlEvent.key.repeat)
++			{
++				auto fskey=SDLScancodeToFSKEY(sdlEvent.key.keysym.scancode);
++				if(FSKEY_NULL!=fskey)
++				{
++					winThrEx.primary.keyCode.push_back(fskey);
++				}
++			}
++			break;
++		case SDL_TEXTINPUT:
++			for(const char *ptr=sdlEvent.text.text; 0!=*ptr; ++ptr)
++			{
++				auto c=(unsigned char)*ptr;
++				if(c<0x80) // ASCII only.  FM Towns doesn't take UTF-8 anyway.
++				{
++					winThrEx.primary.charCode.push_back(c);
++				}
++			}
++			break;
++		case SDL_MOUSEBUTTONDOWN:
++		case SDL_MOUSEBUTTONUP:
++			{
++				bool down=(SDL_MOUSEBUTTONDOWN==sdlEvent.type);
++				MouseEvent mos;
++				mos.evt=FSMOUSEEVENT_NONE;
++				switch(sdlEvent.button.button)
++				{
++				case SDL_BUTTON_LEFT:
++					mouseLb=(down ? 1 : 0);
++					mos.evt=(down ? FSMOUSEEVENT_LBUTTONDOWN : FSMOUSEEVENT_LBUTTONUP);
++					break;
++				case SDL_BUTTON_MIDDLE:
++					mouseMb=(down ? 1 : 0);
++					mos.evt=(down ? FSMOUSEEVENT_MBUTTONDOWN : FSMOUSEEVENT_MBUTTONUP);
++					break;
++				case SDL_BUTTON_RIGHT:
++					mouseRb=(down ? 1 : 0);
++					mos.evt=(down ? FSMOUSEEVENT_RBUTTONDOWN : FSMOUSEEVENT_RBUTTONUP);
++					break;
++				}
++				mouseX=sdlEvent.button.x;
++				mouseY=sdlEvent.button.y;
++				if(FSMOUSEEVENT_NONE!=mos.evt)
++				{
++					mos.lb=mouseLb;
++					mos.mb=mouseMb;
++					mos.rb=mouseRb;
++					mos.mx=mouseX;
++					mos.my=mouseY;
++					winThrEx.primary.mouseEvents.push_back(mos);
++					winThrEx.primary.lastKnownMouse=mos;
++				}
++			}
++			break;
++		case SDL_MOUSEMOTION:
++			{
++				mouseX=sdlEvent.motion.x;
++				mouseY=sdlEvent.motion.y;
++				MouseEvent mos;
++				mos.evt=FSMOUSEEVENT_MOVE;
++				mos.lb=mouseLb;
++				mos.mb=mouseMb;
++				mos.rb=mouseRb;
++				mos.mx=mouseX;
++				mos.my=mouseY;
++				winThrEx.primary.mouseEvents.push_back(mos);
++				winThrEx.primary.lastKnownMouse=mos;
++			}
++			break;
++		case SDL_MOUSEWHEEL:
++			winThrEx.primary.keyCode.push_back(0<sdlEvent.wheel.y ? FSKEY_WHEELUP : FSKEY_WHEELDOWN);
++			break;
++		}
+ 	}
+-	for(int key=0; key<FSKEY_NUM_KEYCODE; ++key)
++
++	if(nullptr!=sdlWindow)
+ 	{
+-		winThrEx.primary.keyState[key]=FsGetKeyState(key);
++		SDL_GetWindowSize(sdlWindow,&winThrEx.primary.winWid,&winThrEx.primary.winHei);
+ 	}
+-	for(;;)
++
++	// Key states from SDL's keyboard-state array, translated into the FSKEY space.
+ 	{
+-		winThrEx.primary.lastKnownMouse.Read();
+-		if(FSMOUSEEVENT_NONE==winThrEx.primary.lastKnownMouse.evt)
++		int numSDLKeys=0;
++		const Uint8 *sdlKeyState=SDL_GetKeyboardState(&numSDLKeys);
++		for(int key=0; key<FSKEY_NUM_KEYCODE; ++key)
+ 		{
+-			break;
++			winThrEx.primary.keyState[key]=0;
++		}
++		for(int sc=0; sc<numSDLKeys; ++sc)
++		{
++			if(0!=sdlKeyState[sc])
++			{
++				auto fskey=SDLScancodeToFSKEY(sc);
++				if(FSKEY_NULL!=fskey)
++				{
++					winThrEx.primary.keyState[fskey]=1;
++				}
++			}
++		}
++		// Aggregate modifiers.  DevicePolling uses FSKEY_SHIFT/CTRL/ALT.
++		if(0!=winThrEx.primary.keyState[FSKEY_LEFT_SHIFT] || 0!=winThrEx.primary.keyState[FSKEY_RIGHT_SHIFT])
++		{
++			winThrEx.primary.keyState[FSKEY_SHIFT]=1;
++		}
++		if(0!=winThrEx.primary.keyState[FSKEY_LEFT_CTRL] || 0!=winThrEx.primary.keyState[FSKEY_RIGHT_CTRL])
++		{
++			winThrEx.primary.keyState[FSKEY_CTRL]=1;
++		}
++		if(0!=winThrEx.primary.keyState[FSKEY_LEFT_ALT] || 0!=winThrEx.primary.keyState[FSKEY_RIGHT_ALT])
++		{
++			winThrEx.primary.keyState[FSKEY_ALT]=1;
+ 		}
+-		winThrEx.primary.mouseEvents.push_back(winThrEx.primary.lastKnownMouse);
+ 	}
+ 
+ 	if(true==shared.differentialMouseIntegration)
+ 	{
+-		int lb,mb,rb,mx,my;
+-		FsGetMouseState(lb,mb,rb,mx,my);
+-		// Next FsGetMouseEvent may lag from FsSetMousePosition if more events are in the queue.
+-		// Therefore mouse position for differentialMouseIntegration should be polled separately.
++		int mx,my;
++		SDL_GetMouseState(&mx,&my);
+ 
+ 		winThrEx.primary.mouseMoveXY[0]+=mx-diffMouseXY[0];
+ 		winThrEx.primary.mouseMoveXY[1]+=my-diffMouseXY[1];
+@@ -1777,7 +1989,10 @@ void FsSimpleWindowConnection::WindowConnection::Interval(void)
+ 			diffMouseXY[0]=cx;
+ 			diffMouseXY[1]=cy;
+ 
+-			FsSetMousePosition(cx,cy);
++			if(nullptr!=sdlWindow)
++			{
++				SDL_WarpMouseInWindow(sdlWindow,cx,cy);
++			}
+ 		}
+ 	}
+ 
+@@ -1787,16 +2002,9 @@ void FsSimpleWindowConnection::WindowConnection::Interval(void)
+ 		std::lock_guard <std::mutex> lock(deviceStateLock);
+ 
+ 		bool mouseCursorVisible=(true!=shared.differentialMouseIntegration && true==shared.showMouseCursor);
+-		if(mouseCursorVisible!=(FsIsMouseCursorVisible()!=0))
++		if(mouseCursorVisible!=(SDL_ENABLE==SDL_ShowCursor(SDL_QUERY)))
+ 		{
+-			if(true==mouseCursorVisible)
+-			{
+-				FsShowMouseCursor(1);
+-			}
+-			else
+-			{
+-				FsShowMouseCursor(0);
+-			}
++			SDL_ShowCursor(true==mouseCursorVisible ? SDL_ENABLE : SDL_DISABLE);
+ 		}
+ 
+ 		winThr.VMClosed=shared.VMClosedFromVMThread;
+@@ -1813,8 +2021,13 @@ void FsSimpleWindowConnection::WindowConnection::Interval(void)
+ */
+ void FsSimpleWindowConnection::WindowConnection::Render(bool swapBuffers)
+ {
++	if(nullptr==sdlWindow || nullptr==sdlRenderer)
++	{
++		return;
++	}
++
+ 	int winWid,winHei;
+-	FsGetWindowSize(winWid,winHei);
++	SDL_GetWindowSize(sdlWindow,&winWid,&winHei);
+ 
+ 	if(0==winThr.mostRecentImage.wid || 0==winThr.mostRecentImage.hei)
+ 	{
+@@ -1856,8 +2069,11 @@ void FsSimpleWindowConnection::WindowConnection::Render(bool swapBuffers)
+ 
+ 	UpdateStatusBitmap();
+ 
+-	UpdateTexture(statusTexId,STATUS_WID,STATUS_HEI,winThr.statusBitmap);
+-	UpdateTexture(mainTexId,winThr.mostRecentImage.wid,winThr.mostRecentImage.hei,winThr.mostRecentImage.rgba.data());
++	if(nullptr!=statusTex)
++	{
++		SDL_UpdateTexture(statusTex,nullptr,winThr.statusBitmap,STATUS_WID*4);
++	}
++	UpdateTextureSDL(mainTex,mainTexWid,mainTexHei,winThr.mostRecentImage.wid,winThr.mostRecentImage.hei,winThr.mostRecentImage.rgba.data());
+ 
+ 	auto lowerRightIcon=shared.lowerRightIcon;
+ 
+@@ -1875,77 +2091,77 @@ void FsSimpleWindowConnection::WindowConnection::Render(bool swapBuffers)
+ 	renderingLock.unlock();
+ 	// }
+ 
++	// Unlike the OpenGL back-end there is no window resizing here.
++	// On KMSDRM the window is the display; autoScaling handles the rest.
++
++	SDL_SetRenderDrawColor(sdlRenderer,0,0,0,255);
++	SDL_RenderClear(sdlRenderer);
+ 
+-	if(true!=autoScaling)
++	// Status bar.  The status bitmap is written bottom-up (OpenGL convention
++	// of the original back-end and of Outside_World::WindowInterface::Put16x16),
++	// therefore it is drawn vertically flipped.
++	if(nullptr!=statusTex)
+ 	{
+-		if(winThr.winWid!=imgWid || winThr.winHei!=imgHei)
+-		{
+-			winThr.winWid=imgWid;
+-			winThr.winHei=imgHei;
+-			winThrEx.sinceLastResize=10;
+-		}
+-		else if(0<winThrEx.sinceLastResize)
+-		{
+-			--winThrEx.sinceLastResize;
+-			if(0==winThrEx.sinceLastResize)
+-			{
+-				FsResizeWindow(winThr.winWid*scalingX/100,winThr.winHei*scalingY/100+STATUS_HEI);
+-			}
+-		}
++		SDL_Rect dst;
++		dst.x=0;
++		dst.y=winHei-STATUS_HEI;
++		dst.w=STATUS_WID;
++		dst.h=STATUS_HEI;
++		SDL_RenderCopyEx(sdlRenderer,statusTex,nullptr,&dst,0.0,nullptr,SDL_FLIP_VERTICAL);
+ 	}
+ 
+-	glClear(GL_COLOR_BUFFER_BIT);
+-	glViewport(0,0,winWid,winHei);
+-	glMatrixMode(GL_PROJECTION);
+-	glLoadIdentity();
+-	glOrtho(0.0f,float(winWid),float(winHei),0.0f,-1,1);
+-
+-
+-	glEnable(GL_TEXTURE_2D);
+-    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+-	glColor3f(1,1,1);
+-
+-	glBindTexture(GL_TEXTURE_2D,statusTexId);
+-	DrawTextureRect(0,winHei-1-STATUS_HEI,STATUS_WID,winHei-1);
+-
+ 	switch(lowerRightIcon)
+ 	{
+ 	case LOWER_RIGHT_NONE:
+ 		break;
+ 	case LOWER_RIGHT_PAUSE:
+-		glBindTexture(GL_TEXTURE_2D,pauseIconTexId);
+-		DrawTextureRect(winWid-PAUSE_wid,winHei-1-PAUSE_hei,winWid,winHei-1);
++		if(nullptr!=pauseIconTex)
++		{
++			SDL_Rect dst;
++			dst.x=winWid-PAUSE_wid;
++			dst.y=winHei-PAUSE_hei;
++			dst.w=PAUSE_wid;
++			dst.h=PAUSE_hei;
++			SDL_RenderCopy(sdlRenderer,pauseIconTex,nullptr,&dst);
++		}
+ 		break;
+ 	case LOWER_RIGHT_MENU:
+-		glBindTexture(GL_TEXTURE_2D,menuIconTexId);
+-		DrawTextureRect(winWid-MENU_wid,winHei-1-MENU_hei,winWid,winHei-1);
++		if(nullptr!=menuIconTex)
++		{
++			SDL_Rect dst;
++			dst.x=winWid-MENU_wid;
++			dst.y=winHei-MENU_hei;
++			dst.w=MENU_wid;
++			dst.h=MENU_hei;
++			SDL_RenderCopy(sdlRenderer,menuIconTex,nullptr,&dst);
++		}
+ 		break;
+ 	}
+ 
+-	glBindTexture(GL_TEXTURE_2D,mainTexId);
+-	DrawTextureRect(dx,dy+imgHei*scalingY/100,dx+imgWid*scalingX/100,dy);
+-
+-	glDisable(GL_TEXTURE_2D);
++	// Main VM image.  ImageNeedsFlip() is false: rows are top-down, drawn as-is.
++	if(nullptr!=mainTex)
++	{
++		SDL_Rect dst;
++		dst.x=dx;
++		dst.y=dy;
++		dst.w=imgWid*scalingX/100;
++		dst.h=imgHei*scalingY/100;
++		SDL_RenderCopy(sdlRenderer,mainTex,nullptr,&dst);
++	}
+ 
+ 	if(true==strikeCommanderSpecial)
+ 	{
+ 		int x;
+-		glColor3ub(128,128,255);
+-		glBegin(GL_LINES);
++		SDL_SetRenderDrawColor(sdlRenderer,128,128,255,255);
+ 
+ 		x=dx+160*2*scalingX/100;
+-		glVertex2i(x,winHei-1);
+-		glVertex2i(x,winHei-STATUS_HEI+1);
++		SDL_RenderDrawLine(sdlRenderer,x,winHei-1,x,winHei-STATUS_HEI+1);
+ 
+ 		x=dx+224*2*scalingX/100;
+-		glVertex2i(x,winHei-1);
+-		glVertex2i(x,winHei-STATUS_HEI+1);
++		SDL_RenderDrawLine(sdlRenderer,x,winHei-1,x,winHei-STATUS_HEI+1);
+ 
+ 		x=dx+278*2*scalingX/100;
+-		glVertex2i(x,winHei-1);
+-		glVertex2i(x,winHei-STATUS_HEI+1);
+-
+-		glEnd();
++		SDL_RenderDrawLine(sdlRenderer,x,winHei-1,x,winHei-STATUS_HEI+1);
+ 	}
+ 
+ 	if(true==rocketRangerSpecial)
+@@ -1963,40 +2179,40 @@ void FsSimpleWindowConnection::WindowConnection::Render(bool swapBuffers)
+ 		//           On  Off                On  Off
+ 		int t=rocketRangerTiming;
+ 
++		SDL_Rect rect;
++
+ 		if((2<=t && t<=5) || (20<=t && t<=23))
+ 		{
+-			glColor3ub(255,255,255);
++			SDL_SetRenderDrawColor(sdlRenderer,255,255,255,255);
+ 		}
+ 		else
+ 		{
+-			glColor3ub(0,0,0);
++			SDL_SetRenderDrawColor(sdlRenderer,0,0,0,255);
+ 		}
+-		glBegin(GL_TRIANGLE_FAN);
+-		glVertex2i(x0,winHei-STATUS_HEI+1);
+-		glVertex2i(x0,winHei-1);
+-		glVertex2i(x1,winHei-1);
+-		glVertex2i(x1,winHei-STATUS_HEI+1);
+-		glEnd();
++		rect.x=x0;
++		rect.y=winHei-STATUS_HEI+1;
++		rect.w=x1-x0;
++		rect.h=STATUS_HEI-2;
++		SDL_RenderFillRect(sdlRenderer,&rect);
+ 
+ 		if(rocketRangerSpeed<rocketRangerNecessarySpeed)
+ 		{
+-			glColor3ub(255,0,0);
++			SDL_SetRenderDrawColor(sdlRenderer,255,0,0,255);
+ 		}
+ 		else
+ 		{
+-			glColor3ub(0,255,0);
++			SDL_SetRenderDrawColor(sdlRenderer,0,255,0,255);
+ 		}
+-		glBegin(GL_TRIANGLE_FAN);
+-		glVertex2i(x2,winHei-STATUS_HEI+1);
+-		glVertex2i(x2,winHei-1);
+-		glVertex2i(x3,winHei-1);
+-		glVertex2i(x3,winHei-STATUS_HEI+1);
+-		glEnd();
++		rect.x=x2;
++		rect.y=winHei-STATUS_HEI+1;
++		rect.w=x3-x2;
++		rect.h=STATUS_HEI-2;
++		SDL_RenderFillRect(sdlRenderer,&rect);
+ 	}
+ 
+ 	if(true==swapBuffers)
+ 	{
+-		FsSwapBuffers();
++		SDL_RenderPresent(sdlRenderer);
+ 	}
+ }
+ 
+@@ -2123,52 +2339,40 @@ void FsSimpleWindowConnection::WindowConnection::UpdateStatusBitmapRocketRangerS
+ 	}
+ }
+ 
+-GLuint FsSimpleWindowConnection::WindowConnection::GenTexture(void)
++void FsSimpleWindowConnection::WindowConnection::UpdateTextureSDL(SDL_Texture *&tex,int &texWid,int &texHei,int wid,int hei,const unsigned char *rgba)
+ {
+-	GLuint texId;
+-
+-	glGenTextures(1,&texId);  // Reserve one texture identifier
+-	glBindTexture(GL_TEXTURE_2D,texId);  // Making the texture identifier current (or bring it to the deck)
+-
+-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP);
+-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);
+-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+-
+-	return texId;
++	if(nullptr==sdlRenderer)
++	{
++		return;
++	}
++	if(nullptr==tex || texWid!=wid || texHei!=hei)
++	{
++		if(nullptr!=tex)
++		{
++			SDL_DestroyTexture(tex);
++			tex=nullptr;
++		}
++		tex=SDL_CreateTexture(sdlRenderer,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_STREAMING,wid,hei);
++		if(nullptr==tex)
++		{
++			fprintf(stderr,"SDL_CreateTexture failed: %s\n",SDL_GetError());
++			return;
++		}
++		texWid=wid;
++		texHei=hei;
++	}
++	SDL_UpdateTexture(tex,nullptr,rgba,wid*4);
+ }
+ 
+-void FsSimpleWindowConnection::WindowConnection::UpdateTexture(GLuint texId,int wid,int hei,const unsigned char *rgba) const
++/* static */ SDL_Texture *FsSimpleWindowConnection::WindowConnection::MakeStaticTexture(SDL_Renderer *renderer,int wid,int hei,const unsigned char *rgba)
+ {
+-	glBindTexture(GL_TEXTURE_2D,texId);
+-	glTexImage2D
+-	    (GL_TEXTURE_2D,
+-	     0,
+-	     GL_RGBA,
+-	     wid,
+-	     hei,
+-	     0,
+-	     GL_RGBA,
+-	     GL_UNSIGNED_BYTE,
+-	     rgba);
+-}
+-void FsSimpleWindowConnection::WindowConnection::DrawTextureRect(int x0,int y0,int x1,int y1) const
+-{
+-	glBegin(GL_QUADS);
+-
+-	glTexCoord2f(0,0);
+-	glVertex2i(x0,y1);
+-
+-	glTexCoord2f(1,0);
+-	glVertex2i(x1,y1);
+-
+-	glTexCoord2f(1,1);
+-	glVertex2i(x1,y0);
+-
+-	glTexCoord2f(0,1);
+-	glVertex2i(x0,y0);
+-
+-	glEnd();
++	auto tex=SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_STATIC,wid,hei);
++	if(nullptr!=tex)
++	{
++		SDL_SetTextureBlendMode(tex,SDL_BLENDMODE_BLEND);
++		SDL_UpdateTexture(tex,nullptr,rgba,wid*4);
++	}
++	return tex;
+ }
+ 
+ ////////////////////////////////////////////////////////////////
+diff --git a/src/externals/connect_fssimplewindow/fssimplewindow_connection.h b/src/externals/connect_fssimplewindow/fssimplewindow_connection.h
+index ecb82c12..e2aa63e3 100644
+--- a/src/externals/connect_fssimplewindow/fssimplewindow_connection.h
++++ b/src/externals/connect_fssimplewindow/fssimplewindow_connection.h
+@@ -37,7 +37,11 @@ So, my best decision is to use streaming mode in macOS, which should work perfec
+ #include "outside_world.h"
+ #include "yssimplesound.h"
+ #include "ysgamepad.h"
+-#include "fssimplewindow.h"
++#ifndef FSSIMPLEWINDOW_DONT_INCLUDE_OPENGL_HEADERS
++#define FSSIMPLEWINDOW_DONT_INCLUDE_OPENGL_HEADERS
++#endif
++#include "fssimplewindow.h" // FSKEY_* key-code space and FsKeyCodeToString/FsStringToKeyCode (linked from fssimplenowindow; no X11/GL)
++#include <SDL2/SDL.h>
+ #include <vector>
+ #include <thread>
+ #include <mutex>
+@@ -51,7 +55,9 @@ public:
+ 		int evt=0,lb=0,mb=0,rb=0,mx=0,my=0;
+ 		inline void Read(void)
+ 		{
+-			evt=FsGetMouseEvent(lb,mb,rb,mx,my);
++			// SDL2 port: mouse events are constructed from SDL events in
++			// WindowConnection::Interval().  Nothing to read here.
++			evt=FSMOUSEEVENT_NONE;
+ 		}
+ 	};
+ 	class DeviceAndEvent
+@@ -178,12 +184,16 @@ public:
+ 		//       If the guest has not consumed previous mouse movement, add the motion instead of overwrite.
+ 
+ 
+-		// Constants that do not change.
+-		GLuint mainTexId,statusTexId,pauseIconTexId,menuIconTexId;
++		// SDL2 window/renderer/textures.  Created in Start(), textures are
++		// (re-)allocated on demand when the source image size changes.
++		SDL_Window *sdlWindow=nullptr;
++		SDL_Renderer *sdlRenderer=nullptr;
++		SDL_Texture *mainTex=nullptr,*statusTex=nullptr,*pauseIconTex=nullptr,*menuIconTex=nullptr;
++		int mainTexWid=0,mainTexHei=0;
++		int mouseLb=0,mouseMb=0,mouseRb=0,mouseX=0,mouseY=0; // last known SDL mouse state (window thread)
+ 
+-		GLuint GenTexture(void);
+-		void UpdateTexture(GLuint texId,int wid,int hei,const unsigned char *rgba) const;
+-		void DrawTextureRect(int x0,int y0,int x1,int y1) const;
++		void UpdateTextureSDL(SDL_Texture *&tex,int &texWid,int &texHei,int wid,int hei,const unsigned char *rgba);
++		static SDL_Texture *MakeStaticTexture(SDL_Renderer *renderer,int wid,int hei,const unsigned char *rgba);
+ 
+ 		void UpdateStatusBitmap(void);
+ 		void UpdateStatusBitmapRocketRangerSpecial(unsigned int position);
