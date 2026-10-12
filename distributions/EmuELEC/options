@@ -275,8 +275,10 @@ LIBRETRO_CORES="2048 \
 81 \
 a5200 \
 amiarcadia \
+applewin \
 arduous \
 atari800 \
+azahar \
 b2 \
 beetle-lynx \
 beetle-ngp \
@@ -336,6 +338,7 @@ mojozork \
 mrboom \
 mu \
 mupen64plus \
+native32emu \
 neocd_libretro \
 nestopia \
 numero \

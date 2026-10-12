@@ -283,6 +283,12 @@ case ${PLATFORM} in
 				RUNTHIS='${TBASH} ti99sdlstart.sh "${ROMNAME}"'
                 fi
                 ;;	
+		"fmtowns"|"fmtownsux")
+				if [ "${EMU}" = "tsugaru" ]; then
+				set_kill_keys "tsugaru"
+				RUNTHIS='${TBASH} tsugarustart.sh "${ROMNAME}"'
+				fi
+				;;		
 		"samcoupe")
                 if [ "${EMU}" = "simcoupe" ]; then
 				set_kill_keys "simcoupe"
@@ -293,6 +299,12 @@ case ${PLATFORM} in
                 if [ "${EMU}" = "touchhle" ]; then
 				set_kill_keys "touchhle-sa"
 				RUNTHIS='${TBASH} start_touchhle.sh "${ROMNAME}"'
+                fi
+                ;;	
+		"dreamm")
+                if [ "${EMU}" = "dreamm" ]; then
+				set_kill_keys "dreamm"
+				RUNTHIS='${TBASH} dreammstart.sh "${ROMNAME}"'
                 fi
                 ;;	
 		"msx"|"msx2"|"msx2+"|"msxturbor")
