@@ -82,9 +82,6 @@ else
     GPTK_CONFIG="$GPTK_DEFAULT"
 fi
 
-# Pause EmulationStation
-kill -SIGSTOP $(pgrep emulationstation) 2>/dev/null
-
 # Start gptokeyb
 gptokeyb 1 xroar -c "$GPTK_CONFIG" &
 
@@ -96,9 +93,6 @@ LIBGL_NOTEST=1 /usr/bin/xroar -fs \
   -default-machine "$MACHINE" \
   ${LOAD_FLAG} "$ROM" \
   ${TYPE_PARAM}
-
-# Resume EmulationStation
-kill -SIGCONT $(pgrep emulationstation) 2>/dev/null
 
 # Cleanup
 killall -9 gptokeyb 2>/dev/null
