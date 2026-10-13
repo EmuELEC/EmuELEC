@@ -41,7 +41,18 @@ configure_target() {
 
 make_target() {
   cd ${PKG_BUILD}/BasiliskII/src/Unix
-  make CC_FOR_BUILD="${HOST_CC}" CXX_FOR_BUILD="${HOST_CXX}"
+  mkdir -p obj
+
+  # The generator tools run on the build host, but Makefile.in builds them
+  # with $(CC)/$(CXX). Build them with the host compiler first.
+  make obj/build68k obj/gencpu \
+    CC="${HOST_CC}" CXX="${HOST_CXX}" CFLAGS="" CXXFLAGS="" LDFLAGS=""
+  make cpuemu.cpp
+
+  # readcpu.o and cpudefs.o are also part of the emulator: rebuild for target,
+  # -o keeps make from relinking the host tools with the target compiler
+  rm -f obj/readcpu.o obj/cpudefs.o
+  make -o obj/build68k -o obj/gencpu
 }
 
 makeinstall_target() {
