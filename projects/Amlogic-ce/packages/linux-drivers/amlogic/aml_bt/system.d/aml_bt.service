@@ -1,0 +1,9 @@
+[Unit]
+Description=Attach Amlogic W1 Bluetooth
+Before=bluetooth.service
+
+[Service]
+Type=forking
+ExecStartPre=-/usr/sbin/rfkill unblock bluetooth
+ExecStart=/usr/sbin/aml_hciattach /dev/stpbt
+TimeoutStartSec=30

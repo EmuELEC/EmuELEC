@@ -113,7 +113,7 @@
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
   ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
                       aic8800-sdio RTW88 RTL8189FS RTL8852BE-aml RTL8723DS-aml
-                      RTL8851BU RTL8852BS-aml mt76 mt7668-wifi-bt w1-aml"
+                      RTL8851BU RTL8852BS-aml mt76 mt7668-wifi-bt w1-aml aml_bt"
       
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)

@@ -59,7 +59,7 @@
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
   ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
                      uwe5631-aml RTL8812AU RTL8822BU-aml RTL8822CS-aml RTL8822CU-aml
-                     RTL8852BS-aml RTL8152-aml w1-aml"
+                     RTL8852BS-aml RTL8152-aml w1-aml aml_bt"
 
 # Default size of system partition, in MB, eg. 512
   SYSTEM_SIZE=2048

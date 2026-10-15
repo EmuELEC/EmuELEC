@@ -1,0 +1,14 @@
+--- a/aml_bt/aml_hciattach/aml_comm.h
++++ b/aml_bt/aml_hciattach/aml_comm.h
+@@ -43,8 +43,9 @@
+ #define PCEDIT_MAC        "/tmp/bdaddr"
+ #define FW_VER_FILE       "/tmp/bt_fw_version"
+ #else
+-#define AMLBT_ADDR_PATH   "/etc/bluetooth/aml/bt_addr"
+-#define FW_VER_FILE       "/etc/bluetooth/aml/bt_fw_version"
++/* /etc is read-only, keep the generated address across reboots */
++#define AMLBT_ADDR_PATH   "/storage/.cache/aml_bt/bt_addr"
++#define FW_VER_FILE       "/run/aml_bt/bt_fw_version"
+ #endif
+ 
+ #define AMLBT_RANDOM_DEV "/dev/urandom"

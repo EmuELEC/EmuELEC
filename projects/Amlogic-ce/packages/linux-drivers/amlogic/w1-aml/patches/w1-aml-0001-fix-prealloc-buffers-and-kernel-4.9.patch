@@ -1,0 +1,39 @@
+--- a/project_w1/vmac/w1_sdio/w1_sdio.c
++++ b/project_w1/vmac/w1_sdio/w1_sdio.c
+@@ -1266,6 +1266,16 @@
+ static void *wlan_preallocated_rx_buf;
+ static void *wlan_preallocated_tx_desc_buf;
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0))
++/* kvmalloc() only exists since 4.12 */
++static void *kvmalloc(size_t size, gfp_t flags)
++{
++    void *buf = kmalloc(size, (flags & ~__GFP_NOFAIL) | __GFP_NOWARN | __GFP_NORETRY);
++
++    return buf ? buf : vmalloc(size);
++}
++#endif
++
+ /* Two defines below taken from aml_static_buf.c. */
+ #define AML_RX  11
+ #define AML_TX  20
+@@ -1316,7 +1326,7 @@
+     wlan_preallocated_rx_buf = kvmalloc(RX_BUF_LEN, GFP_KERNEL);
+ #endif
+     if (!wlan_preallocated_rx_buf) {
+-        vfree(wlan_preallocated_tx_desc_buf);
++        kfree(wlan_preallocated_tx_desc_buf);
+         return -ENOMEM;
+     }
+     return 0;
+@@ -1324,8 +1334,8 @@
+ 
+ static void aml_deinit_wlan_mem(void)
+ {
+-    kfree(wlan_preallocated_rx_buf);
+-    vfree(wlan_preallocated_tx_desc_buf);
++    kvfree(wlan_preallocated_rx_buf);
++    kfree(wlan_preallocated_tx_desc_buf);
+ }
+ 
+ int w1_aml_w1_sdio_init(void)
