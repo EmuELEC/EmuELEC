@@ -1,6 +1,5 @@
 #!/bin/sh
 
-OSRELEASEFILE="/etc/os-release"
 USRCONFFILE="/storage/.config/vfd.conf"
 SYSCONFDIR="/etc/openvfd.conf.d"
 PROC_DT="/proc/device-tree"
@@ -20,11 +19,6 @@ if [ "$(tr -d '\0' < $PROC_DT/openvfd/compatible)" = "open,vfd" ]; then
   else
     exit 0
   fi
-  OS_SPLASH_OPT=""
-  if [ -f "$OSRELEASEFILE" ]; then
-    source "$OSRELEASEFILE"
-    OS_SPLASH_OPT="-s CE${VERSION_ID%%.*}"
-  fi
   /sbin/modprobe openvfd vfd_gpio_clk=${vfd_gpio_clk} \
                          vfd_gpio_dat=${vfd_gpio_dat} \
                          vfd_gpio_stb=${vfd_gpio_stb:-0,0,0xFF} \
@@ -35,5 +29,8 @@ if [ "$(tr -d '\0' < $PROC_DT/openvfd/compatible)" = "open,vfd" ]; then
                          vfd_gpio_protocol=${vfd_gpio_protocol:-0,0} \
                          vfd_chars=${vfd_chars} vfd_dot_bits=${vfd_dot_bits} \
                          vfd_display_type=${vfd_display_type}
-  /usr/sbin/OpenVFDService $OS_SPLASH_OPT ${clock_12h_format:+-12h}
+  # No "-s CE<version>" here: that is a permanent text mode, which on CoreELEC the
+  # Kodi OpenVFD add-on replaces. EmuELEC has no Kodi, so the display would keep
+  # showing "CE4" instead of the clock.
+  /usr/sbin/OpenVFDService ${clock_12h_format:+-12h}
 fi
