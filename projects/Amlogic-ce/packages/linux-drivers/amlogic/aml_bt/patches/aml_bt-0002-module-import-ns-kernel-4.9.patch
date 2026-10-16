@@ -1,0 +1,12 @@
+--- a/aml_bt/sdio_driver_bt/bt_hal_plateform.c
++++ b/aml_bt/sdio_driver_bt/bt_hal_plateform.c
+@@ -8,7 +8,9 @@
+ #include <linux/platform_device.h>
+ #include <linux/version.h>
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+ MODULE_IMPORT_NS(W1-AML);
++#endif
+ 
+ extern unsigned char (*w1_host_wake_w1_req)(void);
+ static int reg_config_complete = 0;
