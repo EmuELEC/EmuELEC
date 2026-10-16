@@ -209,7 +209,10 @@
         ".d77",
         ".d88",
         ".hdm",
-        ".xdf"
+        ".xdf",
+        ".img",
+        ".m3u",
+        ".zip"
       ],
       "emulators": [
         {
@@ -217,7 +220,11 @@
           "cores": [
             {
               "name": "mame",
-              "incompatible": [".cue", ".iso", ".mds", ".mdf", ".ccd", ".d77", ".d88", ".hdm", ".xdf"]
+              "incompatible": [".cue", ".iso", ".mds", ".mdf", ".ccd", ".d77", ".d88", ".hdm", ".xdf", ".img", ".m3u", ".zip"]
+            },
+            {
+              "name": "geartowns",
+              "incompatible": [".cmd", ".mds", ".mdf", ".ccd"]
             }
           ]
         },
@@ -227,13 +234,13 @@
             {
               "name": "tsugaru",
               "default": true,
-              "incompatible": [".cmd", ".chd"]
+              "incompatible": [".cmd", ".chd", ".img", ".m3u", ".zip"]
             }
           ]
         }
       ]
     },
-        {
+    {
       "name": "apple2",
       "fullname": "Apple 2",
       "manufacturer": "Apple",
