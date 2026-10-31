@@ -181,12 +181,14 @@ case ${PLATFORM} in
                 ;;
 		"atarijaguar")
                 if [ "${EMU}" = "bigpemu" ]; then
+				VIRTUAL_KB=$(emuelec-utils set_gptokeyb "bigpemu" "${GPTOKEYB}")
 				set_kill_keys "bigpemu"
 				RUNTHIS='${TBASH} bigpemustart.sh "${ROMNAME}"'
                 fi
                 ;;	
 		"atarijaguarcd")
                 if [ "${EMU}" = "bigpemu" ]; then
+				VIRTUAL_KB=$(emuelec-utils set_gptokeyb "bigpemu" "${GPTOKEYB}")
 				set_kill_keys "bigpemu"
 				RUNTHIS='${TBASH} bigpemustart.sh "${ROMNAME}"'
                 fi
