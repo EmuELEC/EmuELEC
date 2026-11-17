@@ -319,7 +319,7 @@ case ${PLATFORM} in
 				RUNTHIS='${TBASH} startopenmsx-ld.sh "${ROMNAME}"'
 				fi
 				;;
-        "daphne")
+        "daphne"|"actionmax"|"videodriver"|"captpower")
                 if [ "${EMU}" = "HYPSEUS" ]; then
             set_kill_keys "hypseus"
             RUNTHIS='${TBASH} hypseus.start.sh "${ROMNAME}"'

@@ -1227,6 +1227,79 @@
       ]
     },
     {
+      "name": "actionmax",
+      "fullname": "ActionMax",
+      "manufacturer": "Worlds of Wonder",
+      "release": "1987",
+      "hardware": "console",
+      "path": "/storage/roms/actionmax",
+      "platform": "actionmax",
+      "theme": "actionmax",
+      "command": "default",
+      "extensions": [
+        ".daphne"
+      ],
+      "emulators": [
+        {
+          "name": "HYPSEUS",
+          "cores": [
+            {
+              "name": "HYPSEUS",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "captpower",
+      "fullname": "Captain Power",
+      "manufacturer": "Mattel",
+      "release": "1987",
+      "hardware": "console",
+      "path": "/storage/roms/captpower",
+      "platform": "captpower",
+      "theme": "captpower",
+      "command": "default",
+      "extensions": [
+        ".daphne"
+      ],
+      "emulators": [
+        {
+          "name": "HYPSEUS",
+          "cores": [
+            {
+              "name": "HYPSEUS",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "videodriver",
+      "fullname": "Video Driver",
+      "hardware": "console",
+      "path": "/storage/roms/videodriver",
+      "platform": "videodriver",
+      "theme": "videodriver",
+      "command": "default",
+      "extensions": [
+        ".daphne"
+      ],
+      "emulators": [
+        {
+          "name": "HYPSEUS",
+          "cores": [
+            {
+              "name": "HYPSEUS",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "wii",
       "fullname": "Nintendo Wii",
       "manufacturer": "Nintendo",
@@ -3149,6 +3222,32 @@
             },
             {
               "name": "flycast_32b"
+            }
+          ]
+        }
+      ]
+    },
+	 {
+      "name": "model2",
+      "fullname": "Sega Model 2",
+      "manufacturer": "Sega",
+      "release": "1993",
+      "hardware": "arcade",
+      "path": "/storage/roms/model2",
+      "platform": "model2",
+      "theme": "model2",
+      "command": "default",
+      "extensions": [
+        ".7z",
+        ".zip"
+      ],
+      "emulators": [
+        {
+          "name": "libretro",
+          "cores": [
+            {
+              "name": "sm2",
+              "default": true
             }
           ]
         }
