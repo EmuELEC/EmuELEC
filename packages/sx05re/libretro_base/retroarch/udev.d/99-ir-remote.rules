@@ -1,0 +1,2 @@
+# EmuELEC has no Kodi: keep eventlircd from grabbing IR receivers so EmulationStation can read them
+SUBSYSTEM=="input", SUBSYSTEMS=="rc", ENV{eventlircd_enable}="false"
