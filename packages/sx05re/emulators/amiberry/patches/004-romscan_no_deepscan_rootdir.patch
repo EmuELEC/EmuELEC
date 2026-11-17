@@ -1,0 +1,15 @@
+diff --git a/src/osdep/amiberry_gui.cpp b/src/osdep/amiberry_gui.cpp
+--- a/src/osdep/amiberry_gui.cpp
++++ b/src/osdep/amiberry_gui.cpp
+@@ -551,7 +551,10 @@ static int scan_roms_3(UAEREG* fkey, TCHAR** paths, const TCHAR* path)
+ 	realpath(path, pathp);
+ 	if (!pathp[0])
+ 		return ret;
+-	if (_tcsicmp(pathp, get_rom_path().c_str()) == 0)
++	TCHAR rootp[MAX_DPATH];
++	rootp[0] = 0;
++	realpath(get_rom_path().c_str(), rootp);
++	if (rootp[0] && _tcsicmp(pathp, rootp) == 0)
+ 		deepscan = false; // do not scan root dir archives
+ 	for (i = 0; i < MAX_ROM_PATHS; i++) {
+ 		if (paths[i] && !_tcsicmp(paths[i], pathp))
